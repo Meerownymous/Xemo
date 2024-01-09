@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 25.0.1706.7
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XMEM", "XMEM\XMEM.csproj", "{3AE6F929-8C51-4211-A5B3-A078061685DF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3AE6F929-8C51-4211-A5B3-A078061685DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AE6F929-8C51-4211-A5B3-A078061685DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AE6F929-8C51-4211-A5B3-A078061685DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AE6F929-8C51-4211-A5B3-A078061685DF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B164C70C-A13F-4F98-BFD2-1809779064B5}
+	EndGlobalSection
+EndGlobal
