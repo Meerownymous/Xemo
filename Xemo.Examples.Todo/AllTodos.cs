@@ -3,13 +3,22 @@ using Xemo.Information;
 
 namespace Xemo.Examples.Todo
 {
+	/// <summary>
+	/// All todos which exist.
+	/// </summary>
 	public sealed class AllTodos : ClusterEnvelope
 	{
+        /// <summary>
+        /// All todos which exist.
+        /// </summary>
         public AllTodos(params IInformation[] todos) : this(
 			new List<IInformation>(todos)
 		)
 		{ }
 
+        /// <summary>
+        /// All todos which exist.
+        /// </summary>
         public AllTodos(IList<IInformation> todos) : base(
 			new RamCluster(
 				OriginInformation.From(

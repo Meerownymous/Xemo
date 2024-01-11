@@ -46,6 +46,7 @@ namespace Xemo.Examples.Todo
         [Fact]
         public void RejectsWrongDueDate()
         {
+            
             Assert.Throws<ArgumentException>(() =>
                 new AllTodos()
                     .Create(
