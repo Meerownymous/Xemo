@@ -35,6 +35,9 @@ namespace Xemo.Cluster
         public ICluster Create<TNew>(TNew input) =>
             this.core.Create(input);
 
+        public ICluster Remove<TMatch>(TMatch match, Func<TMatch,bool> matches) =>
+            this.core.Remove(match, matches);
+
         IEnumerator IEnumerable.GetEnumerator() =>
             this.core.GetEnumerator();
     }

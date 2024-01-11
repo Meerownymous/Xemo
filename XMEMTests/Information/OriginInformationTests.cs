@@ -10,7 +10,7 @@ namespace XemoTests.Information
 		public void RejectsWhenInformationMissing()
 		{
 			Assert.Throws<ArgumentException>(() =>
-				OriginInformation.Make(
+				OriginInformation.From(
 					new { Name = "", Success = false }
 				).Fill(
 					new { Name = "Fail please" }
@@ -22,7 +22,7 @@ namespace XemoTests.Information
         public void PassesWhenInformationSufficient()
         {
             Assert.True(
-                OriginInformation.Make(
+                OriginInformation.From(
                     new { Name = "", Success = false }
                 ).Fill(
                     new { Name = "Succeed please", Success = true }

@@ -40,6 +40,24 @@ namespace Xemo
                 );
         }
 
+        public ICluster Remove<TQuery>(TQuery blueprint, Func<TQuery, bool> matches)
+        {
+            var without =
+                new List<IInformation>(
+                    Filtered._(
+                        information => !matches(information.Fill(blueprint)),
+                        this.source
+                    )
+                );
+            without.Count();
+
+            foreach(var item in without)
+            {
+                this.source.Remove(item);
+            }
+            return this;
+        }
+
         public ICluster Create<TNew>(TNew input)
         {
             this.source.Add(

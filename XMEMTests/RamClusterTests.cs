@@ -14,7 +14,7 @@ namespace XemoTests
 				13,
 				First._(
 					new RamCluster(
-						OriginInformation.Make(new { }),
+						OriginInformation.From(new { }),
 						RamInformation.Of(new { Name = "Bob", Age = 49 }),
 						RamInformation.Of(new { Name = "Jay", Age = 13 })
 					).Reduced(new { Name = "" }, info => info.Name == "Jay")
@@ -33,7 +33,7 @@ namespace XemoTests
                 1,
                 First._(
                     new RamCluster(
-                        OriginInformation.Make(new { Name = "", Age = 0 })
+                        OriginInformation.From(new { Name = "", Age = 0 })
                     ).Create(
 						new { Name = "Dobert", Age = 1 }
 					)
@@ -47,14 +47,33 @@ namespace XemoTests
         }
 
         [Fact]
-        public void RejectsMissingInformation()
+        public void RejectsCreateOnMissingInformation()
         {
             Assert.Throws<ArgumentException>(() =>
                 new RamCluster(
-                    OriginInformation.Make(new { Name = "", Age = 0 })
+                    OriginInformation.From(new { Name = "", Age = 0 })
                 ).Create(
                     new { Name = "Dobert" }
                 )
+            );
+        }
+
+        [Fact]
+        public void Removes()
+        {
+            Assert.Equal(
+                1,
+                Length._(
+                    new RamCluster(
+                        OriginInformation.From(new { Name = "", Age = 0 }),
+                        RamInformation.Of(new { Name = "Bob", Age = 49 }),
+                        RamInformation.Of(new { Name = "Dobert", Age = 1 })
+                    ).Remove(
+                        new { Name = "" },
+                        u => u.Name == "Dobert"
+                    )
+                )
+                .Value()
             );
         }
     }

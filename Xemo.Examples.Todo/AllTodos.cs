@@ -12,8 +12,9 @@ namespace Xemo.Examples.Todo
 
         public AllTodos(IList<IInformation> todos) : base(
 			new RamCluster(
-				OriginInformation.Make(
-					new { Subject = "", Due = DateTime.MinValue }
+				OriginInformation.From(
+					new { Subject = "", Due = DateTime.MinValue },
+					creating => (creating.Due > DateTime.Now, "Due date must be in the future.")
 				),
 				todos
 			)
