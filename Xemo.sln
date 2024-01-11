@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 25.0.1706.7
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XMEM", "XMEM\XMEM.csproj", "{3AE6F929-8C51-4211-A5B3-A078061685DF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xemo", "XMEM\Xemo.csproj", "{3AE6F929-8C51-4211-A5B3-A078061685DF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XemoTests", "XMEMTests\XemoTests.csproj", "{D8FFF384-EBC0-4C0B-B46F-FA3D5BD4B958}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{3AE6F929-8C51-4211-A5B3-A078061685DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3AE6F929-8C51-4211-A5B3-A078061685DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3AE6F929-8C51-4211-A5B3-A078061685DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8FFF384-EBC0-4C0B-B46F-FA3D5BD4B958}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8FFF384-EBC0-4C0B-B46F-FA3D5BD4B958}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8FFF384-EBC0-4C0B-B46F-FA3D5BD4B958}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8FFF384-EBC0-4C0B-B46F-FA3D5BD4B958}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
