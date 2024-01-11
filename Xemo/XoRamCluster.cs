@@ -4,34 +4,34 @@ using Tonga.Collection;
 
 namespace Xemo
 {
-	public class RamCluster : ICluster
+	public sealed class XoRamCluster : IXemoCluster
 	{
-        private readonly IInformation originInformation;
-        private readonly IList<IInformation> source;
+        private readonly IXemo originInformation;
+        private readonly IList<IXemo> source;
 
-        public RamCluster(IInformation originInformation, params IInformation[] source) : this(
+        public XoRamCluster(IXemo originInformation, params IXemo[] source) : this(
             originInformation,
-            new List<IInformation>(source)
+            new List<IXemo>(source)
         )
         { }
 
-        public RamCluster(IInformation originInformation, IList<IInformation> source)
+        public XoRamCluster(IXemo originInformation, IList<IXemo> source)
 		{
             this.originInformation = originInformation;
             this.source = source;
         }
 
-        public IEnumerator<IInformation> GetEnumerator()
+        public IEnumerator<IXemo> GetEnumerator()
         {
             return this.source.GetEnumerator();
         }
 
-        public ICluster Reduced<TQuery>(TQuery blueprint, Func<TQuery, bool> matches)
+        public IXemoCluster Reduced<TQuery>(TQuery blueprint, Func<TQuery, bool> matches)
         {
             return
-                new RamCluster(
+                new XoRamCluster(
                     this.originInformation,
-                    new List<IInformation>(
+                    new List<IXemo>(
                         Filtered._(
                             information => matches(information.Fill(blueprint)),
                             this.source
@@ -40,10 +40,10 @@ namespace Xemo
                 );
         }
 
-        public ICluster Remove<TQuery>(TQuery blueprint, Func<TQuery, bool> matches)
+        public IXemoCluster Remove<TQuery>(TQuery blueprint, Func<TQuery, bool> matches)
         {
             var without =
-                new List<IInformation>(
+                new List<IXemo>(
                     Filtered._(
                         information => !matches(information.Fill(blueprint)),
                         this.source
@@ -58,12 +58,14 @@ namespace Xemo
             return this;
         }
 
-        public ICluster Create<TNew>(TNew input)
+        public IXemoCluster Create<TNew>(TNew input)
         {
             this.source.Add(
-                RamInformation.Of(this.originInformation.Fill(input))
+                new XoRam().Masked(
+                    this.originInformation.Fill(input)
+                )
             );
-            return new RamCluster(
+            return new XoRamCluster(
                 this.originInformation,
                 this.source
             );

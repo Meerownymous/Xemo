@@ -6,30 +6,32 @@ namespace Xemo.Examples.Todo
 	/// <summary>
 	/// 
 	/// </summary>
-	public sealed class Todo : InformationEnvelope
+	public sealed class Todo : XoEnvelope
 	{
-        public Todo(string subject) : this(
+        public Todo(string subject, IXemo memory) : this(
             new
             {
                 Done = false,
                 Created = DateTime.Now,
                 Subject = subject
-            }
+            },
+			memory
         )
         { }
 
-        public Todo() : this(
+        public Todo(IXemo memory) : this(
 			new
 			{
 				Done = false,
 				Created = DateTime.Now,
 				Subject = ""
-			}
+			},
+			memory
 		)
 		{ }
 
-		public Todo(object content) : base(
-			RamInformation.Of(content)
+		public Todo(object content, IXemo memory) : base(
+			() => memory.Masked(content)
 		)
 		{ }
 	}

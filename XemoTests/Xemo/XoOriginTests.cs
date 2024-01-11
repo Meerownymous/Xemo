@@ -1,16 +1,14 @@
-﻿using System;
-using Xemo.Information;
-using Xunit;
+﻿using Xunit;
 
-namespace XemoTests.Information
+namespace Xemo.Tests
 {
-	public sealed class OriginInformationTests
+	public sealed class XoOriginTests
 	{
 		[Fact]
 		public void RejectsWhenInformationMissing()
 		{
 			Assert.Throws<ArgumentException>(() =>
-				OriginInformation.From(
+				XoOrigin.From(
 					new { Name = "", Success = false }
 				).Fill(
 					new { Name = "Fail please" }
@@ -19,10 +17,23 @@ namespace XemoTests.Information
 		}
 
         [Fact]
+        public void PreservesAdditionalInformation()
+        {
+            Assert.Equal(
+                "Important",
+                XoOrigin.From(
+                    new { Name = "", Success = false }
+                ).Fill(
+                    new { Name = "Succeed please", Success = true, SomeThingElse = "Important" }
+                ).SomeThingElse
+            );
+        }
+
+        [Fact]
         public void PassesWhenInformationSufficient()
         {
             Assert.True(
-                OriginInformation.From(
+                XoOrigin.From(
                     new { Name = "", Success = false }
                 ).Fill(
                     new { Name = "Succeed please", Success = true }

@@ -5,7 +5,7 @@ using Xunit;
 
 namespace XemoTests
 {
-	public sealed class RamClusterTests
+	public sealed class XoRamClusterTests
 	{
 		[Fact]
 		public void ReducesByMatchFunction()
@@ -13,11 +13,14 @@ namespace XemoTests
 			Assert.Equal(
 				13,
 				First._(
-					new RamCluster(
-						OriginInformation.From(new { }),
-						RamInformation.Of(new { Name = "Bob", Age = 49 }),
-						RamInformation.Of(new { Name = "Jay", Age = 13 })
-					).Reduced(new { Name = "" }, info => info.Name == "Jay")
+					new XoRamCluster(
+						XoOrigin.From(new { }),
+						new XoRam().Masked(new { Name = "Bob", Age = 49 }),
+						new XoRam().Masked(new { Name = "Jay", Age = 13 })
+					).Reduced(
+                        new { Name = "" },
+                        info => info.Name == "Jay"
+                    )
 				)
 				.Value()
 				.Fill(
@@ -32,8 +35,8 @@ namespace XemoTests
             Assert.Equal(
                 1,
                 First._(
-                    new RamCluster(
-                        OriginInformation.From(new { Name = "", Age = 0 })
+                    new XoRamCluster(
+                        XoOrigin.From(new { Name = "", Age = 0 })
                     ).Create(
 						new { Name = "Dobert", Age = 1 }
 					)
@@ -50,8 +53,8 @@ namespace XemoTests
         public void RejectsCreateOnMissingInformation()
         {
             Assert.Throws<ArgumentException>(() =>
-                new RamCluster(
-                    OriginInformation.From(new { Name = "", Age = 0 })
+                new XoRamCluster(
+                    XoOrigin.From(new { Name = "", Age = 0 })
                 ).Create(
                     new { Name = "Dobert" }
                 )
@@ -64,10 +67,10 @@ namespace XemoTests
             Assert.Equal(
                 1,
                 Length._(
-                    new RamCluster(
-                        OriginInformation.From(new { Name = "", Age = 0 }),
-                        RamInformation.Of(new { Name = "Bob", Age = 49 }),
-                        RamInformation.Of(new { Name = "Dobert", Age = 1 })
+                    new XoRamCluster(
+                        XoOrigin.From(new { Name = "", Age = 0 }),
+                        new XoRam().Masked(new { Name = "Bob", Age = 49 }),
+                        new XoRam().Masked(new { Name = "Dobert", Age = 1 })
                     ).Remove(
                         new { Name = "" },
                         u => u.Name == "Dobert"

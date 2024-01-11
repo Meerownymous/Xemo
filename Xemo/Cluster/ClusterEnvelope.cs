@@ -6,14 +6,14 @@ namespace Xemo.Cluster
     /// <summary>
     /// Envelope for clusters.
     /// </summary>
-	public abstract class ClusterEnvelope : ICluster
+	public abstract class ClusterEnvelope : IXemoCluster
 	{
-        private readonly ICluster core;
+        private readonly IXemoCluster core;
 
         /// <summary>
         /// Envelope for clusters.
         /// </summary>
-        public ClusterEnvelope(Func<ICluster> core) : this(
+        public ClusterEnvelope(Func<IXemoCluster> core) : this(
             new LazyCluster(core)
         )
         { }
@@ -21,21 +21,21 @@ namespace Xemo.Cluster
         /// <summary>
         /// Envelope for clusters.
         /// </summary>
-        public ClusterEnvelope(ICluster core)
+        public ClusterEnvelope(IXemoCluster core)
 		{
             this.core = core;
         }
 
-        public IEnumerator<IInformation> GetEnumerator() =>
+        public IEnumerator<IXemo> GetEnumerator() =>
             this.core.GetEnumerator();
 
-        public ICluster Reduced<TQuery>(TQuery blueprint, Func<TQuery, bool> matches) =>
+        public IXemoCluster Reduced<TQuery>(TQuery blueprint, Func<TQuery, bool> matches) =>
             this.core.Reduced(blueprint, matches);
 
-        public ICluster Create<TNew>(TNew input) =>
+        public IXemoCluster Create<TNew>(TNew input) =>
             this.core.Create(input);
 
-        public ICluster Remove<TMatch>(TMatch match, Func<TMatch,bool> matches) =>
+        public IXemoCluster Remove<TMatch>(TMatch match, Func<TMatch,bool> matches) =>
             this.core.Remove(match, matches);
 
         IEnumerator IEnumerable.GetEnumerator() =>

@@ -1,12 +1,12 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Xemo.Information
+namespace Xemo
 {
     /// <summary>
     /// Information that ensures it is being filled with all necessary data.
     /// </summary>
-    public sealed class OriginInformation<TMinimum> : IInformation
+    public sealed class XoOrigin<TMinimum> : IXemo
     {
         private readonly TMinimum minimum;
         private readonly Func<TMinimum, (bool,string)>[] validations;
@@ -14,7 +14,7 @@ namespace Xemo.Information
         /// <summary>
         /// Information that ensures it is being filled with all necessary data.
         /// </summary>
-        public OriginInformation(TMinimum minimum, params Func<TMinimum, (bool, string)>[] valid)
+        public XoOrigin(TMinimum minimum, params Func<TMinimum, (bool, string)>[] valid)
         {
             this.minimum = minimum;
             this.validations = valid;
@@ -32,12 +32,26 @@ namespace Xemo.Information
             return wanted;
         }
 
-        public IInformation Mutate<TSlice>(TSlice mutation)
+        public IXemo Mutate<TSlice>(TSlice mutation)
         {
             throw new InvalidOperationException("Origin information cannot be modified.");
         }
 
-        private void Investigate<TNeeds, TPiece>(TNeeds needs, TPiece piece)
+        public IXemo Masked<TSlice>(TSlice mutation)
+        {
+            throw new InvalidOperationException("Origin information cannot be masked.");
+        }
+
+        private TMinimum Casted<TCandidate>(TCandidate candidate)
+        {
+            return
+                JsonConvert.DeserializeAnonymousType(
+                    JsonConvert.SerializeObject(candidate).ToString(),
+                    this.minimum
+                );
+        }
+
+        private static void Investigate<TNeeds, TPiece>(TNeeds needs, TPiece piece)
         {
             Investigate(
                 JObject.Parse(
@@ -49,7 +63,7 @@ namespace Xemo.Information
             );
         }
 
-        private void Investigate(JObject needs, JObject piece)
+        private static void Investigate(JObject needs, JObject piece)
         {
             foreach (var token in needs)
             {
@@ -61,26 +75,17 @@ namespace Xemo.Information
                     Investigate(token.Value, piece[token.Key]);
             }
         }
-
-        private TMinimum Casted<TCandidate>(TCandidate candidate)
-        {
-            return
-                JsonConvert.DeserializeAnonymousType(
-                    JsonConvert.SerializeObject(candidate).ToString(),
-                    this.minimum
-                );
-        }
     }
 
     /// <summary>
     /// Information that ensures it is being filled with all necessary data.
     /// </summary>
-    public static class OriginInformation
+    public static class XoOrigin
     {
         /// <summary>
         /// Information that ensures it is being filled with all necessary data.
         /// </summary>
-        public static OriginInformation<TMinimum> From<TMinimum>(TMinimum minimum, params Func<TMinimum, (bool,string)>[] isValid) =>
-            new OriginInformation<TMinimum>(minimum, isValid);
+        public static XoOrigin<TMinimum> From<TMinimum>(TMinimum minimum, params Func<TMinimum, (bool,string)>[] isValid) =>
+            new XoOrigin<TMinimum>(minimum, isValid);
     }
 }

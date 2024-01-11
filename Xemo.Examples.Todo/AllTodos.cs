@@ -11,17 +11,17 @@ namespace Xemo.Examples.Todo
         /// <summary>
         /// All todos which exist.
         /// </summary>
-        public AllTodos(params IInformation[] todos) : this(
-			new List<IInformation>(todos)
+        public AllTodos(params IXemo[] todos) : this(
+			new List<IXemo>(todos)
 		)
 		{ }
 
         /// <summary>
         /// All todos which exist.
         /// </summary>
-        public AllTodos(IList<IInformation> todos) : base(
-			new RamCluster(
-				OriginInformation.From(
+        public AllTodos(IList<IXemo> todos) : base(
+			new XoRamCluster(
+				XoOrigin.From(
 					new { Subject = "", Due = DateTime.MinValue },
 					creating => (creating.Due > DateTime.Now, "Due date must be in the future.")
 				),

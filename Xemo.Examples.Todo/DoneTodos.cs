@@ -11,7 +11,7 @@ namespace Xemo.Examples.Todo
         /// <summary>
         /// Todos which are done.
         /// </summary>
-        public DoneTodos(ICluster all) : base(() =>
+        public DoneTodos(IXemoCluster all) : base(() =>
 			all.Reduced(new { Done = false }, todo => todo.Done)
 		)
 		{ }

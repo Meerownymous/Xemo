@@ -1,36 +1,65 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Tonga.Enumerable;
+using Xemo.Information;
 
 namespace Xemo
 {
     /// <summary>
     /// Information stored in RAM.
     /// </summary>
-    public sealed class RamInformation<TContent> : IInformation
+    public sealed class XoRam : XoEnvelope
+    {
+        public XoRam() : base(
+            new XoRam<object>()
+        )
+        { }
+    }
+
+    /// <summary>
+    /// Information stored in RAM.
+    /// </summary>
+    public sealed class XoRam<TContent> : IXemo
     {
         private readonly IList<TContent> state;
+        private readonly bool masked = false;
 
         /// <summary>
         /// Information stored in RAM.
         /// </summary>
-        public RamInformation(TContent blueprint)
+        public XoRam() : this(default(TContent), false)
+        { }
+
+        /// <summary>
+        /// Information stored in RAM.
+        /// </summary>
+        private XoRam(TContent blueprint, bool masked)
         {
             this.state = new List<TContent>(AsEnumerable._(blueprint));
+            this.masked = masked;
         }
 
         public TSlice Fill<TSlice>(TSlice wanted)
         {
+            if (!this.masked)
+                throw new InvalidOperationException("Cannot fill objects before this information has been masked.");
             return Merged(wanted, state.Last());
         }
 
-        public IInformation Mutate<TSlice>(TSlice mutation)
+        public IXemo Masked<TMask>(TMask mask)
+        {
+            if (this.state.Count() > 1)
+                throw new InvalidOperationException("Masking must happen before first mutation.");
+            return new XoRam<TMask>(mask, true);
+        }
+
+        public IXemo Mutate<TSlice>(TSlice mutation)
         {
             this.state.Add(Merged(this.state.Last(), mutation));
             return this;
         }
 
-        private TTarget Merged<TTarget,TSource>(TTarget main, TSource patch)
+        private static TTarget Merged<TTarget,TSource>(TTarget main, TSource patch)
         {
             return JsonConvert.DeserializeAnonymousType(
                 Merged(
@@ -49,13 +78,13 @@ namespace Xemo
             );
         }
 
-        private JObject Merged(JObject main, JObject mutation)
+        private static JObject Merged(JObject main, JObject mutation)
         {
             Merge(main, mutation);
             return main;
         }
 
-        private void Merge(JObject main, JObject mutation)
+        private static void Merge(JObject main, JObject mutation)
         {
             foreach (var token in main)
             {
@@ -75,11 +104,5 @@ namespace Xemo
                 }
             }
         }
-    }
-
-    public static class RamInformation
-    {
-        public static RamInformation<TContent> Of<TContent>(TContent content) =>
-            new RamInformation<TContent>(content);
     }
 }

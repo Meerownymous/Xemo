@@ -6,28 +6,28 @@ namespace Xemo.Cluster
     /// <summary>
     /// Cluster which is lazyliy initialized.
     /// </summary>
-	public sealed class LazyCluster : ICluster
+	public sealed class LazyCluster : IXemoCluster
 	{
-        private readonly Lazy<ICluster> origin;
+        private readonly Lazy<IXemoCluster> origin;
 
         /// <summary>
         /// Cluster which is lazyliy initialized.
         /// </summary>
-        public LazyCluster(Func<ICluster> origin)
+        public LazyCluster(Func<IXemoCluster> origin)
 		{
-            this.origin = new Lazy<ICluster>(origin);
+            this.origin = new Lazy<IXemoCluster>(origin);
 		}
 
-        public IEnumerator<IInformation> GetEnumerator() =>
+        public IEnumerator<IXemo> GetEnumerator() =>
             this.origin.Value.GetEnumerator();
 
-        public ICluster Reduced<TQuery>(TQuery blueprint, Func<TQuery, bool> matches) =>
+        public IXemoCluster Reduced<TQuery>(TQuery blueprint, Func<TQuery, bool> matches) =>
             this.origin.Value.Reduced(blueprint, matches);
 
-        public ICluster Create<TNew>(TNew input) =>
+        public IXemoCluster Create<TNew>(TNew input) =>
             this.origin.Value.Create(input);
 
-        public ICluster Remove<TMatch>(TMatch match, Func<TMatch,bool> matches) =>
+        public IXemoCluster Remove<TMatch>(TMatch match, Func<TMatch,bool> matches) =>
             this.origin.Value.Remove(match, matches);
 
         IEnumerator IEnumerable.GetEnumerator() =>

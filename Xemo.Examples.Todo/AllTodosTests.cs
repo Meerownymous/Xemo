@@ -13,7 +13,7 @@ namespace Xemo.Examples.Todo
                 "List me",
                 First._(
                     new AllTodos(
-                        new Todo("List me")
+                        new Todo("List me", new XoRam())
                     )
                 )
                 .Value()
@@ -46,7 +46,7 @@ namespace Xemo.Examples.Todo
         [Fact]
         public void RejectsWrongDueDate()
         {
-            
+
             Assert.Throws<ArgumentException>(() =>
                 new AllTodos()
                     .Create(
