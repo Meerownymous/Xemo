@@ -25,12 +25,12 @@
     <PackageReference Include="Snapshooter.Xunit" Version="0.13.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\XMEM\Xemo.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <None Remove="Information\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Information\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Xemo\Xemo.csproj" />
   </ItemGroup>
 </Project>
