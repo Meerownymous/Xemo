@@ -2,7 +2,6 @@
 using Newtonsoft.Json.Linq;
 using Tonga.Enumerable;
 using Xemo;
-using Xemo.Mutation;
 using Xunit;
 
 namespace XemoTests
@@ -75,7 +74,6 @@ namespace XemoTests
 						new {
 							Name = "Right",
 							Something = "Bla",
-							SomethingElse = new Remove(),
 							Address = new
 							{
 								City = "Helsinki"
@@ -85,8 +83,7 @@ namespace XemoTests
 									initial.NickNames,
 									new[] { "Your Honor", "Obj Simpson"}
 								).ToArray()
-						},
-						new Remove().Converter()
+						}
 					)
 				);
 
