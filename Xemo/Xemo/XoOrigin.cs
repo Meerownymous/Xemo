@@ -37,7 +37,7 @@ namespace Xemo
             throw new InvalidOperationException("Origin information cannot be modified.");
         }
 
-        public IXemo Masked<TSlice>(TSlice mutation)
+        public IXemo Launch<TSlice>(TSlice mutation)
         {
             throw new InvalidOperationException("Origin information cannot be masked.");
         }

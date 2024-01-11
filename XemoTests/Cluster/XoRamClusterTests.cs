@@ -1,6 +1,5 @@
 ﻿using Tonga.Scalar;
 using Xemo;
-using Xemo.Information;
 using Xunit;
 
 namespace XemoTests
@@ -15,8 +14,8 @@ namespace XemoTests
 				First._(
 					new XoRamCluster(
 						XoOrigin.From(new { }),
-						new XoRam().Masked(new { Name = "Bob", Age = 49 }),
-						new XoRam().Masked(new { Name = "Jay", Age = 13 })
+						new XoRam().Launch(new { Name = "Bob", Age = 49 }),
+						new XoRam().Launch(new { Name = "Jay", Age = 13 })
 					).Reduced(
                         new { Name = "" },
                         info => info.Name == "Jay"
@@ -69,8 +68,8 @@ namespace XemoTests
                 Length._(
                     new XoRamCluster(
                         XoOrigin.From(new { Name = "", Age = 0 }),
-                        new XoRam().Masked(new { Name = "Bob", Age = 49 }),
-                        new XoRam().Masked(new { Name = "Dobert", Age = 1 })
+                        new XoRam().Launch(new { Name = "Bob", Age = 49 }),
+                        new XoRam().Launch(new { Name = "Dobert", Age = 1 })
                     ).Remove(
                         new { Name = "" },
                         u => u.Name == "Dobert"

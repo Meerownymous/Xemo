@@ -29,8 +29,8 @@
         public IXemo Mutate<TSlice>(TSlice mutation) =>
             this.core.Mutate(mutation);
 
-        public IXemo Masked<TMask>(TMask mask) =>
-            this.core.Masked(mask);
+        public IXemo Launch<TMask>(TMask mask) =>
+            this.core.Launch(mask);
     }
 }
 

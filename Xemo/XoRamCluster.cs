@@ -61,7 +61,7 @@ namespace Xemo
         public IXemoCluster Create<TNew>(TNew input)
         {
             this.source.Add(
-                new XoRam().Masked(
+                new XoRam().Launch(
                     this.originInformation.Fill(input)
                 )
             );

@@ -46,7 +46,7 @@ namespace Xemo
             return Merged(wanted, state.Last());
         }
 
-        public IXemo Masked<TMask>(TMask mask)
+        public IXemo Launch<TMask>(TMask mask)
         {
             if (this.state.Count() > 1)
                 throw new InvalidOperationException("Masking must happen before first mutation.");
