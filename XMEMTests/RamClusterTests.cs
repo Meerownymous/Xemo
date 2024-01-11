@@ -4,7 +4,7 @@ using Xunit;
 
 namespace XemoTests
 {
-	public sealed class ClusterTests
+	public sealed class RamClusterTests
 	{
 		[Fact]
 		public void ReducesByMatchFunction()

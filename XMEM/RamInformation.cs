@@ -24,9 +24,10 @@ namespace Xemo
             return Merged(wanted, state.Last());
         }
 
-        public void Mutate<TSlice>(TSlice mutation)
+        public IInformation Mutate<TSlice>(TSlice mutation)
         {
             this.state.Add(Merged(this.state.Last(), mutation));
+            return this;
         }
 
         private TTarget Merged<TTarget,TSource>(TTarget main, TSource patch)

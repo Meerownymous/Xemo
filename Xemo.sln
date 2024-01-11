@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xemo", "XMEM\Xemo.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XemoTests", "XMEMTests\XemoTests.csproj", "{D8FFF384-EBC0-4C0B-B46F-FA3D5BD4B958}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xemo.Examples.Todo", "Xemo.Examples.Todo\Xemo.Examples.Todo.csproj", "{69DCA5CC-281F-4A76-9694-A95035C1F202}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{D8FFF384-EBC0-4C0B-B46F-FA3D5BD4B958}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8FFF384-EBC0-4C0B-B46F-FA3D5BD4B958}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8FFF384-EBC0-4C0B-B46F-FA3D5BD4B958}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69DCA5CC-281F-4A76-9694-A95035C1F202}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69DCA5CC-281F-4A76-9694-A95035C1F202}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69DCA5CC-281F-4A76-9694-A95035C1F202}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69DCA5CC-281F-4A76-9694-A95035C1F202}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

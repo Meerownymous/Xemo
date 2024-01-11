@@ -4,7 +4,7 @@ namespace Xemo
 	public interface IInformation
 	{
 		TSlice Fill<TSlice>(TSlice wanted);
-		void Mutate<TSlice>(TSlice mutation);
+		IInformation Mutate<TSlice>(TSlice mutation);
 	}
 }
 
