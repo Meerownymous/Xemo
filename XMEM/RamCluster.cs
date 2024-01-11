@@ -6,15 +6,18 @@ namespace Xemo
 {
 	public class RamCluster : ICluster
 	{
+        private readonly IInformation originInformation;
         private readonly IList<IInformation> source;
 
-        public RamCluster(params IInformation[] source) : this(
+        public RamCluster(IInformation originInformation, params IInformation[] source) : this(
+            originInformation,
             new List<IInformation>(source)
         )
         { }
 
-        public RamCluster(IList<IInformation> source)
+        public RamCluster(IInformation originInformation, IList<IInformation> source)
 		{
+            this.originInformation = originInformation;
             this.source = source;
         }
 
@@ -25,13 +28,26 @@ namespace Xemo
 
         public ICluster Reduced<TQuery>(TQuery blueprint, Func<TQuery, bool> matches)
         {
-            return new RamCluster(
-                new List<IInformation>(
-                    Filtered._(
-                        information => matches(information.Fill(blueprint)),
-                        this.source
+            return
+                new RamCluster(
+                    this.originInformation,
+                    new List<IInformation>(
+                        Filtered._(
+                            information => matches(information.Fill(blueprint)),
+                            this.source
+                        )
                     )
-                )
+                );
+        }
+
+        public ICluster Create<TNew>(TNew input)
+        {
+            this.source.Add(
+                RamInformation.Of(this.originInformation.Fill(input))
+            );
+            return new RamCluster(
+                this.originInformation,
+                this.source
             );
         }
 

@@ -1,5 +1,5 @@
-﻿using System;
-using Xemo.Cluster;
+﻿using Xemo.Cluster;
+using Xemo.Information;
 
 namespace Xemo.Examples.Todo
 {
@@ -11,7 +11,12 @@ namespace Xemo.Examples.Todo
 		{ }
 
         public AllTodos(IList<IInformation> todos) : base(
-			new RamCluster(todos)
+			new RamCluster(
+				OriginInformation.Make(
+					new { Subject = "", Due = DateTime.MinValue }
+				),
+				todos
+			)
 		)
 		{ }
 	}

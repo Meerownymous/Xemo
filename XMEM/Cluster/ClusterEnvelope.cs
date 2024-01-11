@@ -32,6 +32,9 @@ namespace Xemo.Cluster
         public ICluster Reduced<TQuery>(TQuery blueprint, Func<TQuery, bool> matches) =>
             this.core.Reduced(blueprint, matches);
 
+        public ICluster Create<TNew>(TNew input) =>
+            this.core.Create(input);
+
         IEnumerator IEnumerable.GetEnumerator() =>
             this.core.GetEnumerator();
     }
