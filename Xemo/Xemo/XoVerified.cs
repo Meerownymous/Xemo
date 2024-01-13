@@ -6,15 +6,15 @@ namespace Xemo
     /// <summary>
     /// Information that ensures it is being filled with all necessary data.
     /// </summary>
-    public sealed class XoVerify<TMinimum> : IXemo
+    public sealed class XoVerified<TInvestigate> : IXemo
     {
-        private readonly TMinimum minimum;
-        private readonly Func<TMinimum, (bool,string)>[] validations;
+        private readonly TInvestigate minimum;
+        private readonly Func<TInvestigate, (bool, string)>[] validations;
 
         /// <summary>
         /// Information that ensures it is being filled with all necessary data.
         /// </summary>
-        public XoVerify(TMinimum minimum, params Func<TMinimum, (bool, string)>[] valid)
+        public XoVerified(TInvestigate minimum, params Func<TInvestigate, (bool, string)>[] valid)
         {
             this.minimum = minimum;
             this.validations = valid;
@@ -23,12 +23,12 @@ namespace Xemo
         public TSlice Fill<TSlice>(TSlice wanted)
         {
             Investigate(this.minimum, wanted);
-            foreach(var isValid in this.validations)
+            foreach (var isValid in this.validations)
             {
                 var result = isValid(Casted(wanted));
-                if(!result.Item1)
+                if (!result.Item1)
                     throw new ArgumentException($"Validation failed for '{wanted}': {result.Item2}.");
-            }   
+            }
             return wanted;
         }
 
@@ -37,12 +37,12 @@ namespace Xemo
             throw new InvalidOperationException("Origin information cannot be modified.");
         }
 
-        public IXemo Spawn<TSlice>(TSlice mutation)
+        public IXemo Start<TSlice>(TSlice mutation)
         {
             throw new InvalidOperationException("Origin information cannot be masked.");
         }
 
-        private TMinimum Casted<TCandidate>(TCandidate candidate)
+        private TInvestigate Casted<TCandidate>(TCandidate candidate)
         {
             return
                 JsonConvert.DeserializeAnonymousType(
@@ -80,12 +80,15 @@ namespace Xemo
     /// <summary>
     /// Information that ensures it is being filled with all necessary data.
     /// </summary>
-    public static class XoVerify
+    public static class XoVerified
     {
         /// <summary>
         /// Information that ensures it is being filled with all necessary data.
         /// </summary>
-        public static XoVerify<TMinimum> By<TMinimum>(TMinimum minimum, params Func<TMinimum, (bool,string)>[] isValid) =>
-            new XoVerify<TMinimum>(minimum, isValid);
+        public static XoVerified<TMinimum> By<TMinimum>(
+            TMinimum minimum,
+            params Func<TMinimum, (bool, string)>[] isValid
+        ) =>
+            new XoVerified<TMinimum>(minimum, isValid);
     }
 }

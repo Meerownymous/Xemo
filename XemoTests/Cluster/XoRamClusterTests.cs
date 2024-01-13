@@ -13,7 +13,7 @@ namespace XemoTests
 				13,
 				First._(
 					new XoRamCluster(
-						XoVerify.By(new { }),
+						XoSpawn.Seed(new { }),
 						new { Name = "Bob", Age = 49 },
 						new { Name = "Jay", Age = 13 }
 					).Reduced(
@@ -35,7 +35,7 @@ namespace XemoTests
                 1,
                 First._(
                     new XoRamCluster(
-                        XoVerify.By(new { Name = "", Age = 0 })
+                        XoSpawn.Seed(new { Name = "", Age = 0 })
                     ).Create(
 						new { Name = "Dobert", Age = 1 }
 					)
@@ -53,7 +53,7 @@ namespace XemoTests
         {
             Assert.Throws<ArgumentException>(() =>
                 new XoRamCluster(
-                    XoVerify.By(new { Name = "", Age = 0 })
+                    XoSpawn.Seed(new { Name = "", Age = 0 })
                 ).Create(
                     new { Name = "Dobert" }
                 )
@@ -67,7 +67,7 @@ namespace XemoTests
                 1,
                 Length._(
                     new XoRamCluster(
-                        XoVerify.By(new { Name = "", Age = 0 }),
+                        XoSpawn.Seed(new { Name = "", Age = 0 }),
                         new { Name = "Bob", Age = 49 },
                         new { Name = "Dobert", Age = 1 }
                     ).Remove(

@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Tonga.Enumerable;
 using Xemo.Information;
 
 namespace Xemo
@@ -46,7 +45,7 @@ namespace Xemo
             return Merged(wanted, state.Last());
         }
 
-        public IXemo Spawn<TMask>(TMask mask)
+        public IXemo Start<TMask>(TMask mask)
         {
             if (this.state.Count() > 1)
                 throw new InvalidOperationException("Masking must happen before first mutation.");

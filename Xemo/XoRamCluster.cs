@@ -19,7 +19,7 @@ namespace Xemo
             originInformation,
             new List<IXemo>(
                 Tonga.Enumerable.Mapped._(
-                    c => new XoRam().Spawn(c),
+                    c => new XoRam().Start(c),
                     content
                 )
             )
@@ -72,7 +72,7 @@ namespace Xemo
         public IXemoCluster Create<TNew>(TNew input)
         {
             this.content.Add(
-                new XoRam().Spawn(
+                new XoRam().Start(
                     this.originInformation.Fill(input)
                 )
             );
