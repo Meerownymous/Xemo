@@ -47,7 +47,7 @@ namespace Xemo
 
         public IXemo Start<TMask>(TMask mask)
         {
-            if (this.state.Count() > 1)
+            if (!this.masked)
                 throw new InvalidOperationException("Masking must happen before first mutation.");
             return new XoRam<TMask>(mask, true);
         }

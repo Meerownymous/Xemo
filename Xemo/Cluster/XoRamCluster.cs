@@ -6,17 +6,14 @@ namespace Xemo
 {
 	public sealed class XoRamCluster : IXemoCluster
 	{
-        private readonly IXemo originInformation;
         private readonly IList<IXemo> content;
 
-        public XoRamCluster(IXemo originInformation, params object[] source) : this(
-            originInformation,
+        public XoRamCluster(params object[] source) : this(
             new List<object> (source)
         )
         { }
 
-        public XoRamCluster(IXemo originInformation, IList<object> content) : this(
-            originInformation,
+        public XoRamCluster(IList<object> content) : this(
             new List<IXemo>(
                 Tonga.Enumerable.Mapped._(
                     c => new XoRam().Start(c),
@@ -26,9 +23,8 @@ namespace Xemo
         )
         { }
 
-        public XoRamCluster(IXemo originInformation, IList<IXemo> content)
+        public XoRamCluster(IList<IXemo> content)
         {
-            this.originInformation = originInformation;
             this.content = content;
         }
 
@@ -41,7 +37,6 @@ namespace Xemo
         {
             return
                 new XoRamCluster(
-                    this.originInformation,
                     new List<IXemo>(
                         Filtered._(
                             xemo => matches(xemo.Fill(blueprint)),
@@ -71,13 +66,8 @@ namespace Xemo
 
         public IXemoCluster Create<TNew>(TNew input)
         {
-            this.content.Add(
-                new XoRam().Start(
-                    this.originInformation.Fill(input)
-                )
-            );
+            this.content.Add(new XoRam().Start(input));
             return new XoRamCluster(
-                this.originInformation,
                 this.content
             );
         }

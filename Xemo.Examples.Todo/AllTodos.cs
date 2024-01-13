@@ -20,13 +20,12 @@ namespace Xemo.Examples.Todo
         /// All todos which exist.
         /// </summary>
         public AllTodos(IList<IXemo> todos) : base(
-			new XoRamCluster(
-				XoVerified.By(
-					XoSpawn.Seed(
-						new { Subject = "", Due = DateTime.MinValue }
-					)
-				),
-				todos
+            new XoSpawnCluster(
+                XoSpawn.Seed(
+                    new { Subject = "", Due = DateTime.MinValue },
+                    newTodo => (newTodo.Due > DateTime.Now, "Due date must be in the future")
+                ),
+				new XoRamCluster(todos)
 			)
 		)
 		{ }
