@@ -21,6 +21,11 @@ namespace Xemo.Xemo
         private readonly bool masked;
         private readonly IList<TContent> state;
 
+        public XoFile(FileInfo memory, bool masked = false) : this(
+            memory, new List<TContent>(), masked
+        )
+        { }
+
         public XoFile(FileInfo memory, IList<TContent> state, bool masked = false)
         {
             this.memory = memory;
@@ -47,7 +52,7 @@ namespace Xemo.Xemo
                 if (!this.masked)
                     throw new InvalidOperationException("Masking must happen before first mutation.");
                 using (var content = this.FileContent())
-                using(var writer = new StreamWriter(content))
+                using (var writer = new StreamWriter(content))
                 {
                     var oldState = this.state[0];
                     this.state.Clear();
@@ -60,10 +65,10 @@ namespace Xemo.Xemo
             return this;
         }
 
-        public IXemo Start<TMask>(TMask mask)
+        public IXemo Kick<TMask>(TMask mask)
         {
             using (var content = this.FileContent())
-            {   
+            {
                 return
                     new XoFile<TMask>(
                         this.memory,
@@ -136,5 +141,7 @@ namespace Xemo.Xemo
             }
         }
     }
-}
+
+
+    }
 

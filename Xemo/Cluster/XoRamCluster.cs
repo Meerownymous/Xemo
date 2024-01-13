@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using Tonga.Collection;
+using Xemo.Cluster;
 
 namespace Xemo
 {
@@ -16,7 +17,7 @@ namespace Xemo
         public XoRamCluster(IList<object> content) : this(
             new List<IXemo>(
                 Tonga.Enumerable.Mapped._(
-                    c => new XoRam().Start(c),
+                    c => new XoRam().Kick(c),
                     content
                 )
             )
@@ -33,18 +34,8 @@ namespace Xemo
             return this.content.GetEnumerator();
         }
 
-        public IXemoCluster Reduced<TQuery>(TQuery blueprint, Func<TQuery, bool> matches)
-        {
-            return
-                new XoRamCluster(
-                    new List<IXemo>(
-                        Filtered._(
-                            xemo => matches(xemo.Fill(blueprint)),
-                            this.content
-                        )
-                    )
-                );
-        }
+        public IXemoCluster Reduced<TQuery>(TQuery blueprint, Func<TQuery, bool> matches) =>
+            new XoFiltered<TQuery>(this, blueprint, matches);
 
         public IXemoCluster Remove<TQuery>(TQuery blueprint, Func<TQuery, bool> matches)
         {
@@ -66,7 +57,7 @@ namespace Xemo
 
         public IXemoCluster Create<TNew>(TNew input)
         {
-            this.content.Add(new XoRam().Start(input));
+            this.content.Add(new XoRam().Kick(input));
             return new XoRamCluster(
                 this.content
             );

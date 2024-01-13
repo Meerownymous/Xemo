@@ -14,7 +14,7 @@ namespace XemoTests.Xemo
                 new XoFile(
                     new FileInfo(file.Value())
                 )
-                .Start(new { ID = 0, Name = "" })
+                .Kick(new { ID = 0, Name = "" })
                 .Mutate(new { ID = 1, Name = "Persistino" });
 
                 Assert.Equal(
@@ -22,12 +22,27 @@ namespace XemoTests.Xemo
                     new XoFile(
                         new FileInfo(file.Value())
                     )
-                    .Start(new { ID = 0, Name = "" })
+                    .Kick(new { ID = 0, Name = "" })
                     .Fill(new { ID = 0, Name = "" })
                     .Name
                 );
             }
         }
+
+        [Fact]
+        public void MaskingCreatesNoContent()
+        {
+            using (var file = new TempFile())
+            {
+                new XoFile(
+                    new FileInfo(file.Value())
+                )
+                .Kick(new { ID = 0, Name = "" });
+
+                Assert.Empty(
+                    File.ReadAllText(file.Value())
+                );
+            }
+        }
     }
 }
-

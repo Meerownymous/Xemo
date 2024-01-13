@@ -45,10 +45,10 @@ namespace Xemo
             return Merged(wanted, state.Last());
         }
 
-        public IXemo Start<TMask>(TMask mask)
+        public IXemo Kick<TMask>(TMask mask)
         {
-            if (!this.masked)
-                throw new InvalidOperationException("Masking must happen before first mutation.");
+            if (this.masked)
+                throw new InvalidOperationException("Masking has already been done.");
             return new XoRam<TMask>(mask, true);
         }
 

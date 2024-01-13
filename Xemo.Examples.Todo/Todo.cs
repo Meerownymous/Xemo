@@ -31,7 +31,7 @@ namespace Xemo.Examples.Todo
 		{ }
 
 		public Todo(object content, IXemo memory) : base(
-			() => memory.Start(content)
+			() => memory.Kick(content)
 		)
 		{ }
 	}
