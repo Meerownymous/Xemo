@@ -7,23 +7,34 @@ namespace Xemo
 	public sealed class XoRamCluster : IXemoCluster
 	{
         private readonly IXemo originInformation;
-        private readonly IList<IXemo> source;
+        private readonly IList<IXemo> content;
 
-        public XoRamCluster(IXemo originInformation, params IXemo[] source) : this(
+        public XoRamCluster(IXemo originInformation, params object[] source) : this(
             originInformation,
-            new List<IXemo>(source)
+            new List<object> (source)
         )
         { }
 
-        public XoRamCluster(IXemo originInformation, IList<IXemo> source)
-		{
+        public XoRamCluster(IXemo originInformation, IList<object> content) : this(
+            originInformation,
+            new List<IXemo>(
+                Tonga.Enumerable.Mapped._(
+                    c => new XoRam().Spawn(c),
+                    content
+                )
+            )
+        )
+        { }
+
+        public XoRamCluster(IXemo originInformation, IList<IXemo> content)
+        {
             this.originInformation = originInformation;
-            this.source = source;
+            this.content = content;
         }
 
         public IEnumerator<IXemo> GetEnumerator()
         {
-            return this.source.GetEnumerator();
+            return this.content.GetEnumerator();
         }
 
         public IXemoCluster Reduced<TQuery>(TQuery blueprint, Func<TQuery, bool> matches)
@@ -33,8 +44,8 @@ namespace Xemo
                     this.originInformation,
                     new List<IXemo>(
                         Filtered._(
-                            information => matches(information.Fill(blueprint)),
-                            this.source
+                            xemo => matches(xemo.Fill(blueprint)),
+                            this.content
                         )
                     )
                 );
@@ -46,28 +57,28 @@ namespace Xemo
                 new List<IXemo>(
                     Filtered._(
                         information => !matches(information.Fill(blueprint)),
-                        this.source
+                        this.content
                     )
                 );
             without.Count();
 
             foreach(var item in without)
             {
-                this.source.Remove(item);
+                this.content.Remove(item);
             }
             return this;
         }
 
         public IXemoCluster Create<TNew>(TNew input)
         {
-            this.source.Add(
-                new XoRam().Launch(
+            this.content.Add(
+                new XoRam().Spawn(
                     this.originInformation.Fill(input)
                 )
             );
             return new XoRamCluster(
                 this.originInformation,
-                this.source
+                this.content
             );
         }
 

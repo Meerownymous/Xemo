@@ -6,7 +6,7 @@ namespace Xemo
     /// <summary>
     /// Information that ensures it is being filled with all necessary data.
     /// </summary>
-    public sealed class XoOrigin<TMinimum> : IXemo
+    public sealed class XoVerify<TMinimum> : IXemo
     {
         private readonly TMinimum minimum;
         private readonly Func<TMinimum, (bool,string)>[] validations;
@@ -14,7 +14,7 @@ namespace Xemo
         /// <summary>
         /// Information that ensures it is being filled with all necessary data.
         /// </summary>
-        public XoOrigin(TMinimum minimum, params Func<TMinimum, (bool, string)>[] valid)
+        public XoVerify(TMinimum minimum, params Func<TMinimum, (bool, string)>[] valid)
         {
             this.minimum = minimum;
             this.validations = valid;
@@ -37,7 +37,7 @@ namespace Xemo
             throw new InvalidOperationException("Origin information cannot be modified.");
         }
 
-        public IXemo Launch<TSlice>(TSlice mutation)
+        public IXemo Spawn<TSlice>(TSlice mutation)
         {
             throw new InvalidOperationException("Origin information cannot be masked.");
         }
@@ -80,12 +80,12 @@ namespace Xemo
     /// <summary>
     /// Information that ensures it is being filled with all necessary data.
     /// </summary>
-    public static class XoOrigin
+    public static class XoVerify
     {
         /// <summary>
         /// Information that ensures it is being filled with all necessary data.
         /// </summary>
-        public static XoOrigin<TMinimum> From<TMinimum>(TMinimum minimum, params Func<TMinimum, (bool,string)>[] isValid) =>
-            new XoOrigin<TMinimum>(minimum, isValid);
+        public static XoVerify<TMinimum> By<TMinimum>(TMinimum minimum, params Func<TMinimum, (bool,string)>[] isValid) =>
+            new XoVerify<TMinimum>(minimum, isValid);
     }
 }

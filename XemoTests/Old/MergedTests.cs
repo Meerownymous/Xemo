@@ -13,7 +13,7 @@ namespace XemoTests
 		{
 			Assert.Equal(
 				"Ramirez",
-				new XoRam().Launch(
+				new XoRam().Spawn(
 					new
 					{
 						FirstName = "Ramirez",
@@ -32,7 +32,7 @@ namespace XemoTests
         public void MutatesInformation()
         {
 			var info =
-				new XoRam().Launch(
+				new XoRam().Spawn(
 					new
 					{
 						FirstName = "Ramirez",

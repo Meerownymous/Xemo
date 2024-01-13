@@ -8,7 +8,7 @@ namespace Xemo.Tests
 		public void RejectsWhenInformationMissing()
 		{
 			Assert.Throws<ArgumentException>(() =>
-				XoOrigin.From(
+				XoVerify.By(
 					new { Name = "", Success = false }
 				).Fill(
 					new { Name = "Fail please" }
@@ -21,7 +21,7 @@ namespace Xemo.Tests
         {
             Assert.Equal(
                 "Important",
-                XoOrigin.From(
+                XoVerify.By(
                     new { Name = "", Success = false }
                 ).Fill(
                     new { Name = "Succeed please", Success = true, SomeThingElse = "Important" }
@@ -33,7 +33,7 @@ namespace Xemo.Tests
         public void PassesWhenInformationSufficient()
         {
             Assert.True(
-                XoOrigin.From(
+                XoVerify.By(
                     new { Name = "", Success = false }
                 ).Fill(
                     new { Name = "Succeed please", Success = true }

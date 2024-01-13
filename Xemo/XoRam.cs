@@ -35,7 +35,7 @@ namespace Xemo
         /// </summary>
         private XoRam(TContent blueprint, bool masked)
         {
-            this.state = new List<TContent>(AsEnumerable._(blueprint));
+            this.state = new List<TContent>() { blueprint };
             this.masked = masked;
         }
 
@@ -46,7 +46,7 @@ namespace Xemo
             return Merged(wanted, state.Last());
         }
 
-        public IXemo Launch<TMask>(TMask mask)
+        public IXemo Spawn<TMask>(TMask mask)
         {
             if (this.state.Count() > 1)
                 throw new InvalidOperationException("Masking must happen before first mutation.");
