@@ -123,25 +123,12 @@ namespace Xemo.Xemo
         private static void Merge(JObject main, JObject mutation)
         {
             foreach (var token in main)
-            {
                 if (mutation.ContainsKey(token.Key))
-                {
                     if (mutation[token.Key].Type == token.Value.Type)
-                    {
                         if (token.Value.Type == JTokenType.Object)
-                        {
                             Merge(token.Value as JObject, mutation[token.Key] as JObject);
-                        }
                         else
-                        {
                             main[token.Key] = mutation[token.Key];
-                        }
-                    }
-                }
-            }
         }
     }
-
-
-    }
-
+}
