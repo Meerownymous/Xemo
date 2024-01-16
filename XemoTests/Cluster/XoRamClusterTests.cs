@@ -1,4 +1,5 @@
-﻿using Tonga.Scalar;
+﻿using Tonga.List;
+using Tonga.Scalar;
 using Xemo;
 using Xunit;
 
@@ -13,9 +14,8 @@ namespace XemoTests
 				13,
 				First._(
 					new XoRamCluster(
-						XoSpawn.Seed(new { }),
-						new { Name = "Bob", Age = 49 },
-						new { Name = "Jay", Age = 13 }
+						new { ID = 1, Name = "Bob", Age = 49 },
+						new { ID = 2, Name = "Jay", Age = 13 }
 					).Reduced(
                         new { Name = "" },
                         info => info.Name == "Jay"
@@ -34,9 +34,8 @@ namespace XemoTests
             Assert.Equal(
                 1,
                 First._(
-                    new XoRamCluster(
-                        XoSpawn.Seed(new { Name = "", Age = 0 })
-                    ).Create(
+                    new XoRamCluster()
+                    .Create(
 						new { Name = "Dobert", Age = 1 }
 					)
 					.Reduced(new { Name = "" }, u => u.Name == "Dobert")
@@ -52,11 +51,25 @@ namespace XemoTests
         public void RejectsCreateOnMissingInformation()
         {
             Assert.Throws<ArgumentException>(() =>
-                new XoRamCluster(
-                    XoSpawn.Seed(new { Name = "", Age = 0 })
-                ).Create(
+                new XoRamCluster()
+                .Create(
                     new { Name = "Dobert" }
                 )
+            );
+        }
+
+        [Fact]
+        public void DeliversID()
+        {
+            Assert.Equal(
+                "1",
+                First._(
+                    new XoRamCluster()
+                    .Create(
+                        new { ID = 1, Name = "Dobert" }
+                    )
+                ).Value()
+                .ID()
             );
         }
 
@@ -67,7 +80,6 @@ namespace XemoTests
                 1,
                 Length._(
                     new XoRamCluster(
-                        XoSpawn.Seed(new { Name = "", Age = 0 }),
                         new { Name = "Bob", Age = 49 },
                         new { Name = "Dobert", Age = 1 }
                     ).Remove(

@@ -20,6 +20,8 @@ namespace Xemo
             this.validations = valid;
         }
 
+        public string ID() => throw new InvalidOperationException("This is a verify object, it does not have an ID.");
+
         public TSlice Fill<TSlice>(TSlice wanted)
         {
             Investigate(this.minimum, wanted);

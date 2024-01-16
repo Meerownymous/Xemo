@@ -79,11 +79,6 @@ namespace Xemo.Cluster
 
         private string MemoryPath<TPlan>(TPlan content) =>
             Path.Combine(this.home.FullName, this.identity.From(content).ID, "content.json");
-
-        private sealed class Identifier
-        {
-            public string ID { get; set; }
-        }
     }
 }
 

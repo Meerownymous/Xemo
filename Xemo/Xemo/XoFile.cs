@@ -17,6 +17,7 @@ namespace Xemo.Xemo
 
     public sealed class XoFile<TContent> : IXemo
     {
+        private readonly Lazy<string> id;
         private readonly FileInfo memory;
         private readonly bool masked;
         private readonly IList<TContent> state;
@@ -28,10 +29,13 @@ namespace Xemo.Xemo
 
         public XoFile(FileInfo memory, IList<TContent> state, bool masked = false)
         {
+            this.id = new Lazy<string>(() => this.ID());
             this.memory = memory;
             this.masked = masked;
             this.state = state;
         }
+
+        public string ID() => this.id.Value;
 
         public TSlice Fill<TSlice>(TSlice wanted)
         {
@@ -129,6 +133,13 @@ namespace Xemo.Xemo
                             Merge(token.Value as JObject, mutation[token.Key] as JObject);
                         else
                             main[token.Key] = mutation[token.Key];
+        }
+
+        private static string ID(IList<TContent> state)
+        {
+            if (state.Count() < 2)
+                throw new InvalidOperationException("Cannot deliver ID before a state has been introduced.");
+            return new Filling<Identifier>().From(state[0]).ID;
         }
     }
 }

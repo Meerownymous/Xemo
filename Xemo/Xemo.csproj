@@ -21,6 +21,6 @@
     <Folder Include="Old\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <NoWarn>CS8604,CS8603,CS8602</NoWarn>
+    <NoWarn>CS8604,CS8603,CS8602,CS8601</NoWarn>
   </PropertyGroup>
 </Project>

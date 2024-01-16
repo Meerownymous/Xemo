@@ -20,6 +20,7 @@ namespace Xemo
     /// </summary>
     public sealed class XoRam<TContent> : IXemo
     {
+        private readonly Lazy<string> id;
         private readonly IList<TContent> state;
         private readonly bool masked = false;
 
@@ -34,9 +35,12 @@ namespace Xemo
         /// </summary>
         private XoRam(TContent blueprint, bool masked)
         {
+            this.id = new Lazy<string>(() => ID(this.state));
             this.state = new List<TContent>() { blueprint };
             this.masked = masked;
         }
+
+        public string ID() => this.id.Value;
 
         public TSlice Fill<TSlice>(TSlice wanted)
         {
@@ -102,6 +106,13 @@ namespace Xemo
                     }
                 }
             }
+        }
+
+        private static string ID(IList<TContent> state)
+        {
+            if (state.Count() < 1)
+                throw new InvalidOperationException("Cannot deliver ID before a state has been introduced.");
+            return new Filling<Identifier>().From(state[0]).ID;
         }
     }
 }
