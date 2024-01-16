@@ -32,8 +32,8 @@
         public IXemo Mutate<TSlice>(TSlice mutation) =>
             this.core.Mutate(mutation);
 
-        public IXemo Kick<TMask>(TMask mask) =>
-            this.core.Kick(mask);
+        public IXemo Schema<TMask>(TMask mask) =>
+            this.core.Schema(mask);
     }
 }
 

@@ -19,8 +19,8 @@ namespace Xemo.Cluster.Tests
                         new XoRamCluster(
                             new List<IXemo>()
                             {
-                                new XoRam().Kick(new { ID = "12", Name = "Twelve" }),
-                                new XoRam().Kick(new { ID = "20", Name = "Twenty" })
+                                new XoRam().Schema(new { ID = "12", Name = "Twelve" }),
+                                new XoRam().Schema(new { ID = "20", Name = "Twenty" })
                             }
                         ),
                         new { ID = "", Name = "" },

@@ -17,7 +17,7 @@ namespace Xemo
         public XoRamCluster(IList<object> content) : this(
             new List<IXemo>(
                 Tonga.Enumerable.Mapped._(
-                    c => new XoRam().Kick(c),
+                    c => new XoRam().Schema(c),
                     content
                 )
             )
@@ -57,7 +57,7 @@ namespace Xemo
 
         public IXemoCluster Create<TNew>(TNew input)
         {
-            this.content.Add(new XoRam().Kick(input));
+            this.content.Add(new XoRam().Schema(input));
             return new XoRamCluster(
                 this.content
             );

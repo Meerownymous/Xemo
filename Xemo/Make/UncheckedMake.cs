@@ -5,7 +5,7 @@ using Tonga.Scalar;
 
 namespace Xemo
 {
-    public sealed class UncheckedMake<TOutput> : IMake<TOutput, object>
+    public sealed class UncheckedMake<TOutput> : IPipe<TOutput, object>
     {
         public UncheckedMake()
         { }

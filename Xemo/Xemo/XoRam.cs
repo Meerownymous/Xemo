@@ -45,14 +45,14 @@ namespace Xemo
         public TSlice Fill<TSlice>(TSlice wanted)
         {
             if (!this.masked)
-                throw new InvalidOperationException("Cannot fill objects before this information has been masked.");
+                throw new InvalidOperationException("Cannot fill objects before a schema has been defined.");
             return Merged(wanted, state.Last());
         }
 
-        public IXemo Kick<TMask>(TMask mask)
+        public IXemo Schema<TMask>(TMask mask)
         {
             if (this.masked)
-                throw new InvalidOperationException("Masking has already been done.");
+                throw new InvalidOperationException("Schema has already been set.");
             return new XoRam<TMask>(mask, true);
         }
 

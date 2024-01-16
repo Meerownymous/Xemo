@@ -26,8 +26,8 @@
             throw new InvalidOperationException("Spawning cannot be modified.");
         }
 
-        public IXemo Kick<TMask>(TMask mask) =>
-            this.inner.Kick(mask);
+        public IXemo Schema<TMask>(TMask mask) =>
+            this.inner.Schema(mask);
     }
 
     /// <summary>

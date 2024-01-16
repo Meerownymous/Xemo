@@ -14,7 +14,7 @@ namespace Xemo.Cluster.Tests
                 new XoFile(
                     new FileInfo(file.Value())
                 )
-                .Kick(new { ID = 0, Name = "" })
+                .Schema(new { ID = 0, Name = "" })
                 .Mutate(new { ID = 1, Name = "Persistino" });
 
                 Assert.Equal(
@@ -22,7 +22,7 @@ namespace Xemo.Cluster.Tests
                     new XoFile(
                         new FileInfo(file.Value())
                     )
-                    .Kick(new { ID = 0, Name = "" })
+                    .Schema(new { ID = 0, Name = "" })
                     .Fill(new { ID = 0, Name = "" })
                     .Name
                 );
@@ -37,7 +37,7 @@ namespace Xemo.Cluster.Tests
                 new XoFile(
                     new FileInfo(file.Value())
                 )
-                .Kick(new { ID = 0, Name = "" });
+                .Schema(new { ID = 0, Name = "" });
 
                 Assert.Empty(
                     File.ReadAllText(file.Value())

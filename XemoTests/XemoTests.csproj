@@ -27,10 +27,12 @@
   <ItemGroup>
     <None Remove="Xemo\" />
     <None Remove="Cluster\" />
+    <None Remove="Relation\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Xemo\" />
     <Folder Include="Cluster\" />
+    <Folder Include="Relation\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Xemo\Xemo.csproj" />

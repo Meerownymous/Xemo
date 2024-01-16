@@ -12,7 +12,7 @@ namespace Xemo.Cluster.Tests
         {
             using (var home = new TempDirectory("home"))
             {
-                XoFileCluster.Kick(home.Value(), new { ID = "", Name = "" })
+                XoFileCluster.Schema(home.Value(), new { ID = "", Name = "" })
                     .Create(new { ID = "123", Name = "Persistino" });
                 Assert.Equal(
                     "{\"ID\":\"123\",\"Name\":\"Persistino\"}",
@@ -27,7 +27,7 @@ namespace Xemo.Cluster.Tests
         {
             using (var home = new TempDirectory("home"))
             {
-                XoFileCluster.Kick(home.Value(), new { ID = 0, Name = "" })
+                XoFileCluster.Schema(home.Value(), new { ID = 0, Name = "" })
                     .Create(new { ID = 123, Name = "Persistino" })
                     .Remove(new { ID = 0, Name = "" }, user => user.ID == 123);
 
@@ -41,13 +41,13 @@ namespace Xemo.Cluster.Tests
             using (var home = new TempDirectory("home"))
             {
                 XoFileCluster
-                    .Kick(home.Value(), new { ID = 0, Name = "" })
+                    .Schema(home.Value(), new { ID = 0, Name = "" })
                     .Create(new { ID = 123, Name = "Persistino" });
 
                 Assert.Equal(
                     "Persistino",
                     First._(
-                        XoFileCluster.Kick(home.Value(), new { ID = 0, Name = "" })
+                        XoFileCluster.Schema(home.Value(), new { ID = 0, Name = "" })
                     ).Value()
                     .Fill(new { ID = 0, Name = "" })
                     .Name
@@ -62,7 +62,7 @@ namespace Xemo.Cluster.Tests
             {
                 Assert.Throws<InvalidOperationException>(() =>
                     XoFileCluster
-                        .Kick(home.Value(), new { ID = 0, Name = "" })
+                        .Schema(home.Value(), new { ID = 0, Name = "" })
                         .Create(new { ID = 123, Name = "Persistino" })
                         .Reduced(new { ID = 0 }, user => user.ID == 123)
                 );

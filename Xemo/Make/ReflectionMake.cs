@@ -5,7 +5,7 @@ using Tonga.Scalar;
 
 namespace Xemo
 {
-    public sealed class ReflectionMake<TOutput> : IMake<TOutput, object>
+    public sealed class ReflectionMake<TOutput> : IPipe<TOutput, object>
     {
         public ReflectionMake()
         { }

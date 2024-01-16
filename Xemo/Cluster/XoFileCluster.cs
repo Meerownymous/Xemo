@@ -6,14 +6,14 @@ namespace Xemo.Cluster
 {
     public static class XoFileCluster
     {
-        public static XoFileCluster<TContent> Kick<TContent>(DirectoryInfo home, TContent mask) =>
+        public static XoFileCluster<TContent> Schema<TContent>(DirectoryInfo home, TContent mask) =>
             new XoFileCluster<TContent>(home, mask);
     }
 
     public sealed class XoFileCluster<TContent> : IXemoCluster
     {
         private readonly TContent mask;
-        private readonly IMake<Identifier, object> identity;
+        private readonly IPipe<Identifier, object> identity;
         private readonly DirectoryInfo home;
 
         public XoFileCluster(DirectoryInfo home, TContent mask)

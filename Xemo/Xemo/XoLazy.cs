@@ -24,8 +24,8 @@ namespace Xemo.Information
         public IXemo Mutate<TSlice>(TSlice mutation) =>
             this.core.Value.Mutate(mutation);
 
-        public IXemo Kick<TMask>(TMask mask) =>
-            this.core.Value.Kick(mask);
+        public IXemo Schema<TMask>(TMask mask) =>
+            this.core.Value.Schema(mask);
     }
 }
 

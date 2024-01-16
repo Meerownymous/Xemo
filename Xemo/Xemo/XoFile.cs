@@ -69,7 +69,7 @@ namespace Xemo.Xemo
             return this;
         }
 
-        public IXemo Kick<TMask>(TMask mask)
+        public IXemo Schema<TMask>(TMask mask)
         {
             using (var content = this.FileContent())
             {

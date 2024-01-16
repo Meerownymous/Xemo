@@ -3,7 +3,7 @@
 	public interface IXemo
 	{
 		string ID();
-		IXemo Kick<TMask>(TMask mask);
+		IXemo Schema<TSchema>(TSchema mask);
 		TSlice Fill<TSlice>(TSlice wanted);
 		IXemo Mutate<TSlice>(TSlice mutation);
 	}

@@ -20,7 +20,10 @@ namespace Xemo
             this.validations = valid;
         }
 
-        public string ID() => throw new InvalidOperationException("This is a verify object, it does not have an ID.");
+        public string ID() =>
+            throw new InvalidOperationException(
+                "This is a verify object, it does not have an ID."
+            );
 
         public TSlice Fill<TSlice>(TSlice wanted)
         {
@@ -36,12 +39,12 @@ namespace Xemo
 
         public IXemo Mutate<TSlice>(TSlice mutation)
         {
-            throw new InvalidOperationException("Origin information cannot be modified.");
+            throw new InvalidOperationException("Verifying xemo cannot be modified.");
         }
 
-        public IXemo Kick<TSlice>(TSlice mutation)
+        public IXemo Schema<TSlice>(TSlice mutation)
         {
-            throw new InvalidOperationException("Origin information cannot be masked.");
+            throw new InvalidOperationException("Verifying xemo does not accept a schema.");
         }
 
         private TInvestigate Casted<TCandidate>(TCandidate candidate)
@@ -72,7 +75,10 @@ namespace Xemo
                 if (!piece.ContainsKey(token.Key))
                     throw new ArgumentException($"Expected '{token.Key}' in {piece}.");
                 if (token.Value.Type != piece[token.Key].Type)
-                    throw new ArgumentException($"Expected '{token.Key}' to be '{token.Value.Type}' but it is '{piece[token.Key].Type}'.");
+                    throw new ArgumentException(
+                        $"Expected '{token.Key}' to be '{token.Value.Type}', "
+                        + $"but it is '{piece[token.Key].Type}'."
+                    );
                 if (token.Value.Type == JTokenType.Object)
                     Investigate(token.Value, piece[token.Key]);
             }

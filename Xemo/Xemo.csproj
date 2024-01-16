@@ -15,14 +15,16 @@
     <None Remove="Xemo\" />
     <None Remove="Old\" />
     <None Remove="Make\" />
+    <None Remove="Relation\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Cluster\" />
     <Folder Include="Xemo\" />
     <Folder Include="Old\" />
     <Folder Include="Make\" />
+    <Folder Include="Relation\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <NoWarn>CS8604,CS8603,CS8602,CS8601</NoWarn>
+    <NoWarn>CS8604,CS8603,CS8602,CS8601,CS8618</NoWarn>
   </PropertyGroup>
 </Project>
