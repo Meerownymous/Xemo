@@ -26,12 +26,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Xemo\" />
-    <None Remove="Old\" />
     <None Remove="Cluster\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Xemo\" />
-    <Folder Include="Old\" />
     <Folder Include="Cluster\" />
   </ItemGroup>
   <ItemGroup>

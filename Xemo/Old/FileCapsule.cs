@@ -50,15 +50,15 @@ namespace Xemo
             return (TValue)result;
         }
 
-        public TSubject Print<TSubject>(string name, IPrinting<TSubject> printing)
-        {
-            throw new NotImplementedException();
-            //object result;
-            //if (!this.values.TryGetValue(name, out result))
-            //    throw new ArgumentException($"Capsule does not contain '{name}'.");
+        //public TSubject Print<TSubject>(string name, IPrinting<TSubject> printing)
+        //{
+        //    throw new NotImplementedException();
+        //    //object result;
+        //    //if (!this.values.TryGetValue(name, out result))
+        //    //    throw new ArgumentException($"Capsule does not contain '{name}'.");
 
-            //return new PrimitiveContent(result);
-        }
+        //    //return new PrimitiveContent(result);
+        //}
 
         public ICollection<string> TOC()
         {
@@ -205,9 +205,9 @@ namespace Xemo
             throw new NotImplementedException();
         }
 
-        public TSubject Print<TSubject>(IPrinting<TSubject> printing)
-        {
-            throw new NotImplementedException();
-        }
+        //public TSubject Print<TSubject>(IPrinting<TSubject> printing)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }

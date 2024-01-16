@@ -48,5 +48,12 @@ namespace Xemo.Cluster
         IEnumerator IEnumerable.GetEnumerator() =>
             this.GetEnumerator();
     }
+
+
+    public static class XoFiltered
+    {
+        public static XoFiltered<TSlice> _<TSlice>(IXemoCluster origin, TSlice schema, Func<TSlice,bool> matches) =>
+            new XoFiltered<TSlice>(origin, schema, item => matches(item));
+    }
 }
 

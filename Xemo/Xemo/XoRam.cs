@@ -112,7 +112,7 @@ namespace Xemo
         {
             if (state.Count() < 1)
                 throw new InvalidOperationException("Cannot deliver ID before a state has been introduced.");
-            return new Filling<Identifier>().From(state[0]).ID;
+            return new ReflectionMake<Identifier>().From(state[0]).ID;
         }
     }
 }

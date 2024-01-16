@@ -2,7 +2,7 @@
 using Xemo.Xemo;
 using Xunit;
 
-namespace XemoTests.Xemo
+namespace Xemo.Cluster.Tests
 {
     public sealed class XoFileTests
     {

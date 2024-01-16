@@ -21,7 +21,7 @@ namespace Xemo.Examples.Todo
         /// </summary>
         public AllTodos(IList<IXemo> todos) : base(
             new XoSpawnCluster(
-                XoSpawn.Seed(
+                XoSpawn.Schema(
                     new { Subject = "", Due = DateTime.MinValue },
                     newTodo => (newTodo.Due > DateTime.Now, "Due date must be in the future")
                 ),

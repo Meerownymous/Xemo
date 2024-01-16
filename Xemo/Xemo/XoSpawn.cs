@@ -38,7 +38,7 @@
         /// <summary>
         /// Information that ensures it is being filled with all necessary data.
         /// </summary>
-        public static XoSpawn<TMinimum> Seed<TMinimum>(TMinimum minimum, params Func<TMinimum, (bool,string)>[] isValid) =>
+        public static XoSpawn<TMinimum> Schema<TMinimum>(TMinimum minimum, params Func<TMinimum, (bool,string)>[] isValid) =>
             new XoSpawn<TMinimum>(minimum, isValid);
     }
 }

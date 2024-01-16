@@ -3,7 +3,7 @@ using Tonga.Scalar;
 using Xemo.Cluster;
 using Xunit;
 
-namespace XemoTests.Cluster
+namespace Xemo.Cluster.Tests
 {
     public sealed class XoFileClusterTests
     {
@@ -12,10 +12,10 @@ namespace XemoTests.Cluster
         {
             using (var home = new TempDirectory("home"))
             {
-                XoFileCluster.Kick(home.Value(), new { ID = 0, Name = "" })
-                    .Create(new { ID = 123, Name = "Persistino" });
+                XoFileCluster.Kick(home.Value(), new { ID = "", Name = "" })
+                    .Create(new { ID = "123", Name = "Persistino" });
                 Assert.Equal(
-                    "{\"ID\":123,\"Name\":\"Persistino\"}",
+                    "{\"ID\":\"123\",\"Name\":\"Persistino\"}",
                     File.ReadAllText(Path.Combine(home.Value().FullName, "123", "content.json"))
                 );
 

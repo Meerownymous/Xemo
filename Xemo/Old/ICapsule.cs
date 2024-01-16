@@ -12,6 +12,6 @@ namespace Xemo
         public ICapsule With(string name, IContent content);
         public ICapsule With(ICapsule patch);
         public object Value(string name);
-        public TSubject Print<TSubject>(IPrinting<TSubject> printing);
+        //public TSubject Print<TSubject>(IPrinting<TSubject> printing);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Xemo;
 using Xunit;
 
-namespace XemoTests
+namespace Xemo.Tests
 {
 	public sealed class XoRamTests
 	{

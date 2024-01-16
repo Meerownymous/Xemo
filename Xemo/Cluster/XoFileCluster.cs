@@ -13,13 +13,13 @@ namespace Xemo.Cluster
     public sealed class XoFileCluster<TContent> : IXemoCluster
     {
         private readonly TContent mask;
-        private readonly IExtraction<Identifier> identity;
+        private readonly IMake<Identifier, object> identity;
         private readonly DirectoryInfo home;
 
         public XoFileCluster(DirectoryInfo home, TContent mask)
         {
             this.mask = mask;
-            this.identity = new Filling<Identifier>();
+            this.identity = new UncheckedMake<Identifier>();
             this.home = home;
         }
 

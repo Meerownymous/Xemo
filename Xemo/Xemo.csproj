@@ -14,11 +14,13 @@
     <None Remove="Cluster\" />
     <None Remove="Xemo\" />
     <None Remove="Old\" />
+    <None Remove="Make\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Cluster\" />
     <Folder Include="Xemo\" />
     <Folder Include="Old\" />
+    <Folder Include="Make\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <NoWarn>CS8604,CS8603,CS8602,CS8601</NoWarn>

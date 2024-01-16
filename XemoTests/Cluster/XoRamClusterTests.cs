@@ -3,7 +3,7 @@ using Tonga.Scalar;
 using Xemo;
 using Xunit;
 
-namespace XemoTests
+namespace Xemo.Cluster.Tests
 {
 	public sealed class XoRamClusterTests
 	{
@@ -65,9 +65,9 @@ namespace XemoTests
                 "1",
                 First._(
                     new XoRamCluster()
-                    .Create(
-                        new { ID = 1, Name = "Dobert" }
-                    )
+                        .Create(
+                            new { ID = "1", Name = "Dobert" }
+                        )
                 ).Value()
                 .ID()
             );

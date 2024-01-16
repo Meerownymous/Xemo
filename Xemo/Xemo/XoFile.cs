@@ -43,7 +43,7 @@ namespace Xemo.Xemo
                 throw new InvalidOperationException("Cannot fill objects before this information has been masked.");
             using (var content = FileContent())
             {
-                return new Filling<TSlice>().From(
+                return new UncheckedMake<TSlice>().From(
                     JsonConvert.DeserializeObject<TSlice>(new StreamReader(content).ReadToEnd())
                 );
             }
@@ -139,7 +139,7 @@ namespace Xemo.Xemo
         {
             if (state.Count() < 2)
                 throw new InvalidOperationException("Cannot deliver ID before a state has been introduced.");
-            return new Filling<Identifier>().From(state[0]).ID;
+            return new ReflectionMake<Identifier>().From(state[0]).ID;
         }
     }
 }

@@ -3,51 +3,20 @@ using System.Diagnostics;
 using Xemo;
 using Xunit;
 
-namespace XemoTests
+namespace Xemo.Make.Tests
 {
     public sealed class MakeTests
     {
         [Fact]
-        public void Investigation()
-        {
-            var id = new Example { Number = 123, Nested = new NestedExample { NestedNumber = 100 } };
-
-            var sw = new Stopwatch();
-            sw.Start();
-            for (var i = 0; i < 1000000; i++)
-            {
-                Assert.Equal(123, new Filling<Example>().From(id).Number);
-            }
-            sw.Stop();
-
-            var sw2 = new Stopwatch();
-            sw2.Start();
-            for (var i = 0; i < 1000000; i++)
-            {
-                Assert.Equal(
-                    123,
-                    new Make<Example>()
-                        .From(
-                            new { Nest = new NestedExample { NestedNumber = 100 } }
-                        ).Numbers[0]
-                );
-            }
-            sw2.Stop();
-
-            Debug.WriteLine($"{sw.ElapsedMilliseconds} vs {sw2.ElapsedMilliseconds}");
-        }
-
-        [Fact]
         public void FillsPropertyObjects()
         {
             Assert.Equal(
-                100,
-                new Make<Example>()
+                9,
+                new ReflectionMake<Example>()
                     .From(
-                        new {  }
+                        new { Number = 9 }
                     )
-                    .Nested
-                    .NestedNumber
+                    .Number
             );
         }
 
@@ -56,7 +25,7 @@ namespace XemoTests
         {
             Assert.Equal(
                 100,
-                new Make<Example>()
+                new ReflectionMake<Example>()
                     .From(
                         new { Nested = new NestedExample { NestedNumber = 100 } }
                     )
@@ -70,7 +39,7 @@ namespace XemoTests
         {
             Assert.Equal(
                 100,
-                Make.A(new Example { Numbers = new int[0] })
+                ReflectionMake.A(new Example { Numbers = new int[0] })
                     .From(
                         new Example { Numbers = new[] { 100 } }
                     )
@@ -83,7 +52,7 @@ namespace XemoTests
         {
             Assert.Equal(
                 123,
-                Make.A(new Example())
+                ReflectionMake.A(new Example())
                     .From(
                         new Example
                         {
@@ -103,7 +72,7 @@ namespace XemoTests
         {
             Assert.Equal(
                 100,
-                Make.A(new { Number = 0 })
+                ReflectionMake.A(new { Number = 0 })
                     .From(
                         new { Number = 100 }
                     )
@@ -116,7 +85,7 @@ namespace XemoTests
         {
             Assert.Equal(
                 100,
-                Make.A(new { Nested = new { NestedNumber = 0 } })
+                ReflectionMake.A(new { Nested = new { NestedNumber = 0 } })
                     .From(
                         new { Nested = new { NestedNumber = 100 } }
                     )
@@ -130,7 +99,7 @@ namespace XemoTests
         {
             Assert.Equal(
                 100,
-                Make.A(new { Numbers = new int[0] })
+                ReflectionMake.A(new { Numbers = new int[0] })
                     .From(
                         new { Numbers = new[] { 100 } }
                     )
@@ -143,12 +112,52 @@ namespace XemoTests
         {
             Assert.Equal(
                 123,
-                Make.A(new { Things = new[] { new { ID = 0 } } })
+                ReflectionMake.A(new { Things = new[] { new { ID = 0 } } })
                     .From(
                         new { Things = new[] { new { ID = 123 } } }
                     )
                     .Things[0].ID
             );
+        }
+
+        [Fact(Skip = "For performane analysis only")]
+        public void Investigation()
+        {
+            var id = new Example { Number = 123, Nested = new NestedExample { NestedNumber = 100 } };
+
+            var sw = new Stopwatch();
+            sw.Start();
+            for (var i = 0; i < 1000000; i++)
+            {
+                Assert.Equal(
+                    123,
+                    ReflectionMake.A(new Example())
+                        .From(
+                            new { Nested = new { NestedNumber = 123 } }
+                        )
+                        .Nested
+                        .NestedNumber
+                    );
+            }
+            sw.Stop();
+
+            var sw2 = new Stopwatch();
+            sw2.Start();
+            for (var i = 0; i < 1000000; i++)
+            {
+                Assert.Equal(
+                    123,
+                    UncheckedMake.A(new Example())
+                        .From(
+                            new { Nested = new { NestedNumber = 123 } }
+                        )
+                        .Nested
+                        .NestedNumber
+                );
+            }
+            sw2.Stop();
+
+            Debug.WriteLine($"{sw.ElapsedMilliseconds} vs {sw2.ElapsedMilliseconds}");
         }
 
         internal sealed class Example
