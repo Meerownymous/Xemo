@@ -34,29 +34,26 @@ namespace Xemo
                 var collectedProps = new object[propsToCollect.Length];
                 for (int i = 0; i < availableProps.Length; i++)
                 {
-                    var outProp = inType.GetProperty(propsToCollect[i].Name);
-                    if (outProp != null && outProp.CanRead && TypeMatches(outProp, availableProps[i]))
+                    var outProp = inType.GetProperty(availableProps[i].Name);
+                    if (IsPrimitive(availableProps[i]))
                     {
-                        if (IsPrimitive(propsToCollect[i]))
-                        {
-                            collectedProps[i] = availableProps[i].GetValue(input);
-                        }
-                        else if (IsAnonymousType(propsToCollect[i].PropertyType))
-                        {
-                            collectedProps[i] =
-                                IntoAnonymous(
-                                    propsToCollect[i].PropertyType,
-                                    availableProps[i].GetValue(input)
-                                );
-                        }
-                        else
-                        {
-                            collectedProps[i] =
-                                IntoProperties(
-                                    propsToCollect[i].PropertyType,
-                                    availableProps[i].GetValue(input)
-                                );
-                        }
+                        collectedProps[i] = availableProps[i].GetValue(input);
+                    }
+                    else if (IsAnonymousType(propsToCollect[i].PropertyType))
+                    {
+                        collectedProps[i] =
+                            IntoAnonymous(
+                                propsToCollect[i].PropertyType,
+                                availableProps[i].GetValue(input)
+                            );
+                    }
+                    else
+                    {
+                        collectedProps[i] =
+                            IntoProperties(
+                                propsToCollect[i].PropertyType,
+                                availableProps[i].GetValue(input)
+                            );
                     }
                 }
                 result =
@@ -69,13 +66,14 @@ namespace Xemo
 
         private object IntoProperties(Type outType, object input)
         {
-            object result = new object();
+            object result = null;
             if (input != null)
             {
                 var inType = input.GetType();
                 result =
                     First._(
-                        outType.GetConstructors()
+                        outType.GetConstructors(),
+                        new ArgumentException($"'{outType.Name}' needs a parameterless constructor.")
                     )
                     .Value()
                     .Invoke(new object[0]);
@@ -120,7 +118,7 @@ namespace Xemo
 
     public static class UncheckedMake
     {
-        public static UncheckedMake<TOutput> A<TOutput>(TOutput target) => new UncheckedMake<TOutput>();
+        public static UncheckedMake<TOutput> Fill<TOutput>(TOutput target) => new UncheckedMake<TOutput>();
     }
 }
 

@@ -1,6 +1,4 @@
 ﻿using System.Reflection;
-using Newtonsoft.Json;
-using Tonga.Collection;
 using Tonga.Scalar;
 
 namespace Xemo
@@ -32,29 +30,34 @@ namespace Xemo
                 var propsToCollect = outtype.GetProperties();
                 var availableProps = inType.GetProperties();
                 var collectedProps = new object[propsToCollect.Length];
-                for (int i = 0; i < availableProps.Length; i++)
+                int collected = 0;
+                foreach (var outProp in propsToCollect)
                 {
-                    var outProp = inType.GetProperty(propsToCollect[i].Name);
-                    if (IsPrimitive(propsToCollect[i]))
+                    var inProp = inType.GetProperty(outProp.Name);
+                    if (inProp != null && inProp.CanRead && TypeMatches(outProp, inProp))
                     {
-                        collectedProps[i] = availableProps[i].GetValue(input);
+                        if (IsPrimitive(outProp))
+                        {
+                            collectedProps[collected] = inProp.GetValue(input);
+                        }
+                        else if (IsAnonymousType(outProp.PropertyType))
+                        {
+                            collectedProps[collected] =
+                                IntoAnonymous(
+                                    outProp.PropertyType,
+                                    inProp.GetValue(input)
+                                );
+                        }
+                        else
+                        {
+                            collectedProps[collected] =
+                                IntoProperties(
+                                    outProp.PropertyType,
+                                    inProp.GetValue(input)
+                                );
+                        }
                     }
-                    else if (IsAnonymousType(propsToCollect[i].PropertyType))
-                    {
-                        collectedProps[i] =
-                            IntoAnonymous(
-                                propsToCollect[i].PropertyType,
-                                availableProps[i].GetValue(input)
-                            );
-                    }
-                    else
-                    {
-                        collectedProps[i] =
-                            IntoProperties(
-                                propsToCollect[i].PropertyType,
-                                availableProps[i].GetValue(input)
-                            );
-                    }
+                    collected++;
                 }
                 result =
                     First._(outtype.GetConstructors())
@@ -66,14 +69,13 @@ namespace Xemo
 
         private object IntoProperties(Type outType, object input)
         {
-            object result = null;
+            object result = new object();
             if (input != null)
             {
                 var inType = input.GetType();
                 result =
                     First._(
-                        outType.GetConstructors(),
-                        new ArgumentException($"'{outType.Name}' needs a parameterless constructor.")
+                        outType.GetConstructors()
                     )
                     .Value()
                     .Invoke(new object[0]);
@@ -118,7 +120,7 @@ namespace Xemo
 
     public static class ReflectionMake
     {
-        public static ReflectionMake<TOutput> A<TOutput>(TOutput target) => new ReflectionMake<TOutput>();
+        public static ReflectionMake<TOutput> Fill<TOutput>(TOutput target) => new ReflectionMake<TOutput>();
     }
 }
 

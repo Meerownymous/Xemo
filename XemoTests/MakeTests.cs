@@ -12,7 +12,7 @@ namespace Xemo.Make.Tests
         {
             Assert.Equal(
                 9,
-                new ReflectionMake<Example>()
+                new UncheckedMake<Example>()
                     .From(
                         new { Number = 9 }
                     )
@@ -25,7 +25,7 @@ namespace Xemo.Make.Tests
         {
             Assert.Equal(
                 100,
-                new ReflectionMake<Example>()
+                new UncheckedMake<Example>()
                     .From(
                         new { Nested = new NestedExample { NestedNumber = 100 } }
                     )
@@ -39,7 +39,7 @@ namespace Xemo.Make.Tests
         {
             Assert.Equal(
                 100,
-                ReflectionMake.A(new Example { Numbers = new int[0] })
+                ReflectionMake.Fill(new Example { Numbers = new int[0] })
                     .From(
                         new Example { Numbers = new[] { 100 } }
                     )
@@ -52,7 +52,7 @@ namespace Xemo.Make.Tests
         {
             Assert.Equal(
                 123,
-                ReflectionMake.A(new Example())
+                ReflectionMake.Fill(new Example())
                     .From(
                         new Example
                         {
@@ -72,7 +72,7 @@ namespace Xemo.Make.Tests
         {
             Assert.Equal(
                 100,
-                ReflectionMake.A(new { Number = 0 })
+                ReflectionMake.Fill(new { Number = 0 })
                     .From(
                         new { Number = 100 }
                     )
@@ -85,7 +85,7 @@ namespace Xemo.Make.Tests
         {
             Assert.Equal(
                 100,
-                ReflectionMake.A(new { Nested = new { NestedNumber = 0 } })
+                ReflectionMake.Fill(new { Nested = new { NestedNumber = 0 } })
                     .From(
                         new { Nested = new { NestedNumber = 100 } }
                     )
@@ -99,7 +99,7 @@ namespace Xemo.Make.Tests
         {
             Assert.Equal(
                 100,
-                ReflectionMake.A(new { Numbers = new int[0] })
+                ReflectionMake.Fill(new { Numbers = new int[0] })
                     .From(
                         new { Numbers = new[] { 100 } }
                     )
@@ -112,7 +112,7 @@ namespace Xemo.Make.Tests
         {
             Assert.Equal(
                 123,
-                ReflectionMake.A(new { Things = new[] { new { ID = 0 } } })
+                ReflectionMake.Fill(new { Things = new[] { new { ID = 0 } } })
                     .From(
                         new { Things = new[] { new { ID = 123 } } }
                     )
@@ -131,7 +131,7 @@ namespace Xemo.Make.Tests
             {
                 Assert.Equal(
                     123,
-                    ReflectionMake.A(new Example())
+                    ReflectionMake.Fill(new Example())
                         .From(
                             new { Nested = new { NestedNumber = 123 } }
                         )
@@ -147,7 +147,7 @@ namespace Xemo.Make.Tests
             {
                 Assert.Equal(
                     123,
-                    UncheckedMake.A(new Example())
+                    ReflectionMake.Fill(new Example())
                         .From(
                             new { Nested = new { NestedNumber = 123 } }
                         )

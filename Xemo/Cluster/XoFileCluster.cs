@@ -19,7 +19,7 @@ namespace Xemo.Cluster
         public XoFileCluster(DirectoryInfo home, TContent mask)
         {
             this.mask = mask;
-            this.identity = new UncheckedMake<Identifier>();
+            this.identity = new ReflectionMake<Identifier>();
             this.home = home;
         }
 

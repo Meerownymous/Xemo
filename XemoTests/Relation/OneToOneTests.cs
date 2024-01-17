@@ -16,7 +16,9 @@ namespace XemoTests.Relation
             var friend =
                 new XoRam().Schema(new { Username = "Jay" });
 
-            var relationMemory = new XoRam().Schema(new { Name = "", LeftID = "", RightID = "" });
+            var relationMemory =
+                new XoRam()
+                    .Schema(new { Name = "", LeftID = "", RightID = "" });
 
             new OneToOne(
                 user,
