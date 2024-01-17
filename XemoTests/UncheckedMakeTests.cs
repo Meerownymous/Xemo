@@ -1,11 +1,9 @@
-﻿using System;
-using System.Diagnostics;
-using Xemo;
+﻿using System.Diagnostics;
 using Xunit;
 
 namespace Xemo.Make.Tests
 {
-    public sealed class MakeTests
+    public sealed class UncheckedMakeTests
     {
         [Fact]
         public void FillsPropertyObjects()
@@ -13,9 +11,7 @@ namespace Xemo.Make.Tests
             Assert.Equal(
                 9,
                 new UncheckedMake<Example>()
-                    .From(
-                        new { Number = 9 }
-                    )
+                    .From(new { Number = 9 })
                     .Number
             );
         }
@@ -26,9 +22,7 @@ namespace Xemo.Make.Tests
             Assert.Equal(
                 100,
                 new UncheckedMake<Example>()
-                    .From(
-                        new { Nested = new NestedExample { NestedNumber = 100 } }
-                    )
+                    .From(new { Nested = new NestedExample { NestedNumber = 100 } })
                     .Nested
                     .NestedNumber
             );
@@ -39,10 +33,9 @@ namespace Xemo.Make.Tests
         {
             Assert.Equal(
                 100,
-                ReflectionMake.Fill(new Example { Numbers = new int[0] })
-                    .From(
-                        new Example { Numbers = new[] { 100 } }
-                    )
+                UncheckedMake
+                    .Fill(new Example { Numbers = new int[0] })
+                    .From(new Example { Numbers = new[] { 100 } })
                     .Numbers[0]
             );
         }
@@ -52,7 +45,7 @@ namespace Xemo.Make.Tests
         {
             Assert.Equal(
                 123,
-                ReflectionMake.Fill(new Example())
+                UncheckedMake.Fill(new Example())
                     .From(
                         new Example
                         {
@@ -72,10 +65,8 @@ namespace Xemo.Make.Tests
         {
             Assert.Equal(
                 100,
-                ReflectionMake.Fill(new { Number = 0 })
-                    .From(
-                        new { Number = 100 }
-                    )
+                UncheckedMake.Fill(new { Number = 0 })
+                    .From(new { Number = 100 })
                     .Number
             );
         }
@@ -85,7 +76,7 @@ namespace Xemo.Make.Tests
         {
             Assert.Equal(
                 100,
-                ReflectionMake.Fill(new { Nested = new { NestedNumber = 0 } })
+                UncheckedMake.Fill(new { Nested = new { NestedNumber = 0 } })
                     .From(
                         new { Nested = new { NestedNumber = 100 } }
                     )
@@ -99,7 +90,7 @@ namespace Xemo.Make.Tests
         {
             Assert.Equal(
                 100,
-                ReflectionMake.Fill(new { Numbers = new int[0] })
+                UncheckedMake.Fill(new { Numbers = new int[0] })
                     .From(
                         new { Numbers = new[] { 100 } }
                     )
@@ -112,7 +103,7 @@ namespace Xemo.Make.Tests
         {
             Assert.Equal(
                 123,
-                ReflectionMake.Fill(new { Things = new[] { new { ID = 0 } } })
+                UncheckedMake.Fill(new { Things = new[] { new { ID = 0 } } })
                     .From(
                         new { Things = new[] { new { ID = 123 } } }
                     )
@@ -131,7 +122,7 @@ namespace Xemo.Make.Tests
             {
                 Assert.Equal(
                     123,
-                    ReflectionMake.Fill(new Example())
+                    UncheckedMake.Fill(new Example())
                         .From(
                             new { Nested = new { NestedNumber = 123 } }
                         )
@@ -147,7 +138,7 @@ namespace Xemo.Make.Tests
             {
                 Assert.Equal(
                     123,
-                    ReflectionMake.Fill(new Example())
+                    UncheckedMake.Fill(new Example())
                         .From(
                             new { Nested = new { NestedNumber = 123 } }
                         )

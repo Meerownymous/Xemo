@@ -69,7 +69,7 @@ namespace Xemo
 
         private object IntoProperties(Type outType, object input)
         {
-            object result = new object();
+            object result = null;
             if (input != null)
             {
                 var inType = input.GetType();

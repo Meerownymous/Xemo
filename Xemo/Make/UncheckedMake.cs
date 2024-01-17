@@ -32,27 +32,31 @@ namespace Xemo
                 var propsToCollect = outtype.GetProperties();
                 var availableProps = inType.GetProperties();
                 var collectedProps = new object[propsToCollect.Length];
-                for (int i = 0; i < availableProps.Length; i++)
+                var collected = 0;
+                foreach (var outProp in propsToCollect)
                 {
-                    var outProp = inType.GetProperty(availableProps[i].Name);
-                    if (IsPrimitive(availableProps[i]))
+                    if (IsPrimitive(outProp))
                     {
-                        collectedProps[i] = availableProps[i].GetValue(input);
+                        collectedProps[collected] =
+                            inType.GetProperty(outProp.Name)
+                                .GetValue(input);
                     }
-                    else if (IsAnonymousType(propsToCollect[i].PropertyType))
+                    else if (IsAnonymousType(outProp.PropertyType))
                     {
-                        collectedProps[i] =
+                        collectedProps[collected] =
                             IntoAnonymous(
-                                propsToCollect[i].PropertyType,
-                                availableProps[i].GetValue(input)
+                                outProp.PropertyType,
+                                inType.GetProperty(outProp.Name)
+                                    .GetValue(input)
                             );
                     }
                     else
                     {
-                        collectedProps[i] =
+                        collectedProps[collected] =
                             IntoProperties(
-                                propsToCollect[i].PropertyType,
-                                availableProps[i].GetValue(input)
+                                outProp.PropertyType,
+                                inType.GetProperty(outProp.Name)
+                                    .GetValue(input)
                             );
                     }
                 }
