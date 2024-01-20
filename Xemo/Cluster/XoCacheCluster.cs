@@ -4,7 +4,7 @@ using Tonga.Enumerable;
 
 namespace Xemo.Cluster
 {
-    public class XoCacheCluster : IXemoCluster
+    public class XoCacheCluster<TContent> : IXemoCluster
     {
         private readonly Lazy<string> indexKey;
         private readonly IXemoCluster origin;
@@ -12,7 +12,6 @@ namespace Xemo.Cluster
 
         public XoCacheCluster(
             IXemoCluster origin,
-            string[] whiteList,
             ConcurrentDictionary<string, object> cache
         )
         {
@@ -21,10 +20,8 @@ namespace Xemo.Cluster
             this.cache = cache;
         }
 
-        public IXemoCluster Schema<TContent>(TContent schema) =>
+        public IXemoCluster Schema<TSchema>(TSchema schema) =>
             this.origin.Schema(schema);
-
-        //public IXemoCluster With<TNew>(TNew plan) => this.origin.With(plan);
 
         public IXemo Create<TNew>(TNew plan) => this.origin.Create(plan);
 
@@ -37,20 +34,9 @@ namespace Xemo.Cluster
         public IXemoCluster Reduced<TQuery>(TQuery slice, Func<TQuery, bool> matches)
         {
             return
-                new XoCacheCluster(
-                    this.origin,
-                    Mapped._(
-                        xemo => xemo.ID(),
-                        Filtered._(
-                            xemo => matches(
-                                new XoCache(xemo, this.cache)
-                                    .Fill(slice)
-                            ),
-                            this.origin
-                        )
-                    ).ToArray(),
-                    this.cache
-                );
+                new XoFiltered<TContent>(
+                    this,
+                )
         }
 
         public IXemoCluster Without(params IXemo[] gone) =>

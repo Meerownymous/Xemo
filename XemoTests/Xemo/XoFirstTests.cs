@@ -10,18 +10,17 @@ namespace XemoTests.Xemo
         [Fact]
         public void FindsFirst()
         {
-            var schema = new { Name = "" };
-            schema = schema.XoMerge(new { Name = "Yes" });
+            var schema = new { ID = "" };
 
             Assert.Equal(
-                "Meerow",
+                "Dobertus Meow",
                 new XoFirst(
                     new XoWith(
                         new XoRamCluster().Schema(schema),
-                        new { Name = "Dobertus Meow" },
-                        new { Name = "Meerow" }
+                        new { ID = "Meerow" },
+                        new { ID = "Dobertus Meow" }
                     )
-                ).Fill(schema).Name
+                ).Fill(schema).ID
             );
         }
     }

@@ -5,35 +5,34 @@ namespace Xemo.Cluster
     /// <summary>
     /// Cluster which is filtered by a given mask + match.
     /// </summary>
-    public sealed class XoFiltered<TSlice> : IXemoCluster
+    public sealed class XoFiltered<TFilterSlice> : IXemoCluster
     {
         private readonly IXemoCluster origin;
-        private readonly TSlice mask;
-        private readonly Func<TSlice, bool> match;
+        private readonly TFilterSlice filterSlice;
+        private readonly Func<TFilterSlice, bool> match;
 
         /// <summary>
         /// Cluster which is filtered by a given mask + match.
         /// </summary>
-        public XoFiltered(IXemoCluster origin) : this(
-            origin, default(TSlice), slice => true
+        public XoFiltered(IXemoCluster origin, TFilterSlice filterSlice) : this(
+            origin, filterSlice, filterSlice => true
         )
         { }
 
         /// <summary>
         /// Cluster which is filtered by a given mask + match.
         /// </summary>
-        public XoFiltered(IXemoCluster origin, TSlice slice, Func<TSlice, bool> match)
+        public XoFiltered(IXemoCluster origin, TFilterSlice filterSlice, Func<TFilterSlice, bool> match)
         {
             this.origin = origin;
-            this.mask = slice;
+            this.filterSlice = filterSlice;
             this.match = match;
         }
 
         public IXemoCluster Schema<TContent>(TContent schema) =>
-            new XoFiltered<TSlice>(this.origin.Schema(schema), this.mask, this.match);
-
-        //public IXemoCluster With<TNew>(TNew plan) =>
-        //    new XoFiltered<TSlice>(this.origin.With(plan), mask, match);
+            new XoFiltered<TFilterSlice>(
+                this.origin.Schema(schema), this.filterSlice, this.match
+            );
 
         public IXemo Create<TNew>(TNew plan) =>
             this.origin.Create(plan);
@@ -41,15 +40,18 @@ namespace Xemo.Cluster
         public IEnumerator<IXemo> GetEnumerator()
         {
             foreach (var item in this.origin)
-                if (this.match(item.Fill(mask)))
+                if (this.match(item.Fill(this.filterSlice)))
                     yield return item;
         }
 
-        public IXemoCluster Reduced<TQuery>(TQuery blueprint, Func<TQuery, bool> matches) =>
-            new XoFiltered<TQuery>(this, blueprint, matches);
+        public IXemoCluster Reduced<TQuery>(TQuery filterSlice, Func<TQuery, bool> matches) =>
+            new XoFiltered<TQuery>(this, filterSlice, matches);
 
-        public IXemoCluster Without(params IXemo[] gone) =>
-            new XoFiltered<TSlice>(this.origin.Without(gone), mask, match);
+        public IXemoCluster Without(params IXemo[] gone)
+        {
+            this.origin.Without(gone);
+            return this;
+        }
 
         IEnumerator IEnumerable.GetEnumerator() =>
             this.GetEnumerator();
@@ -57,7 +59,7 @@ namespace Xemo.Cluster
 
     public static class XoFiltered
     {
-        public static XoFiltered<TSlice> _<TSlice>(IXemoCluster origin, TSlice schema, Func<TSlice,bool> matches) =>
+        public static XoFiltered<TSlice> _<TSlice>(IXemoCluster origin, TSlice schema, Func<TSlice, bool> matches) =>
             new XoFiltered<TSlice>(origin, schema, item => matches(item));
     }
 }

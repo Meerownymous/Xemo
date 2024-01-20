@@ -3,10 +3,20 @@ using Tonga.Scalar;
 
 namespace Xemo
 {
+    /// <summary>
+    /// Flexible merge of one object into a target object, disregarding types of
+    /// the objects. If the source property type matches the target property type,
+    /// data is copied into the target property.
+    /// </summary>
     public sealed class ReflectionMerge<TOutput> : IPipe<TOutput>
     {
         private readonly TOutput target;
 
+        /// <summary>
+        /// Flexible merge of one object into a target object, disregarding types of
+        /// the objects. If the source property type matches the target property type,
+        /// data is copied into the target property.
+        /// </summary>
         public ReflectionMerge(TOutput target)
         {
             this.target = target;
@@ -129,11 +139,6 @@ namespace Xemo
             var code = t.IsArray ? t.MemberType.GetTypeCode() : Type.GetTypeCode(t);
             return code != TypeCode.Object;
         }
-    }
-
-    public static class ReflectionMerge
-    {
-        public static ReflectionMerge<TOutput> Fill<TOutput>(TOutput target) => new ReflectionMerge<TOutput>(target);
     }
 }
 

@@ -85,9 +85,11 @@ namespace Xemo.Cluster
                 var contentFile = Path.Combine(directory.FullName, "content.json");
                 if (File.Exists(contentFile))
                     yield return
-                        new XoFile(
-                            directory.Name, new FileInfo(contentFile)
-                        ).Schema(this.schema);
+                        new XoFile<TContent>(
+                            directory.Name,
+                            new FileInfo(contentFile),
+                            this.schema
+                        );
             }
         }
 
