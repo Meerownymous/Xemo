@@ -4,60 +4,87 @@ using Xemo.Xemo;
 
 namespace Xemo.Cluster
 {
-    public static class XoFileCluster
+    public sealed class XoFileCluster : ClusterEnvelope
     {
-        public static XoFileCluster<TContent> Schema<TContent>(DirectoryInfo home, TContent mask) =>
-            new XoFileCluster<TContent>(home, mask);
+        public XoFileCluster(DirectoryInfo home) : base(
+            new XoFileCluster<object>(home)
+        )
+        { }
     }
 
     public sealed class XoFileCluster<TContent> : IXemoCluster
     {
-        private readonly TContent mask;
-        private readonly IPipe<Identifier, object> identity;
+        private readonly TContent schema;
         private readonly DirectoryInfo home;
 
-        public XoFileCluster(DirectoryInfo home, TContent mask)
+        public XoFileCluster(DirectoryInfo home) : this(home, default(TContent))
+        { }
+
+        public XoFileCluster(DirectoryInfo home, TContent schema)
         {
-            this.mask = mask;
-            this.identity = new ReflectionMake<Identifier>();
+            this.schema = schema;
             this.home = home;
         }
 
-        public IXemoCluster Create<TNew>(TNew plan)
+        public IXemoCluster With<TNew>(TNew plan)
         {
-            using (FileStream f = Memory(plan))
-            using(var writer = new StreamWriter(f))
+            this.Create(plan);
+            return this;
+        }
+
+        public IXemoCluster Schema<TSchema>(TSchema schema) =>
+            new XoFileCluster<TSchema>(this.home, schema);
+
+        public IXemo Create<TNew>(TNew plan)
+        {
+            var id =
+                ReflectionMerge.Fill(
+                    new Identifier(Guid.NewGuid().ToString())
+                )
+                .From(plan)
+                .ID;
+            using (FileStream f = Memory(id))
+            using (var writer = new StreamWriter(f))
             {
                 if (f.Length > 0)
-                    throw new InvalidOperationException($"Cannot create '{this.identity.From(plan).ID}' because it already exists.");
+                    throw new InvalidOperationException($"Cannot create '{id}' because it already exists.");
                 writer.Write(JsonConvert.SerializeObject(plan));
             }
-            return this;
+            return
+                new XoFile(
+                    id,
+                    new FileInfo(MemoryPath(id))
+                ).Schema(this.schema);
         }
 
         public IEnumerator<IXemo> GetEnumerator()
         {
-            foreach (var file in this.home.EnumerateFiles("content.json", SearchOption.AllDirectories))
-                yield return new XoFile<TContent>(file, true);
+            foreach (var directory in this.home.EnumerateDirectories())
+            {
+                var contentFile = Path.Combine(directory.FullName, "content.json");
+                if (File.Exists(contentFile))
+                    yield return
+                        new XoFile(
+                            directory.Name, new FileInfo(contentFile)
+                        ).Schema(this.schema);
+            }
         }
 
         public IXemoCluster Reduced<TQuery>(TQuery blueprint, Func<TQuery, bool> matches)
         {
-            throw new InvalidOperationException("Direct filtering is not supported: Decorate this object with a filtering object.");
+            throw new InvalidOperationException(
+                "Direct filtering is not supported: Decorate this object with a filtering object."
+            );
         }
 
-        public IXemoCluster Remove<TQuery>(TQuery blueprint, Func<TQuery, bool> matches)
+        public IXemoCluster Without(params IXemo[] gone)
         {
             foreach (var xemo in this)
             {
-                var content = xemo.Fill(blueprint);
-                if (matches(content))
+                using(var file = Memory(xemo.ID()))
                 {
-                    using(var file = Memory(content))
-                    {
-                        file.SetLength(0);
-                    }
-                    File.Delete(MemoryPath(content));
+                    file.SetLength(0);
+                    File.Delete(MemoryPath(xemo.ID()));
                 }
             }
             return this;
@@ -66,9 +93,9 @@ namespace Xemo.Cluster
         IEnumerator IEnumerable.GetEnumerator() =>
             this.GetEnumerator();
 
-        private FileStream Memory<TPlan>(TPlan content)
+        private FileStream Memory(string id)
         {
-            var itemHome = Path.Combine(this.home.FullName, this.identity.From(content).ID);
+            var itemHome = Path.Combine(this.home.FullName, id);
             if (!Directory.Exists(itemHome))
                 Directory.CreateDirectory(itemHome);
             return
@@ -77,8 +104,8 @@ namespace Xemo.Cluster
                 );
         }
 
-        private string MemoryPath<TPlan>(TPlan content) =>
-            Path.Combine(this.home.FullName, this.identity.From(content).ID, "content.json");
+        private string MemoryPath(string id) =>
+            Path.Combine(this.home.FullName, id, "content.json");
     }
 }
 

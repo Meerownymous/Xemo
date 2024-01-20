@@ -9,137 +9,107 @@ namespace Xemo.Xemo
     /// </summary>
     public sealed class XoFile : XoEnvelope
     {
-        public XoFile(FileInfo content) : base(
-            new XoFile<object>(content, new List<object>() { new object() })
+        public XoFile(FileInfo storage) : this(
+            string.Empty, storage
+        )
+        { }
+
+        public XoFile(string id, FileInfo storage) : base(
+            new XoFile<object>(id, storage, new List<object>() { new object() })
         )
         { }
     }
 
     public sealed class XoFile<TContent> : IXemo
     {
-        private readonly Lazy<string> id;
-        private readonly FileInfo memory;
-        private readonly bool masked;
-        private readonly IList<TContent> state;
+        private readonly string id;
+        private readonly FileInfo storage;
+        private readonly TContent schema;
 
-        public XoFile(FileInfo memory, bool masked = false) : this(
-            memory, new List<TContent>(), masked
+        public XoFile(string id, FileInfo storage) : this(
+            id, storage, default(TContent)
         )
         { }
 
-        public XoFile(FileInfo memory, IList<TContent> state, bool masked = false)
+        public XoFile(string id, FileInfo memory, TContent schema)
         {
-            this.id = new Lazy<string>(() => this.ID());
-            this.memory = memory;
-            this.masked = masked;
-            this.state = state;
+            this.id = id;
+            this.storage = memory;
+            this.schema = schema;
         }
 
-        public string ID() => this.id.Value;
+        public string ID() => this.id;
 
         public TSlice Fill<TSlice>(TSlice wanted)
         {
-            if (!this.masked)
-                throw new InvalidOperationException("Cannot fill objects before this information has been masked.");
+            if (!this.HasSchema())
+                throw new InvalidOperationException("Cannot fill objects before a schema has been defined.");
             using (var content = FileContent())
             {
-                return new ReflectionMake<TSlice>().From(
-                    JsonConvert.DeserializeObject<TSlice>(new StreamReader(content).ReadToEnd())
-                );
+                var state =
+                    IsAnonymousType(this.schema.GetType())
+                    ?
+                    JsonConvert.DeserializeAnonymousType(
+                        new StreamReader(content).ReadToEnd(),
+                        this.schema
+                    )
+                    :
+                    JsonConvert.DeserializeObject<TContent>(
+                        new StreamReader(content).ReadToEnd()
+                    );
+                    return
+                        new ReflectionMerge<TSlice>(wanted)
+                            .From<TContent>(state != null ? state : this.schema);
             }
         }
 
         public IXemo Mutate<TSlice>(TSlice mutation)
         {
-            lock (this.state)
+            if (!this.HasSchema())
+                throw new InvalidOperationException("Define a schema prior to first mutation.");
+            using (var content = this.FileContent())
+            using (var writer = new StreamWriter(content))
             {
-                if (!this.masked)
-                    throw new InvalidOperationException("Masking must happen before first mutation.");
-                using (var content = this.FileContent())
-                using (var writer = new StreamWriter(content))
+                var newState =
+                    ReflectionMerge.Fill(
+                        JsonConvert.DeserializeObject<TSlice>(
+                            new StreamReader(content).ReadToEnd()
+                        )
+                    ).From(mutation);
+                var newID = ReflectionMerge.Fill(new Identifier()).From(newState).ID;
+                if (newID != this.id)
                 {
-                    var oldState = this.state[0];
-                    this.state.Clear();
-                    this.state.Add(Merged(oldState, mutation));
-                    var newState = JsonConvert.SerializeObject(this.state[0]);
-                    content.SetLength(0);
-                    writer.Write(newState);
+                    throw new InvalidOperationException("ID change is not supported.");
                 }
+                content.SetLength(0);
+                writer.Write(JsonConvert.SerializeObject(newState));
             }
-            return this;
+        return this;
         }
 
-        public IXemo Schema<TMask>(TMask mask)
-        {
-            using (var content = this.FileContent())
-            {
-                return
-                    new XoFile<TMask>(
-                        this.memory,
-                        content.Length > 0 ?
-                        new List<TMask>()
-                        {
-                            JsonConvert.DeserializeAnonymousType(new StreamReader(content).ReadToEnd(), mask)
-                        }
-                        :
-                        new List<TMask>() { mask },
-                        true
-                    );
-            }
-        }
+        public IXemo Schema<TSchema>(TSchema schema) =>
+            new XoFile<TSchema>(
+                this.id,
+                this.storage,
+                schema
+            );
+
+        private bool IsAnonymousType(Type candidate) => candidate.Namespace == null;
 
         private FileStream FileContent()
         {
             return
                 File.Open(
-                    this.memory.FullName,
+                    this.storage.FullName,
                     FileMode.Open,
                     FileAccess.ReadWrite,
                     FileShare.None
             );
         }
 
-        private static TTarget Merged<TTarget, TSource>(TTarget main, TSource patch)
+        private bool HasSchema()
         {
-            return JsonConvert.DeserializeAnonymousType(
-                Merged(
-                    JObject.Parse(
-                        JsonConvert.SerializeObject(
-                            main
-                        )
-                    ),
-                    JObject.Parse(
-                        JsonConvert.SerializeObject(
-                            patch
-                        )
-                    )
-                ).ToString(),
-                main
-            );
-        }
-
-        private static JObject Merged(JObject main, JObject mutation)
-        {
-            Merge(main, mutation);
-            return main;
-        }
-
-        private static void Merge(JObject main, JObject mutation)
-        {
-            foreach (var token in main)
-                if (mutation.ContainsKey(token.Key))
-                    if (mutation[token.Key].Type == token.Value.Type)
-                        if (token.Value.Type == JTokenType.Object)
-                            Merge(token.Value as JObject, mutation[token.Key] as JObject);
-                        else
-                            main[token.Key] = mutation[token.Key];
-        }
-
-        private static string ID(IList<TContent> state)
-        {
-            if (state.Count() < 2)
-                throw new InvalidOperationException("Cannot deliver ID before a state has been introduced.");
-            return new UncheckedMake<Identifier>().From(state[0]).ID;
+            return this.schema != null && !this.schema.Equals(default(TContent));
         }
     }
 }

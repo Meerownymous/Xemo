@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using Tonga.Scalar;
 using Xunit;
 
@@ -9,46 +10,40 @@ namespace Xemo.Examples.Todo
         [Fact]
         public void ListsTodos()
         {
+            var todos = new AllTodos(new XoRamCluster());
+            todos.Create(new { Subject = "List me", Due = DateTime.Now + new TimeSpan(24,0,0,0) });
             Assert.Equal(
                 "List me",
-                First._(
-                    new AllTodos(
-                        new Todo("List me", new XoRam())
-                    )
-                )
-                .Value()
-                .Fill(new { Subject = "" })
-                .Subject
+                First._(todos).Value()
+                    .Fill(new { Subject = "" })
+                    .Subject
             );
         }
 
         [Fact]
         public void CreatesTodo()
         {
+            var todos = new AllTodos(new XoRamCluster());
+            todos.Create(
+                new
+                {
+                    Subject = "Complete me",
+                    Due = DateTime.Now + new TimeSpan(24, 0, 0, 0)
+                }
+            );
             Assert.Equal(
                 "Complete me",
-                First._(
-                    new AllTodos()
-                        .Create(
-                            new
-                            {
-                                Subject = "Complete me",
-                                Due = DateTime.Now + new TimeSpan(24, 0, 0, 0)
-                            }
-                        )
-                )
-                .Value()
-                .Fill(new { Subject = "", Due = DateTime.MinValue })
-                .Subject
+                First._(todos).Value()
+                    .Fill(new { Subject = "", Due = DateTime.MinValue })
+                    .Subject
             );
         }
 
         [Fact]
         public void RejectsWrongDueDate()
         {
-
             Assert.Throws<ArgumentException>(() =>
-                new AllTodos()
+                new AllTodos(new XoRamCluster())
                     .Create(
                         new
                         {

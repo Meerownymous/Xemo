@@ -26,17 +26,23 @@ namespace Xemo.Cluster
             this.core = core;
         }
 
+        public IXemoCluster Schema<TContent>(TContent schema) =>
+            this.core.Schema(schema);
+
         public IEnumerator<IXemo> GetEnumerator() =>
             this.core.GetEnumerator();
 
         public IXemoCluster Reduced<TQuery>(TQuery blueprint, Func<TQuery, bool> matches) =>
             this.core.Reduced(blueprint, matches);
 
-        public IXemoCluster Create<TNew>(TNew input) =>
+        //public IXemoCluster With<TNew>(TNew input) =>
+        //    this.core.With(input);
+
+        public IXemo Create<TNew>(TNew input) =>
             this.core.Create(input);
 
-        public IXemoCluster Remove<TMatch>(TMatch match, Func<TMatch,bool> matches) =>
-            this.core.Remove(match, matches);
+        public IXemoCluster Without(params IXemo[] gone) =>
+            this.core.Without(gone);
 
         IEnumerator IEnumerable.GetEnumerator() =>
             this.core.GetEnumerator();

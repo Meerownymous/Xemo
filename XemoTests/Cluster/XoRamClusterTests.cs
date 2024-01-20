@@ -1,6 +1,4 @@
-﻿using Tonga.List;
-using Tonga.Scalar;
-using Xemo;
+﻿using Tonga.Scalar;
 using Xunit;
 
 namespace Xemo.Cluster.Tests
@@ -10,17 +8,19 @@ namespace Xemo.Cluster.Tests
 		[Fact]
 		public void ReducesByMatchFunction()
 		{
-			Assert.Equal(
-				13,
-				First._(
-					new XoRamCluster(
-						new { ID = 1, Name = "Bob", Age = 49 },
-						new { ID = 2, Name = "Jay", Age = 13 }
-					).Reduced(
-                        new { Name = "" },
-                        info => info.Name == "Jay"
-                    )
-				)
+            var users = new XoRamCluster().Schema(new { ID = 0, Name = "", Age = 0 });
+            users.Create(new { ID = 2, Name = "Jay", Age = 13 });
+            users.Create(new { ID = 1, Name = "Bob", Age = 49 });
+
+            Assert.Equal(
+                13,
+                First._(
+                    users
+                        .Reduced(
+                            new { Name = "" },
+                            info => info.Name == "Jay"
+                        )
+                )
 				.Value()
 				.Fill(
 					new { Age = 0 }
@@ -31,30 +31,28 @@ namespace Xemo.Cluster.Tests
         [Fact]
         public void Creates()
         {
+            var users = new XoRamCluster().Schema(new { Name = "", Age = 0 });
+            users.Create(new { Name = "Dobert", Age = 1 });
             Assert.Equal(
                 1,
-                First._(
-                    new XoRamCluster()
-                    .Create(
-						new { Name = "Dobert", Age = 1 }
-					)
-					.Reduced(new { Name = "" }, u => u.Name == "Dobert")
-                )
-                .Value()
-                .Fill(
-                    new { Age = 0 }
-                ).Age
+                First._(users.Reduced(new { Name = "" }, u => u.Name == "Dobert"))
+                    .Value()
+                    .Fill(
+                        new { Age = 0 }
+                    ).Age
             );
         }
 
         [Fact]
-        public void RejectsCreateOnMissingInformation()
+        public void AutoGeneratesID()
         {
-            Assert.Throws<ArgumentException>(() =>
+            Assert.NotEmpty(
                 new XoRamCluster()
-                .Create(
-                    new { Name = "Dobert" }
-                )
+                    .Schema(new { Name = "" })
+                    .Create(
+                        new { Name = "Dobert" }
+                    )
+                .ID()
             );
         }
 
@@ -63,12 +61,9 @@ namespace Xemo.Cluster.Tests
         {
             Assert.Equal(
                 "1",
-                First._(
-                    new XoRamCluster()
-                        .Create(
-                            new { ID = "1", Name = "Dobert" }
-                        )
-                ).Value()
+                new XoRamCluster()
+                    .Schema(new { ID = "", Name = "" })
+                    .Create(new { ID = "1", Name = "Dobert" })
                 .ID()
             );
         }
@@ -76,18 +71,11 @@ namespace Xemo.Cluster.Tests
         [Fact]
         public void Removes()
         {
-            Assert.Equal(
-                1,
-                Length._(
-                    new XoRamCluster(
-                        new { Name = "Bob", Age = 49 },
-                        new { Name = "Dobert", Age = 1 }
-                    ).Remove(
-                        new { Name = "" },
-                        u => u.Name == "Dobert"
-                    )
-                )
-                .Value()
+            var cluster = new XoRamCluster().Schema(new { ID = "", Name = "" });
+            var dobert = cluster.Create(new { ID = "22", Name = "Dobert", Age = 1 });
+            Assert.NotEqual(
+                Length._(cluster).Value(),
+                Length._(cluster.Without(dobert)).Value()
             );
         }
     }

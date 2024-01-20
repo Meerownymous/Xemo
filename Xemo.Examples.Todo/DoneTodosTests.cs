@@ -3,39 +3,54 @@ using Xunit;
 
 namespace Xemo.Examples.Todo
 {
-	public sealed class DoneTodosTests
-	{
-		[Fact]
-		public void ListsOnlyDone()
-		{
-			Assert.Equal(
-				1,
-				Length._(
-					new DoneTodos(
-						new AllTodos(
-							new Todo("I am done", new XoRam()).Mutate(new { Done = true }),
-                            new Todo("I am not done", new XoRam())
-                        )
-					)
-				).Value()
-			);
-		}
+    public sealed class DoneTodosTests
+    {
+        [Fact]
+        public void ListsOnlyDone()
+        {
+            var cluster = new AllTodos(new XoRamCluster());
+            cluster
+                .Create(
+                    new
+                    {
+                        Subject = "I am done",
+                        Due = DateTime.Now + new TimeSpan(24, 0, 0, 0)
+                    }
+                )
+                .Mutate(new { Done = true });
+
+            Assert.Equal(
+                1,
+                Length._(
+                    new DoneTodos(cluster)
+                ).Value()
+            );
+        }
 
         [Fact]
         public void DeliversDone()
         {
+            var cluster = new AllTodos(new XoRamCluster());
+            cluster.Create(
+                new
+                {
+                    Subject = "I am done",
+                    Due = DateTime.Now + new TimeSpan(24, 0, 0, 0)
+                }
+            )
+            .Mutate(new { Done = true });
+
+            cluster.Create(
+                new { Subject = "I am not done", Due = DateTime.Now + new TimeSpan(24, 0, 0, 0) }
+            );
             Assert.Equal(
                 "I am done",
                 First._(
-                    new DoneTodos(
-                        new AllTodos(
-                            new Todo("I am done", new XoRam()).Mutate(new { Done = true }),
-                            new Todo("I am not done", new XoRam())
-                        )
-                    )
-                ).Value()
+                    new DoneTodos(cluster)
+                )
+                .Value()
                 .Fill(
-                    new { Subject = "" }
+                    new { Subject = "", Due = DateTime.MinValue }
                 ).Subject
             );
         }

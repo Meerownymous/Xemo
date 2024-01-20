@@ -3,9 +3,8 @@
 	public interface IXemo
 	{
 		string ID();
-		IXemo Schema<TSchema>(TSchema mask);
 		TSlice Fill<TSlice>(TSlice wanted);
+        IXemo Schema<TSchema>(TSchema schema);
 		IXemo Mutate<TSlice>(TSlice mutation);
 	}
 }
-

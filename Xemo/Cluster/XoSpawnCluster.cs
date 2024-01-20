@@ -13,7 +13,13 @@ namespace Xemo.Cluster
             this.origin = origin;
         }
 
-        public IXemoCluster Create<TNew>(TNew plan) =>
+        public IXemoCluster Schema<TSchema>(TSchema schema) =>
+            new XoSpawnCluster(this.spawnGuard, this.origin.Schema(schema));
+
+        //public IXemoCluster With<TNew>(TNew plan) =>
+        //    this.origin.With(this.spawnGuard.Fill(plan));
+
+        public IXemo Create<TNew>(TNew plan) =>
             this.origin.Create(this.spawnGuard.Fill(plan));
 
         public IEnumerator<IXemo> GetEnumerator() =>
@@ -25,8 +31,8 @@ namespace Xemo.Cluster
                 this.origin.Reduced(blueprint, matches)
             );
 
-        public IXemoCluster Remove<TQuery>(TQuery blueprint, Func<TQuery, bool> matches) =>
-            this.origin.Remove(blueprint, matches);
+        public IXemoCluster Without(params IXemo[] gone) =>
+            this.origin.Without(gone);
 
         IEnumerator IEnumerable.GetEnumerator() =>
             this.origin.GetEnumerator();

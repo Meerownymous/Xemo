@@ -18,17 +18,23 @@ namespace Xemo.Cluster
             this.origin = new Lazy<IXemoCluster>(origin);
 		}
 
+        public IXemoCluster Schema<TSchema>(TSchema schema) =>
+            new LazyCluster(() => this.origin.Value.Schema(schema));
+
         public IEnumerator<IXemo> GetEnumerator() =>
             this.origin.Value.GetEnumerator();
 
         public IXemoCluster Reduced<TQuery>(TQuery blueprint, Func<TQuery, bool> matches) =>
             this.origin.Value.Reduced(blueprint, matches);
 
-        public IXemoCluster Create<TNew>(TNew input) =>
+        //public IXemoCluster With<TNew>(TNew input) =>
+        //    this.origin.Value.With(input);
+
+        public IXemo Create<TNew>(TNew input) =>
             this.origin.Value.Create(input);
 
-        public IXemoCluster Remove<TMatch>(TMatch match, Func<TMatch,bool> matches) =>
-            this.origin.Value.Remove(match, matches);
+        public IXemoCluster Without(params IXemo[] gone) =>
+            this.origin.Value.Without(gone);
 
         IEnumerator IEnumerable.GetEnumerator() =>
             this.origin.Value.GetEnumerator();

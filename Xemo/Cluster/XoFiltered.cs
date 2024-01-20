@@ -22,15 +22,21 @@ namespace Xemo.Cluster
         /// <summary>
         /// Cluster which is filtered by a given mask + match.
         /// </summary>
-        public XoFiltered(IXemoCluster origin, TSlice mask, Func<TSlice, bool> match)
+        public XoFiltered(IXemoCluster origin, TSlice slice, Func<TSlice, bool> match)
         {
             this.origin = origin;
-            this.mask = mask;
+            this.mask = slice;
             this.match = match;
         }
 
-        public IXemoCluster Create<TNew>(TNew plan) =>
-            new XoFiltered<TSlice>(this.origin.Create(plan), mask, match);
+        public IXemoCluster Schema<TContent>(TContent schema) =>
+            new XoFiltered<TSlice>(this.origin.Schema(schema), this.mask, this.match);
+
+        //public IXemoCluster With<TNew>(TNew plan) =>
+        //    new XoFiltered<TSlice>(this.origin.With(plan), mask, match);
+
+        public IXemo Create<TNew>(TNew plan) =>
+            this.origin.Create(plan);
 
         public IEnumerator<IXemo> GetEnumerator()
         {
@@ -42,13 +48,12 @@ namespace Xemo.Cluster
         public IXemoCluster Reduced<TQuery>(TQuery blueprint, Func<TQuery, bool> matches) =>
             new XoFiltered<TQuery>(this, blueprint, matches);
 
-        public IXemoCluster Remove<TQuery>(TQuery blueprint, Func<TQuery, bool> matches) =>
-            new XoFiltered<TSlice>(this.origin.Remove(blueprint, matches), mask, match);
+        public IXemoCluster Without(params IXemo[] gone) =>
+            new XoFiltered<TSlice>(this.origin.Without(gone), mask, match);
 
         IEnumerator IEnumerable.GetEnumerator() =>
             this.GetEnumerator();
     }
-
 
     public static class XoFiltered
     {

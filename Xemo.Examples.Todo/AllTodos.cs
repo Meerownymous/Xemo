@@ -11,21 +11,22 @@ namespace Xemo.Examples.Todo
         /// <summary>
         /// All todos which exist.
         /// </summary>
-        public AllTodos(params IXemo[] todos) : this(
-			new List<IXemo>(todos)
-		)
-		{ }
-
-        /// <summary>
-        /// All todos which exist.
-        /// </summary>
-        public AllTodos(IList<IXemo> todos) : base(
-            new XoSpawnCluster(
-                XoSpawn.Schema(
-                    new { Subject = "", Due = DateTime.MinValue },
-                    newTodo => (newTodo.Due > DateTime.Now, "Due date must be in the future")
-                ),
-				new XoRamCluster(todos)
+        public AllTodos(IXemoCluster storage) : base(
+            new LazyCluster(() =>
+                new XoSpawnCluster(
+                    XoSpawn.Schema(
+                        new { Subject = "", Due = DateTime.MinValue },
+                        todo => (todo.Due > DateTime.Now, "Due date must be in the future.")
+                    ),
+                    storage.Schema(
+                        new
+                        {
+                            Done = false,
+                            Due = DateTime.Now,
+                            Subject = ""
+                        }
+                    )
+                )
 			)
 		)
 		{ }

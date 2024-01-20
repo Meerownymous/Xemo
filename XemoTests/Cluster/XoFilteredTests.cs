@@ -12,21 +12,20 @@ namespace Xemo.Cluster.Tests
         [Fact]
         public void Reduces()
         {
+            var cluster = new XoRamCluster().Schema(new { ID = "", Name = "" });
+            cluster.Create(new { ID = "12", Name = "Twelve" });
+            cluster.Create(new { ID = "20", Name = "Twenty" });
+
             Assert.Equal(
                 "Twenty",
                 First._(
                     XoFiltered._(
-                        new XoRamCluster(
-                            new List<IXemo>()
-                            {
-                                new XoRam().Schema(new { ID = "12", Name = "Twelve" }),
-                                new XoRam().Schema(new { ID = "20", Name = "Twenty" })
-                            }
-                        ),
-                        new { ID = "", Name = "" },
+                        cluster,
+                        new { ID = "" },
                         slice => slice.ID == "20"
                     )
-                ).Value()
+                )
+                .Value()
                 .Fill(new { Name = ""})
                 .Name
             );

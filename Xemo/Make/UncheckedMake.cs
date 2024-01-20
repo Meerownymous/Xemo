@@ -5,12 +5,12 @@ using Tonga.Scalar;
 
 namespace Xemo
 {
-    public sealed class UncheckedMake<TOutput> : IPipe<TOutput, object>
+    public sealed class UncheckedMake<TOutput> : IPipe<TOutput>
     {
         public UncheckedMake()
         { }
 
-        public TOutput From(object input) =>
+        public TOutput From<TInput>(TInput input) =>
             IsAnonymousType(typeof(TOutput))
             ?
             (TOutput)IntoAnonymous(typeof(TOutput), input)
@@ -23,14 +23,13 @@ namespace Xemo
         /// Inflate an anonymous object.
         /// Anonymous objects can only be filled by using the ctor.
         /// </summary>
-        private object IntoAnonymous(Type outtype, object input)
+        private object IntoAnonymous<TInput>(Type outtype, TInput input)
         {
-            object result = new object();
+            object result = null;
             if (input != null)
             {
                 var inType = input.GetType();
                 var propsToCollect = outtype.GetProperties();
-                var availableProps = inType.GetProperties();
                 var collectedProps = new object[propsToCollect.Length];
                 var collected = 0;
                 foreach (var outProp in propsToCollect)
@@ -68,7 +67,7 @@ namespace Xemo
             return result;
         }
 
-        private object IntoProperties(Type outType, object input)
+        private object IntoProperties<TInput>(Type outType, TInput input)
         {
             object result = null;
             if (input != null)

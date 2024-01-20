@@ -1,66 +1,69 @@
-﻿using System;
-using System.Collections;
-using Tonga.Collection;
+﻿using System.Collections;
+using System.Collections.Concurrent;
 using Xemo.Cluster;
 
 namespace Xemo
 {
-	public sealed class XoRamCluster : IXemoCluster
-	{
-        private readonly IList<IXemo> content;
+    public sealed class XoRamCluster : ClusterEnvelope
+    {
+        public XoRamCluster() : base(
+            new XoRamCluster<object>()
+        )
+        { }
+    }
 
-        public XoRamCluster(params object[] source) : this(
-            new List<object> (source)
+    public sealed class XoRamCluster<TContent> : IXemoCluster
+    {
+        private readonly ConcurrentDictionary<string, TContent> storage;
+        private readonly TContent schema;
+
+        public XoRamCluster() : this(
+            new ConcurrentDictionary<string, TContent>(), default(TContent)
         )
         { }
 
-        public XoRamCluster(IList<object> content) : this(
-            new List<IXemo>(
-                Tonga.Enumerable.Mapped._(
-                    c => new XoRam().Schema(c),
-                    content
-                )
-            )
-        )
-        { }
-
-        public XoRamCluster(IList<IXemo> content)
+        public XoRamCluster(ConcurrentDictionary<string, TContent> storage, TContent schema)
         {
-            this.content = content;
+            this.storage = storage;
+            this.schema = schema;
         }
 
         public IEnumerator<IXemo> GetEnumerator()
         {
-            return this.content.GetEnumerator();
+            foreach (var key in this.storage.Keys)
+                yield return new XoRam<TContent>(key, this.storage, this.schema);
         }
+
+        public IXemoCluster Schema<TSchema>(TSchema schema) =>
+            new XoRamCluster<TSchema>(new ConcurrentDictionary<string, TSchema>(), schema);
 
         public IXemoCluster Reduced<TQuery>(TQuery blueprint, Func<TQuery, bool> matches) =>
             new XoFiltered<TQuery>(this, blueprint, matches);
 
-        public IXemoCluster Remove<TQuery>(TQuery blueprint, Func<TQuery, bool> matches)
+        public IXemoCluster Without(params IXemo[] gone)
         {
-            var without =
-                new List<IXemo>(
-                    Filtered._(
-                        information => !matches(information.Fill(blueprint)),
-                        this.content
-                    )
-                );
-            without.Count();
-
-            foreach(var item in without)
+            foreach (var xemo in gone)
             {
-                this.content.Remove(item);
+                this.storage.TryRemove(xemo.ID(), out _);
             }
             return this;
         }
 
-        public IXemoCluster Create<TNew>(TNew input)
+        public IXemoCluster With<TNew>(TNew input)
         {
-            this.content.Add(new XoRam().Schema(input));
-            return new XoRamCluster(
-                this.content
-            );
+            this.Create(input);
+            return this;
+        }
+
+        public IXemo Create<TNew>(TNew input)
+        {
+            var id =
+                ReflectionMerge.Fill(
+                    new Identifier(Guid.NewGuid().ToString())
+                ).From(input)
+                .ID;
+            this.storage.TryAdd(id, ReflectionMerge.Fill(this.schema).From(input));
+            return new XoRam<TContent>(id, this.storage, this.schema);
         }
 
         IEnumerator IEnumerable.GetEnumerator()

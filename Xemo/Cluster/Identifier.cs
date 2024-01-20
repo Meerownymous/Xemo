@@ -5,7 +5,14 @@
     /// </summary>
     public sealed class Identifier
     {
-        public Identifier() { ID = ""; }
+        public Identifier() : this(string.Empty)
+        { }
+
+        public Identifier(string id)
+        {
+            ID = id;
+        }
+
         public string ID { get; set; }
     }
 }

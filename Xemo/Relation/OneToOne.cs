@@ -20,7 +20,7 @@ namespace Xemo.Relation
             this.relationMemory =
                 new Lazy<IXemo>(() =>
                     relationMemory(name)
-                        //.Schema(new { Name = "", LeftID = "", RightID = "" })
+                //.Schema(new { Name = "", LeftID = "", RightID = "" })
                 ); ;
             this.origin = origin;
             this.name = name;

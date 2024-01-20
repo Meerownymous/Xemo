@@ -5,21 +5,28 @@
 	/// </summary>
 	public interface IXemoCluster : IEnumerable<IXemo>
 	{
+        IXemoCluster Schema<TContent>(TContent schema);
+
 		/// <summary>
 		/// Reduce this cluster by the given filter. The filter is applied against
 		/// the given blueprint after filling it with information.
 		/// </summary>
-		IXemoCluster Reduced<TQuery>(TQuery blueprint, Func<TQuery, bool> matches);
+		IXemoCluster Reduced<TQuery>(TQuery slice, Func<TQuery, bool> matches);
+
+        ///// <summary>
+        ///// Create new information in this cluster from the given plan.
+        ///// </summary>
+        //IXemoCluster With<TNew>(TNew plan);
 
         /// <summary>
         /// Create new information in this cluster from the given plan.
         /// </summary>
-        IXemoCluster Create<TNew>(TNew plan);
+        IXemo Create<TNew>(TNew plan);
 
         /// <summary>
         /// Remove information from this cluster which matches the given filter
 		/// after filling the blueprint.
         /// </summary>
-        IXemoCluster Remove<TQuery>(TQuery blueprint, Func<TQuery, bool> matches);
+        IXemoCluster Without(params IXemo[] gone);
 	}
 }

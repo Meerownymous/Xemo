@@ -1,5 +1,6 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using System.Collections.Concurrent;
+using Tonga;
+using Tonga.Text;
 using Xemo.Information;
 
 namespace Xemo
@@ -7,12 +8,43 @@ namespace Xemo
     /// <summary>
     /// Information stored in RAM.
     /// </summary>
-    public sealed class XoRam : XoEnvelope
+    public sealed class XoRam : IXemo
     {
-        public XoRam() : base(
-            new XoRam<object>()
-        )
+        private readonly string id;
+
+        /// <summary>
+        /// Information stored in RAM.
+        /// Before using, you need to define a schema, calling
+        /// Schema(propertyObject).
+        /// </summary>
+        public XoRam() : this(string.Empty)
         { }
+
+        /// <summary>
+        /// Information stored in RAM.
+        /// Before using, you need to define a schema, calling
+        /// Schema(propertyObject).
+        /// </summary>
+        public XoRam(string id)
+        {
+            this.id = id;
+        }
+
+        public TSlice Fill<TSlice>(TSlice wanted) =>
+            throw new InvalidOperationException("Define a schema first.");
+
+        public string ID() => this.id;
+
+        public IXemo Mutate<TSlice>(TSlice mutation) =>
+            throw new InvalidOperationException("Define a schema first.");
+
+        public IXemo Schema<TSchema>(TSchema schema) =>
+            new XoRam<TSchema>(this.id, new ConcurrentDictionary<string, TSchema>(), schema);
+
+        public static XoRam<TSchema> Make<TSchema>(
+            string id, ConcurrentDictionary<string, TSchema> storage, TSchema schema
+        ) =>
+            new XoRam<TSchema>(id, storage, schema);
     }
 
     /// <summary>
@@ -21,98 +53,105 @@ namespace Xemo
     public sealed class XoRam<TContent> : IXemo
     {
         private readonly Lazy<string> id;
-        private readonly IList<TContent> state;
-        private readonly bool masked = false;
+
+        /// <summary>
+        /// Storage of Xemos addressable by unique strings.
+        /// </summary>
+        private readonly ConcurrentDictionary<string, TContent> storage;
+        private readonly TContent schema;
 
         /// <summary>
         /// Information stored in RAM.
         /// </summary>
-        public XoRam() : this(default(TContent), false)
+        public XoRam() : this(string.Empty)
         { }
 
         /// <summary>
         /// Information stored in RAM.
         /// </summary>
-        private XoRam(TContent blueprint, bool masked)
+        public XoRam(string id) : this(
+            id,
+            new ConcurrentDictionary<string, TContent>(),
+            default(TContent)
+        )
+        { }
+
+        /// <summary>
+        /// Information stored in RAM.
+        /// </summary>
+        public XoRam(
+            string id,
+            ConcurrentDictionary<string, TContent> storage
+        ) : this(
+            id, storage, default(TContent)
+        )
+        { }
+
+        /// <summary>
+        /// Information stored in RAM.
+        /// </summary>
+        public XoRam(
+            string id,
+            ConcurrentDictionary<string, TContent> storage,
+            TContent schema
+        )
         {
-            this.id = new Lazy<string>(() => ID(this.state));
-            this.state = new List<TContent>() { blueprint };
-            this.masked = masked;
+            this.id = new Lazy<string>(() => id);
+            this.storage = storage;
+            this.schema = schema;
         }
 
         public string ID() => this.id.Value;
 
         public TSlice Fill<TSlice>(TSlice wanted)
         {
-            if (!this.masked)
+            if (!this.HasSchema())
                 throw new InvalidOperationException("Cannot fill objects before a schema has been defined.");
-            return Merged(wanted, state.Last());
+            TContent current = (TContent)storage.GetValueOrDefault(this.id.Value, this.schema);
+            return ReflectionMerge.Fill(wanted).From(current);
         }
 
-        public IXemo Schema<TMask>(TMask mask)
+        public IXemo Schema<TSchema>(TSchema schema)
         {
-            if (this.masked)
-                throw new InvalidOperationException("Schema has already been set.");
-            return new XoRam<TMask>(mask, true);
+            throw new NotImplementedException();
+            //if (this.HasSchema())
+            //    throw new InvalidOperationException("Schema has already been defined.");
+            //return new XoRam<TSchema>(this.id.Value, this.storage, schema);
         }
 
         public IXemo Mutate<TSlice>(TSlice mutation)
         {
-            this.state.Add(Merged(this.state.Last(), mutation));
+            this.storage.AddOrUpdate(
+                this.id.Value,
+                key =>
+                {
+                    var newState = ReflectionMerge.Fill(this.schema).From(mutation);
+                    var newID = ReflectionMerge.Fill(new Identifier()).From(newState).ID;
+                    if (newID != string.Empty && newID != this.id.Value)
+                    {
+                        throw new InvalidOperationException("ID change is not supported.");
+                    }
+                    return newState;
+                },
+                (key, existing) =>
+                {
+                    var newState = ReflectionMerge.Fill((TContent)existing).From(mutation);
+                    var newID = ReflectionMerge.Fill(new Identifier()).From(newState).ID;
+                    if (newID != string.Empty
+                        && newID != ReflectionMake.Fill(new Identifier()).From(existing).ID
+                    )
+                    {
+                        throw new InvalidOperationException("ID change is not supported.");
+                    }
+                    return newState;
+                }
+            );
             return this;
         }
 
-        private static TTarget Merged<TTarget,TSource>(TTarget main, TSource patch)
+        private bool HasSchema()
         {
-            return JsonConvert.DeserializeAnonymousType(
-                Merged(
-                    JObject.Parse(
-                        JsonConvert.SerializeObject(
-                            main
-                        )
-                    ),
-                    JObject.Parse(
-                        JsonConvert.SerializeObject(
-                            patch
-                        )
-                    )
-                ).ToString(),
-                main
-            );
-        }
-
-        private static JObject Merged(JObject main, JObject mutation)
-        {
-            Merge(main, mutation);
-            return main;
-        }
-
-        private static void Merge(JObject main, JObject mutation)
-        {
-            foreach (var token in main)
-            {
-                if (mutation.ContainsKey(token.Key))
-                {
-                    if (mutation[token.Key].Type == token.Value.Type)
-                    {
-                        if (token.Value.Type == JTokenType.Object)
-                        {
-                            Merge(token.Value as JObject, mutation[token.Key] as JObject);
-                        }
-                        else
-                        {
-                            main[token.Key] = mutation[token.Key];
-                        }
-                    }
-                }
-            }
-        }
-
-        private static string ID(IList<TContent> state)
-        {
-            if (state.Count() < 1)
-                throw new InvalidOperationException("Cannot deliver ID before a state has been introduced.");
-            return new UncheckedMake<Identifier>().From(state[0]).ID;
+            return this.schema != null && !this.schema.Equals(default(TContent));
         }
     }
 }

@@ -3,14 +3,14 @@ using Newtonsoft.Json.Linq;
 
 namespace Xemo
 {
-    public sealed class JsonMake<TOutput> : IPipe<TOutput, JObject>
+    public sealed class JsonMake<TOutput> : IPipe<TOutput>
     {
         public JsonMake()
         {
 
         }
 
-        public TOutput From(JObject input)
+        public TOutput From<JObject>(JObject input)
         {
             return
                 JsonConvert.DeserializeObject<TOutput>(
