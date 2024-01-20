@@ -3,10 +3,14 @@ using Tonga.Scalar;
 
 namespace Xemo
 {
-    public sealed class ReflectionMake<TOutput> : IPipe<TOutput>
+    public sealed class ReflectionMerge<TOutput> : IPipe<TOutput>
     {
-        public ReflectionMake()
-        { }
+        private readonly TOutput target;
+
+        public ReflectionMerge(TOutput target)
+        {
+            this.target = target;
+        }
 
         public TOutput From<TInput>(TInput input) =>
             IsAnonymousType(typeof(TOutput))
@@ -56,33 +60,39 @@ namespace Xemo
                                 );
                         }
                     }
+                    else
+                    {
+                        collectedProps[collected] =
+                            outProp.GetValue(this.target);
+                    }
                     collected++;
                 }
                 result =
                     First._(outtype.GetConstructors())
-                    .Value()
-                    .Invoke(collectedProps);
+                        .Value()
+                        .Invoke(collectedProps);
             }
             return result;
         }
 
         private object IntoProperties<TInput>(Type outType, TInput input)
         {
-            object result = null;
+            TOutput result = default(TOutput);
             if (input != null)
             {
                 var inType = input.GetType();
                 result =
+                    (TOutput)
                     First._(
                         outType.GetConstructors()
                     )
                     .Value()
                     .Invoke(new object[0]);
 
-                foreach (var inProp in inType.GetProperties())
+                foreach (var outProp in outType.GetProperties())
                 {
-                    var outProp = outType.GetProperty(inProp.Name);
-                    if (outProp != null && outProp.CanWrite && inProp.CanRead && TypeMatches(inProp, outProp))
+                    var inProp = inType.GetProperty(outProp.Name);
+                    if (inProp != null && outProp.CanWrite && inProp.CanRead && TypeMatches(inProp, outProp))
                     {
                         if (IsPrimitive(outProp))
                         {
@@ -98,6 +108,10 @@ namespace Xemo
                                 )
                             );
                         }
+                    }
+                    else
+                    {
+                        outProp.SetValue(result, outProp.GetValue(this.target));
                     }
                 }
             }
@@ -117,9 +131,9 @@ namespace Xemo
         }
     }
 
-    public static class ReflectionMake
+    public static class ReflectionMerge
     {
-        public static ReflectionMake<TOutput> Fill<TOutput>(TOutput target) => new ReflectionMake<TOutput>();
+        public static ReflectionMerge<TOutput> Fill<TOutput>(TOutput target) => new ReflectionMerge<TOutput>(target);
     }
 }
 

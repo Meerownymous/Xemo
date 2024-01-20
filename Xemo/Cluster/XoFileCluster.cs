@@ -4,22 +4,47 @@ using Xemo.Xemo;
 
 namespace Xemo.Cluster
 {
+    /// <summary>
+    /// Cluster saved in files.
+    /// You must call .Schema(...) to define a content schema, before you can
+    /// use this cluster.
+    /// </summary>
     public sealed class XoFileCluster : ClusterEnvelope
     {
+        /// <summary>
+        /// Cluster saved in files.
+        /// You must call .Schema(...) to define a content schema, before you can
+        /// use this cluster.
+        /// </summary>
         public XoFileCluster(DirectoryInfo home) : base(
             new XoFileCluster<object>(home)
         )
         { }
     }
 
+    /// <summary>
+    /// Cluster saved in files.
+    /// You can use <see cref="XoFileCluster"/> if you want to setup a
+    /// FileCluster with an anonymous type.
+    /// </summary>
     public sealed class XoFileCluster<TContent> : IXemoCluster
     {
         private readonly TContent schema;
         private readonly DirectoryInfo home;
 
+        /// <summary>
+        /// Cluster saved in files.
+        /// You can use <see cref="XoFileCluster"/> if you want to setup a
+        /// FileCluster with an anonymous type.
+        /// </summary>
         public XoFileCluster(DirectoryInfo home) : this(home, default(TContent))
         { }
 
+        /// <summary>
+        /// Cluster saved in files.
+        /// You can use <see cref="XoFileCluster"/> if you want to setup a
+        /// FileCluster with an anonymous type.
+        /// </summary>
         public XoFileCluster(DirectoryInfo home, TContent schema)
         {
             this.schema = schema;
@@ -50,11 +75,7 @@ namespace Xemo.Cluster
                     throw new InvalidOperationException($"Cannot create '{id}' because it already exists.");
                 writer.Write(JsonConvert.SerializeObject(plan));
             }
-            return
-                new XoFile(
-                    id,
-                    new FileInfo(MemoryPath(id))
-                ).Schema(this.schema);
+            return new XoFile<TContent>(id, new FileInfo(MemoryPath(id)));
         }
 
         public IEnumerator<IXemo> GetEnumerator()
@@ -81,7 +102,7 @@ namespace Xemo.Cluster
         {
             foreach (var xemo in this)
             {
-                using(var file = Memory(xemo.ID()))
+                using (var file = Memory(xemo.ID()))
                 {
                     file.SetLength(0);
                     File.Delete(MemoryPath(xemo.ID()));

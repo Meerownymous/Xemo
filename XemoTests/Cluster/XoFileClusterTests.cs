@@ -1,6 +1,5 @@
 ﻿using Tonga.IO;
 using Tonga.Scalar;
-using Xemo.Cluster;
 using Xunit;
 
 namespace Xemo.Cluster.Tests
@@ -47,7 +46,8 @@ namespace Xemo.Cluster.Tests
                 Assert.Equal(
                     "Persistino",
                     First._(
-                        new XoFileCluster(home.Value()).Schema(new { ID = 0, Name = "" })
+                        new XoFileCluster(home.Value())
+                            .Schema(new { ID = 0, Name = "" })
                     )
                     .Value()
                     .Fill(new { ID = 0, Name = "" })
