@@ -63,7 +63,7 @@ namespace Xemo.Cluster
         public IXemo Create<TNew>(TNew plan)
         {
             var id =
-                ReflectionMerge.Fill(
+                ReflectionFill.Fill(
                     new Identifier(Guid.NewGuid().ToString())
                 )
                 .From(plan)

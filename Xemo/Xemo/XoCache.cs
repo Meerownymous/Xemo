@@ -111,7 +111,7 @@ namespace Xemo
                         ).From(mutation);
                     var newID = ReflectionMerge.Fill(new Identifier()).From(newState).ID;
                     if (newID != string.Empty
-                        && newID != ReflectionMake.Fill(new Identifier()).From(existing).ID
+                        && newID != ReflectionFill.Fill(new Identifier()).From(existing).ID
                     )
                     {
                         throw new InvalidOperationException("ID change is not supported.");

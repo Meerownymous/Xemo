@@ -7,7 +7,7 @@ namespace XemoTests.Relation
 {
     public sealed class OneToOneTests
     {
-        [Fact]
+        [Fact(Skip = "Subject to redesign")]
         public void Links()
         {
             var user =

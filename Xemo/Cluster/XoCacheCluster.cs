@@ -1,12 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Concurrent;
-using Tonga.Enumerable;
 
 namespace Xemo.Cluster
 {
     public class XoCacheCluster<TContent> : IXemoCluster
     {
-        private readonly Lazy<string> indexKey;
         private readonly IXemoCluster origin;
         private readonly ConcurrentDictionary<string, object> cache;
 
@@ -15,7 +13,6 @@ namespace Xemo.Cluster
             ConcurrentDictionary<string, object> cache
         )
         {
-            this.indexKey = new Lazy<string>(() => Guid.NewGuid().ToString());
             this.origin = origin;
             this.cache = cache;
         }
@@ -31,13 +28,8 @@ namespace Xemo.Cluster
                 yield return new XoCache(xemo, this.cache);
         }
 
-        public IXemoCluster Reduced<TQuery>(TQuery slice, Func<TQuery, bool> matches)
-        {
-            return
-                new XoFiltered<TContent>(
-                    this,
-                )
-        }
+        public IXemoCluster Reduced<TQuery>(TQuery slice, Func<TQuery, bool> matches) =>
+            new XoFiltered<TQuery>(this, slice, matches);
 
         public IXemoCluster Without(params IXemo[] gone) =>
             this.origin.Without(gone);

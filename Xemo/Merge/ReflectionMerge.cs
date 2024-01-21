@@ -7,6 +7,7 @@ namespace Xemo
     /// Flexible merge of one object into a target object, disregarding types of
     /// the objects. If the source property type matches the target property type,
     /// data is copied into the target property.
+    /// Works with anonymous types, both input and output.
     /// </summary>
     public sealed class ReflectionMerge<TOutput> : IPipe<TOutput>
     {
@@ -16,6 +17,7 @@ namespace Xemo
         /// Flexible merge of one object into a target object, disregarding types of
         /// the objects. If the source property type matches the target property type,
         /// data is copied into the target property.
+        /// Works with anonymous types, both input and output.
         /// </summary>
         public ReflectionMerge(TOutput target)
         {
@@ -25,9 +27,9 @@ namespace Xemo
         public TOutput From<TInput>(TInput input) =>
             IsAnonymousType(typeof(TOutput))
             ?
-            (TOutput)IntoAnonymous(typeof(TOutput), input)
+            (TOutput)IntoAnonymous(typeof(TOutput), this.target, input)
             :
-            (TOutput)IntoProperties(typeof(TOutput), input);
+            (TOutput)IntoProperties(typeof(TOutput), this.target, input);
 
         private bool IsAnonymousType(Type candidate) => candidate.Namespace == null;
 
@@ -35,7 +37,7 @@ namespace Xemo
         /// Inflate an anonymous object.
         /// Anonymous objects can only be filled by using the ctor.
         /// </summary>
-        private object IntoAnonymous<TInput>(Type outtype, TInput input)
+        private object IntoAnonymous<TInput>(Type outtype, object output, TInput input)
         {
             object result = null;
             if (input != null)
@@ -47,33 +49,38 @@ namespace Xemo
                 foreach (var outProp in propsToCollect)
                 {
                     var inProp = inType.GetProperty(outProp.Name);
-                    if (inProp != null && inProp.CanRead && TypeMatches(outProp, inProp))
+                    if (inProp != null && inProp.CanRead)
                     {
-                        if (IsPrimitive(outProp))
+                        if (TypeMatches(outProp, inProp))
                         {
-                            collectedProps[collected] = inProp.GetValue(input);
-                        }
-                        else if (IsAnonymousType(outProp.PropertyType))
-                        {
-                            collectedProps[collected] =
-                                IntoAnonymous(
-                                    outProp.PropertyType,
-                                    inProp.GetValue(input)
-                                );
-                        }
-                        else
-                        {
-                            collectedProps[collected] =
-                                IntoProperties(
-                                    outProp.PropertyType,
-                                    inProp.GetValue(input)
-                                );
+                            if (IsPrimitive(outProp))
+                            {
+                                collectedProps[collected] = inProp.GetValue(input);
+                            }
+                            else if (IsAnonymousType(outProp.PropertyType))
+                            {
+                                collectedProps[collected] =
+                                    IntoAnonymous(
+                                        outProp.PropertyType,
+                                        outProp.GetValue(output),
+                                        inProp.GetValue(input)
+                                    );
+                            }
+                            else
+                            {
+                                collectedProps[collected] =
+                                    IntoProperties(
+                                        outProp.PropertyType,
+                                        outProp.GetValue(output),
+                                        inProp.GetValue(input)
+                                    );
+                            }
                         }
                     }
                     else
                     {
                         collectedProps[collected] =
-                            outProp.GetValue(this.target);
+                            outProp.GetValue(output);
                     }
                     collected++;
                 }
@@ -85,14 +92,13 @@ namespace Xemo
             return result;
         }
 
-        private object IntoProperties<TInput>(Type outType, TInput input)
+        private object IntoProperties<TInput>(Type outType, object output, TInput input)
         {
-            TOutput result = default(TOutput);
+            object result = null;
             if (input != null)
             {
                 var inType = input.GetType();
                 result =
-                    (TOutput)
                     First._(
                         outType.GetConstructors()
                     )
@@ -114,6 +120,7 @@ namespace Xemo
                                 result,
                                 IntoProperties(
                                     outProp.PropertyType,
+                                    outProp.GetValue(output),
                                     inProp.GetValue(input)
                                 )
                             );
@@ -128,9 +135,23 @@ namespace Xemo
             return result;
         }
 
-        private bool TypeMatches(PropertyInfo left, PropertyInfo right)
+        private bool TypeMatches(PropertyInfo left, PropertyInfo right) =>
+            Type.GetTypeCode(left.PropertyType) == Type.GetTypeCode(right.PropertyType)
+                || BothAnonymous(left, right)
+                || BothNumbers(left, right);
+
+        private bool BothAnonymous(PropertyInfo left, PropertyInfo right) =>
+            left.GetType().Namespace == null && right.GetType().Namespace == null;
+
+        private bool BothNumbers(PropertyInfo left, PropertyInfo right)
         {
-            return Type.GetTypeCode(left.PropertyType) == Type.GetTypeCode(right.PropertyType);
+            var leftCode = Type.GetTypeCode(left.PropertyType);
+            var rightCode = Type.GetTypeCode(right.PropertyType);
+
+            return
+                leftCode is TypeCode.Decimal or TypeCode.Double or TypeCode.Int16 or TypeCode.Int32 or TypeCode.Int64
+                &&
+                rightCode is TypeCode.Decimal or TypeCode.Double or TypeCode.Int16 or TypeCode.Int32 or TypeCode.Int64;
         }
 
         private bool IsPrimitive(PropertyInfo propInfo)
@@ -139,6 +160,12 @@ namespace Xemo
             var code = t.IsArray ? t.MemberType.GetTypeCode() : Type.GetTypeCode(t);
             return code != TypeCode.Object;
         }
+    }
+
+    public static class ReflectionMerge
+    {
+        public static ReflectionMerge<TOutput> Fill<TOutput>(TOutput output) =>
+            new ReflectionMerge<TOutput>(output);
     }
 }
 

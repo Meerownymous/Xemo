@@ -1,32 +1,58 @@
 ﻿using System.Collections.Concurrent;
 using Xemo;
+using Xemo.Xemo;
 using Xunit;
 
 namespace Xemo.Tests
 {
-	public sealed class XoRamTests
-	{
-		[Fact]
-		public void FillsInformation()
-		{
-			Assert.Equal(
-				"Ramirez",
-				new XoRam().Schema(
-					new
-					{
-						FirstName = "Ramirez",
-						LastName = "Memorius"
-					}
-				)
-                .Mutate(new { FirstName = "Ramirez" })
-                .Fill(
-					new
-					{
-						FirstName = ""
-					}
-				).FirstName
-			);
-		}
+    public sealed class XoRamTests
+    {
+        [Fact]
+        public void DeliversID()
+        {
+            Assert.Equal(
+                "1",
+                new
+                {
+                    FirstName = "Ramirez",
+                    LastName = "Memorius"
+                }.AsXemo(new XoRam("1")).ID()
+            );
+        }
+
+        [Fact]
+        public void CreatesID()
+        {
+            Assert.True(
+                Guid.TryParse(
+                    new
+                    {
+                        FirstName = "Ramirez",
+                        LastName = "Memorius"
+                    }.AsXemo(new XoRam()).ID(),
+                    out _
+                )
+            );
+        }
+
+        [Fact]
+        public void FillsInformation()
+        {
+            var schema =
+                new
+                {
+                    FirstName = "Ramirez",
+                    LastName = "Memorius"
+                };
+
+            Assert.Equal(
+                "Ramirez",
+                schema.AsXemo(new XoRam())
+                    .Mutate(new { FirstName = "Ramirez" })
+                    .Fill(schema)
+                    .FirstName
+            );
+        }
         [Fact]
         public void RejectsIDChange()
         {
@@ -35,7 +61,7 @@ namespace Xemo.Tests
                     .Schema(
                         new
                         {
-						    ID = "",
+                            ID = "",
                             FirstName = "Ramirez",
                             LastName = "Memorius"
                         }
@@ -51,20 +77,20 @@ namespace Xemo.Tests
         [Fact]
         public void MutatesInformation()
         {
-			var info =
-				new XoRam().Schema(
-					new
-					{
-						FirstName = "Ramirez",
-						LastName = "Memorius"
-					}
-				);
-			info.Mutate(new { LastName = "Saveman" });
+            var info =
+                new XoRam().Schema(
+                    new
+                    {
+                        FirstName = "Ramirez",
+                        LastName = "Memorius"
+                    }
+                );
+            info.Mutate(new { LastName = "Saveman" });
 
-			Assert.Equal(
-				"Saveman",
-				info.Fill(new { LastName = "" }).LastName
-			);
+            Assert.Equal(
+                "Saveman",
+                info.Fill(new { LastName = "" }).LastName
+            );
         }
 
         [Fact]
@@ -115,7 +141,7 @@ namespace Xemo.Tests
                     FirstName = "Ramirez",
                     LastName = "Memorius"
                 };
-            var storage = ConcurrentDictionary.WithSchema(schema);
+            var storage = RamStorage.WithSchema(schema);
             XoRam
                 .Make("1", storage, schema)
                 .Mutate(new { LastName = "Saveman" });

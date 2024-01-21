@@ -6,7 +6,7 @@ namespace Xemo
     /// <summary>
     /// Merges one object's property values into another object's properties by
     /// setting the target properties from the source property values,
-    /// Handy when the target of the merge is a property object.
+    /// can be handy when the target of the merge is a property object.
     /// </summary>
     public sealed class ReflectionFill<TOutput> : IPipe<TOutput>
     {
@@ -15,7 +15,7 @@ namespace Xemo
         /// <summary>
         /// Merges one object's property values into another object's properties by
         /// setting the target properties from the source property values,
-        /// Handy when the target of the merge is a property object.
+        /// can be handy when the target of the merge is a property object.
         /// </summary>
         public ReflectionFill(TOutput target)
         {
@@ -78,9 +78,9 @@ namespace Xemo
         }
     }
 
-    public static class ReflectionMerge
+    public static class ReflectionFill
     {
-        public static ReflectionMerge<TOutput> Fill<TOutput>(TOutput target) => new ReflectionMerge<TOutput>(target);
+        public static ReflectionFill<TOutput> Fill<TOutput>(TOutput target) => new ReflectionFill<TOutput>(target);
     }
 }
 

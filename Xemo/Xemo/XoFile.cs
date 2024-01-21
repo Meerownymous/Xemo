@@ -59,7 +59,7 @@ namespace Xemo.Xemo
                     );
                     return
                         new ReflectionMerge<TSlice>(wanted)
-                            .From<TContent>(state != null ? state : this.schema);
+                            .From(state != null ? state : this.schema);
             }
         }
 

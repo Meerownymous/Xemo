@@ -76,7 +76,7 @@ namespace Xemo
         public IXemo Create<TNew>(TNew input)
         {
             var id =
-                ReflectionMerge.Fill(
+                ReflectionFill.Fill(
                     new Identifier(Guid.NewGuid().ToString())
                 ).From(input)
                 .ID;

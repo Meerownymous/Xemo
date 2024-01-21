@@ -1,5 +1,5 @@
-﻿using System;
-using Xemo.Information;
+﻿using Xemo.Information;
+using Xemo.Xemo;
 
 namespace Xemo.Examples.Todo
 {
@@ -9,26 +9,22 @@ namespace Xemo.Examples.Todo
 	public sealed class Todo : XoEnvelope
 	{
         public Todo(string subject, IXemo memory) : base(() =>
-			memory.Schema(
-				new
-				{
-					Done = false,
-					Created = DateTime.Now,
-					Subject = subject
-				}
-			)
+			new
+			{
+				Done = false,
+				Created = DateTime.Now,
+				Subject = subject
+			}.AsXemo(memory)
 		)
         { }
 
         public Todo(IXemo memory) : base(() =>
-			memory.Schema(
-				new
-				{
-					Done = false,
-					Created = DateTime.Now,
-					Subject = ""
-				}
-			)
+			new
+			{
+				Done = false,
+				Created = DateTime.Now,
+				Subject = ""
+			}.AsXemo(memory)
 		)
 		{ }
 	}

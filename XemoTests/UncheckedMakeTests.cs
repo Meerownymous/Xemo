@@ -138,7 +138,7 @@ namespace Xemo.Make.Tests
             {
                 Assert.Equal(
                     123,
-                    ReflectionMerge.Fill(new Example())
+                    ReflectionFill.Fill(new Example())
                         .From(
                             new { Nested = new { NestedNumber = 123 } }
                         )
