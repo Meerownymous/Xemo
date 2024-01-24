@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 
 namespace Xemo
 {
@@ -26,9 +25,10 @@ namespace Xemo
 
         public IXemo Xemo(string subject, string id)
         {
-            throw new NotImplementedException();
-            //if (!this.banks.TryGetValue(subject, out result))
-            //    throw new ArgumentException($"'{subject}' is an unknown subject.");
+            IXemoCluster result;
+            if (!this.clusters.TryGetValue(subject, out result))
+                throw new ArgumentException($"'{subject}' is an unknown subject.");
+            return result.Xemo(id);
         }
 
         public IMem Allocate<TSchema>(string subject, TSchema schema)
@@ -40,6 +40,7 @@ namespace Xemo
                     this.clusters.TryAdd(
                         subject,
                         new XoRamCluster<TSchema>(
+                            this,
                             subject,
                             subjectMemory,
                             schema

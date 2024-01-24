@@ -149,25 +149,26 @@ namespace Xemo.Tests
             var schema =
                 new
                 {
-                    FirstName = "Ramirez",
+                    FirstName = "Defaultus",
                     LastName = "Memorius"
                 };
-            var storage = RamStorage.WithSchema(schema);
+            var storage = RamStorage.Allocated(schema);
             XoRam
                 .Make(new AsIDCard("1", "User"), storage, schema)
-                .Mutate(new { LastName = "Saveman" });
+                .Mutate(new { FirstName = "Ulf", LastName = "Saveman" });
 
             Assert.Equal(
-                "Saveman",
-                ReflectionMake
-                    .Fill(new { LastName = "" })
-                    .From(storage["1"])
-                    .LastName
+                new
+                {
+                    FirstName = "Ulf",
+                    LastName = "Saveman"
+                },
+                storage["1"]
             );
         }
 
         [Fact]
-        public void AllowsConcurrency()
+        public void ToleratesConcurrency()
         {
             var users = new ConcurrentDictionary<string, object>();
             var xemo =

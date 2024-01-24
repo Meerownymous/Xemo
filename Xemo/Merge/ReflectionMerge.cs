@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using Tonga.Scalar;
 
 namespace Xemo
@@ -65,6 +66,10 @@ namespace Xemo
                                         outProp.GetValue(output),
                                         inProp.GetValue(input)
                                     );
+                            }
+                            else if (IsRelation(outProp.PropertyType))
+                            {
+                                Debug.WriteLine($"Should now solve {outProp.Name}");
                             }
                             else
                             {
@@ -135,15 +140,15 @@ namespace Xemo
             return result;
         }
 
-        private bool TypeMatches(PropertyInfo left, PropertyInfo right) =>
+        private static bool TypeMatches(PropertyInfo left, PropertyInfo right) =>
             Type.GetTypeCode(left.PropertyType) == Type.GetTypeCode(right.PropertyType)
                 || BothAnonymous(left, right)
                 || BothNumbers(left, right);
 
-        private bool BothAnonymous(PropertyInfo left, PropertyInfo right) =>
+        private static bool BothAnonymous(PropertyInfo left, PropertyInfo right) =>
             left.GetType().Namespace == null && right.GetType().Namespace == null;
 
-        private bool BothNumbers(PropertyInfo left, PropertyInfo right)
+        private static bool BothNumbers(PropertyInfo left, PropertyInfo right)
         {
             var leftCode = Type.GetTypeCode(left.PropertyType);
             var rightCode = Type.GetTypeCode(right.PropertyType);
@@ -154,11 +159,17 @@ namespace Xemo
                 rightCode is TypeCode.Decimal or TypeCode.Double or TypeCode.Int16 or TypeCode.Int32 or TypeCode.Int64;
         }
 
-        private bool IsPrimitive(PropertyInfo propInfo)
+        private static bool IsPrimitive(PropertyInfo propInfo)
         {
             var t = propInfo.PropertyType;
             var code = t.IsArray ? t.MemberType.GetTypeCode() : Type.GetTypeCode(t);
             return code != TypeCode.Object;
+        }
+
+        private static bool IsRelation(Type propType)
+        {
+            return propType.IsAssignableTo(typeof(IRelation<IXemo>))
+                || propType.IsAssignableTo(typeof(IRelation<IXemoCluster>));
         }
     }
 
@@ -168,4 +179,3 @@ namespace Xemo
             new ReflectionMerge<TOutput>(output);
     }
 }
-

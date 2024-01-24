@@ -19,7 +19,7 @@ namespace Xemo
         /// Schema(propertyObject).
         /// </summary>
         public XoRam(string subject) : this(
-            new LazyIDCard(() => Guid.NewGuid().ToString(), subject)
+            new LazyIDCard(() => Guid.NewGuid().ToString(), () => subject)
         )
         { }
 
@@ -74,7 +74,7 @@ namespace Xemo
         /// <summary>
         /// Information stored in RAM.
         /// </summary>
-        public XoRam() : this(new BlankPassport())
+        public XoRam() : this(new BlankIDCard())
         { }
 
         /// <summary>

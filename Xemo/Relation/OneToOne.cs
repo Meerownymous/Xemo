@@ -1,36 +1,82 @@
-﻿using System;
-using Xemo.Information;
+﻿using Xemo.Xemo;
 
 namespace Xemo.Relation
 {
     public sealed class OneToOne : IRelation<IXemo>
     {
-        private readonly string subject;
         private readonly IXemo source;
-        private readonly IXemo storage;
+        private readonly string subject;
+        private readonly IMem mem;
 
-        public OneToOne(string subject, IXemo source, IXemo storage)
+        public OneToOne(
+            string targetSubject
+        ) : this(
+            new XoDead(),
+            targetSubject,
+            new DeadMem("This is only a relation definition.")
+        )
+        { }
+
+        public OneToOne(
+            IXemo source,
+            string targetSubject,
+            IMem mem
+        )
         {
-            this.subject = subject;
             this.source = source;
-            this.storage =
-                storage.Schema(new { Subject = subject, Source = source.Card() });
+            this.subject = targetSubject;
+            this.mem = mem;
         }
 
         public void Link(IXemo target)
         {
-            throw new NotImplementedException();
+            if (this.subject != target.Card().Kind())
+                throw new NotImplementedException($"Cannot link relation because"
+                    + $" expected is a '{this.subject}' but got a '{target.Card().Kind()}'.");
+            this.Relation()
+                .Mutate(
+                    new
+                    {
+                        Source = source.Card(),
+                        Target = target.Card()
+                    }
+            );
         }
 
         public IXemo Target()
         {
-            throw new NotImplementedException();
+            var card =
+                this.Relation()
+                    .Fill(new { ID = "", Kind = "" });
+            if (card.ID == "" && card.Kind == "")
+                throw new ArgumentException(
+                    $"{this.source.Card().Kind()}.{this.source.Card().ID()}.{this.subject} is not defined."
+                );
+            return mem.Cluster(this.subject).Xemo(card.ID);
         }
+
+        public string TargetSubject() => this.subject;
 
         public void Unlink(IXemo target)
         {
-            throw new NotImplementedException();
+            if (this.subject != target.Card().Kind())
+                throw new NotImplementedException($"Cannot release relation because"
+                    + $" expected is a '{this.subject}' but got a '{target.Card().Kind()}'.");
+            this.Relation()
+                .Mutate(
+                    new
+                    {
+                        Source = new { ID = "", Kind = "" },
+                        Target = new { ID = "", Kind = "" }
+                    }
+                );
         }
+
+        private IXemo Relation() =>
+            this.mem
+                .Xemo(
+                    $"Relation-OneToOne.{this.source.Card().Kind()}.{this.subject}", this.source.Card().ID()
+                );
     }
 }
 

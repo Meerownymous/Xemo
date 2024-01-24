@@ -1,8 +1,8 @@
 ﻿namespace Xemo.IDCard
 {
-    public sealed class BlankPassport : IIDCard
+    public sealed class BlankIDCard : IIDCard
     {
-        public BlankPassport()
+        public BlankIDCard()
         { }
 
         public string ID() => string.Empty;

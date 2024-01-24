@@ -14,7 +14,7 @@ namespace XemoTests.Xemo
 
             Assert.Equal(
                 1,
-                lst.InRam(new Ram(), "Things")
+                lst.AllocatedXemo("Things", new Ram())
                     .Fill(new { Count = 0L })
                     .Count
             );
@@ -59,7 +59,7 @@ namespace XemoTests.Xemo
                         Hobbies = new string[0]
                     }
                 }
-                .InRam(new Ram(), "profiles")
+                .AllocatedXemo("profiles", new Ram())
                 .Mutate(new { Profile = new { Personal = new { FirstName = "Mister", LastName = "O" } } })
                 .Fill(new { Profile = new { Personal = new { FirstName = "", LastName = "" } } })
                 .Profile.Personal.FirstName

@@ -14,23 +14,31 @@ namespace Xemo
         { }
 
         public static XoRamCluster<TSchema> Allocate<TSchema>(string subject, TSchema schema) =>
-            new XoRamCluster<TSchema>(subject, new ConcurrentDictionary<string,TSchema>(), schema);
+            new XoRamCluster<TSchema>(new DeadMem("This cluster is isolated."), subject, new ConcurrentDictionary<string, TSchema>(), schema);
+
+        public static XoRamCluster<TSchema> Allocate<TSchema>(IMem home, string subject, TSchema schema) =>
+            new XoRamCluster<TSchema>(home, subject, new ConcurrentDictionary<string,TSchema>(), schema);
     }
 
     public sealed class XoRamCluster<TContent> : IXemoCluster
     {
+        private readonly IMem home;
         private string subject;
         private readonly Lazy<List<string>> index;
         private readonly ConcurrentDictionary<string, TContent> storage;
         private readonly TContent schema;
 
         public XoRamCluster() : this(
-            string.Empty, new ConcurrentDictionary<string, TContent>(), default(TContent)
+            new DeadMem("This cluster is isolated."),
+            string.Empty,
+            new ConcurrentDictionary<string, TContent>(),
+            default(TContent)
         )
         { }
 
-        public XoRamCluster(string subject, ConcurrentDictionary<string, TContent> storage, TContent schema)
+        public XoRamCluster(IMem home, string subject, ConcurrentDictionary<string, TContent> storage, TContent schema)
         {
+            this.home = home;
             this.subject = subject;
             this.index = new Lazy<List<string>>(() =>
             {
@@ -59,7 +67,7 @@ namespace Xemo
             new XoRam<TContent>(new AsIDCard(id, this.subject), this.storage, this.schema);
 
         public IXemoCluster Schema<TSchema>(TSchema schema) =>
-            new XoRamCluster<TSchema>(this.subject, new ConcurrentDictionary<string, TSchema>(), schema);
+            new XoRamCluster<TSchema>(this.home, this.subject, new ConcurrentDictionary<string, TSchema>(), schema);
 
         public IXemoCluster Reduced<TQuery>(TQuery blueprint, Func<TQuery, bool> matches) =>
             new XoFiltered<TQuery>(this, blueprint, matches);
