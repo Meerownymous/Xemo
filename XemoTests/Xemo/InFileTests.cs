@@ -1,4 +1,5 @@
 ﻿using System;
+using Xemo;
 using Xemo.Xemo;
 using Xunit;
 
@@ -13,7 +14,7 @@ namespace XemoTests.Xemo
 
             Assert.Equal(
                 1,
-                lst.InRam()
+                lst.InRam(new Ram(), "Things")
                     .Fill(new { Count = 0L })
                     .Count
             );
@@ -58,7 +59,7 @@ namespace XemoTests.Xemo
                         Hobbies = new string[0]
                     }
                 }
-                .InRam()
+                .InRam(new Ram(), "profiles")
                 .Mutate(new { Profile = new { Personal = new { FirstName = "Mister", LastName = "O" } } })
                 .Fill(new { Profile = new { Personal = new { FirstName = "", LastName = "" } } })
                 .Profile.Personal.FirstName

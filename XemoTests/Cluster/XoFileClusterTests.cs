@@ -11,11 +11,13 @@ namespace Xemo.Cluster.Tests
         {
             using (var home = new TempDirectory("home"))
             {
-                new XoFileCluster(home.Value()).Schema(new { ID = "", Name = "" })
+                XoFileCluster
+                    .Allocate("User", new { ID = "", Name = "" }, home.Value())
                     .Create(new { ID = "123", Name = "Persistino" });
+
                 Assert.Equal(
                     "{\"ID\":\"123\",\"Name\":\"Persistino\"}",
-                    File.ReadAllText(Path.Combine(home.Value().FullName, "123", "content.json"))
+                    File.ReadAllText(Path.Combine(home.Value().FullName, "User", "123", "content.json"))
                 );
 
             }
@@ -26,8 +28,8 @@ namespace Xemo.Cluster.Tests
         {
             using (var home = new TempDirectory("home"))
             {
-                var cluster = new XoFileCluster(home.Value()).Schema(new { ID = 0, Name = "" });
-                var persistino = cluster.Create(new { ID = 123, Name = "Persistino" });
+                var cluster = XoFileCluster.Allocate("User", new { ID = 0, Name = "" }, home.Value());
+                var persistino = cluster.Create(new { ID = "123", Name = "Persistino" });
                 cluster.Without(persistino);
 
                 Assert.Empty(home.Value().GetFiles("*.*", SearchOption.AllDirectories));
@@ -39,15 +41,15 @@ namespace Xemo.Cluster.Tests
         {
             using (var home = new TempDirectory("home"))
             {
-                new XoFileCluster(home.Value())
-                    .Schema(new { ID = 0, Name = "" })
+                XoFileCluster
+                    .Allocate("user", new { ID = 0, Name = "" }, home.Value())
                     .Create(new { ID = 123, Name = "Persistino" });
 
                 Assert.Equal(
                     "Persistino",
                     First._(
-                        new XoFileCluster(home.Value())
-                            .Schema(new { ID = 0, Name = "" })
+                        XoFileCluster
+                            .Allocate("user", new { ID = 0, Name = "" }, home.Value())
                     )
                     .Value()
                     .Fill(new { ID = 0, Name = "" })
@@ -61,11 +63,11 @@ namespace Xemo.Cluster.Tests
         {
             using (var home = new TempDirectory("home"))
             {
-                var cluster =
-                    new XoFileCluster(home.Value())
-                        .Schema(new { ID = 0, Name = "" });
                 Assert.Throws<InvalidOperationException>(() =>
-                    cluster.Reduced(new { ID = 0 }, user => user.ID == 123)
+
+                    XoFileCluster.Allocate(
+                        "user", new { ID = 0, Name = "" }, home.Value()
+                    ).Reduced(new { ID = 0 }, user => user.ID == 123)
                 );
             }
         }

@@ -5,7 +5,8 @@
 	/// </summary>
 	public interface IXemoCluster : IEnumerable<IXemo>
 	{
-        IXemoCluster Schema<TContent>(TContent schema);
+        //IXemoCluster Schema<TContent>(TContent schema);
+
 
         IXemo Xemo(string id);
 

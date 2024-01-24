@@ -37,10 +37,10 @@ namespace Xemo.Cluster
             return xemo;
         }
 
-        public IXemoCluster Schema<TContent>(TContent schema) =>
-            new XoFiltered<TFilterSlice>(
-                this.origin.Schema(schema), this.filterSlice, this.match
-            );
+        //public IXemoCluster Schema<TContent>(TContent schema) =>
+        //    new XoFiltered<TFilterSlice>(
+        //        this.origin.Schema(schema), this.filterSlice, this.match
+        //    );
 
         public IXemo Create<TNew>(TNew plan) =>
             this.origin.Create(plan);

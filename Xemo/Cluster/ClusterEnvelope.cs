@@ -29,8 +29,8 @@ namespace Xemo.Cluster
         public IXemo Xemo(string id) =>
             this.core.Xemo(id);
 
-        public IXemoCluster Schema<TContent>(TContent schema) =>
-            this.core.Schema(schema);
+        //public IXemoCluster Schema<TContent>(TContent schema) =>
+        //    this.core.Schema(schema);
 
         public IEnumerator<IXemo> GetEnumerator() =>
             this.core.GetEnumerator();

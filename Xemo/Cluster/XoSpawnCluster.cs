@@ -13,8 +13,8 @@ namespace Xemo.Cluster
             this.origin = origin;
         }
 
-        public IXemoCluster Schema<TSchema>(TSchema schema) =>
-            new XoSpawnCluster(this.spawnGuard, this.origin.Schema(schema));
+        //public IXemoCluster Schema<TSchema>(TSchema schema) =>
+        //    new XoSpawnCluster(this.spawnGuard, this.origin.Schema(schema));
 
         public IXemo Xemo(string id) =>
             this.origin.Xemo(id);

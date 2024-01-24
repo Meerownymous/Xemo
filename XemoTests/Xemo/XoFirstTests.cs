@@ -16,7 +16,7 @@ namespace XemoTests.Xemo
                 "Dobertus Meow",
                 new XoFirst(
                     new XoWith(
-                        new XoRamCluster().Schema(schema),
+                        XoRamCluster.Allocate("Personalities", schema),
                         new { ID = "Meerow" },
                         new { ID = "Dobertus Meow" }
                     )

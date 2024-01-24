@@ -30,6 +30,9 @@ namespace Xemo.Cluster
             new XoFileCluster<object>(subject, home)
         )
         { }
+
+        public static XoFileCluster<TSchema> Allocate<TSchema>(string subject, TSchema schema, DirectoryInfo home) =>
+            new XoFileCluster<TSchema>(subject, home, schema);
     }
 
     /// <summary>
@@ -101,7 +104,7 @@ namespace Xemo.Cluster
 
         public IEnumerator<IXemo> GetEnumerator()
         {
-            foreach (var directory in this.home.EnumerateDirectories())
+            foreach (var directory in this.home.EnumerateDirectories($"./{this.subject}/*"))
             {
                 var contentFile = Path.Combine(directory.FullName, "content.json");
                 if (File.Exists(contentFile))

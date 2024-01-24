@@ -20,8 +20,8 @@ namespace Xemo.Cluster
         public IXemo Xemo(string id) =>
             this.origin.Xemo(id);
 
-        public IXemoCluster Schema<TSchema>(TSchema schema) =>
-            this.origin.Schema(schema);
+        //public IXemoCluster Schema<TSchema>(TSchema schema) =>
+        //    this.origin.Schema(schema);
 
         public IXemo Create<TNew>(TNew plan) => this.origin.Create(plan);
 

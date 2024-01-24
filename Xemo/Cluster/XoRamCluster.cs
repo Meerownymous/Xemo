@@ -12,6 +12,9 @@ namespace Xemo
             new XoRamCluster<object>()
         )
         { }
+
+        public static XoRamCluster<TSchema> Allocate<TSchema>(string subject, TSchema schema) =>
+            new XoRamCluster<TSchema>(subject, new ConcurrentDictionary<string,TSchema>(), schema);
     }
 
     public sealed class XoRamCluster<TContent> : IXemoCluster
