@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using Tonga.Enumerable;
 using Xemo.Cluster;
+using Xemo.IDCard;
 
 namespace Xemo
 {
@@ -48,11 +48,15 @@ namespace Xemo
         public IEnumerator<IXemo> GetEnumerator()
         {
             foreach (var key in this.index.Value)
-                yield return new XoRam<TContent>(new AsPassport(key, this.subject), this.storage, this.schema);
+                yield return new XoRam<TContent>(
+                    new AsIDCard(key, this.subject),
+                    this.storage,
+                    this.schema
+                );
         }
 
         public IXemo Xemo(string id) =>
-            new XoRam<TContent>(new AsPassport(id, this.subject), this.storage, this.schema);
+            new XoRam<TContent>(new AsIDCard(id, this.subject), this.storage, this.schema);
 
         public IXemoCluster Schema<TSchema>(TSchema schema) =>
             new XoRamCluster<TSchema>(this.subject, new ConcurrentDictionary<string, TSchema>(), schema);
@@ -105,7 +109,7 @@ namespace Xemo
             );
             return
                 new XoRam<TContent>(
-                    new AsPassport(id, this.subject),
+                    new AsIDCard(id, this.subject),
                     this.storage,
                     this.schema
                 );

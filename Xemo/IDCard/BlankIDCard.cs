@@ -1,5 +1,4 @@
-﻿using System;
-namespace Xemo
+﻿namespace Xemo.IDCard
 {
     public sealed class BlankPassport : IIDCard
     {

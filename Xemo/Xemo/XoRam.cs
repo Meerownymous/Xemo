@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Tonga;
 using Tonga.Text;
+using Xemo.IDCard;
 using Xemo.Information;
 
 namespace Xemo
@@ -18,7 +19,7 @@ namespace Xemo
         /// Schema(propertyObject).
         /// </summary>
         public XoRam(string subject) : this(
-            new LazyPassport(() => Guid.NewGuid().ToString(), subject)
+            new LazyIDCard(() => Guid.NewGuid().ToString(), subject)
         )
         { }
 
@@ -27,7 +28,7 @@ namespace Xemo
         /// Before using, you need to define a schema, calling
         /// Schema(propertyObject).
         /// </summary>
-        public XoRam(string subject, string id) : this(new AsPassport(subject, id))
+        public XoRam(string subject, string id) : this(new AsIDCard(subject, id))
         { }
 
         /// <summary>

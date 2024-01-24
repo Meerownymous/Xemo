@@ -1,12 +1,11 @@
-﻿using System;
-namespace Xemo
+﻿namespace Xemo.IDCard
 {
-    public sealed class AsPassport : IIDCard
+    public sealed class AsIDCard : IIDCard
     {
         private readonly string id;
         private readonly string kind;
 
-        public AsPassport(string id, string kind)
+        public AsIDCard(string id, string kind)
         {
             this.id = id;
             this.kind = kind;

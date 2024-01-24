@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Xemo.IDCard;
 using Xemo.Information;
 
 namespace Xemo.Xemo
@@ -33,7 +34,7 @@ namespace Xemo.Xemo
 
         public XoFile(string id, string subject, FileInfo memory, TContent schema)
         {
-            this.passport = new AsPassport(id, subject);
+            this.passport = new AsIDCard(id, subject);
             this.storage = memory;
             this.schema = schema;
         }

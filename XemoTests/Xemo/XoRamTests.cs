@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Xemo;
+using Xemo.IDCard;
 using Xemo.Xemo;
 using Xunit;
 
@@ -153,7 +154,7 @@ namespace Xemo.Tests
                 };
             var storage = RamStorage.WithSchema(schema);
             XoRam
-                .Make(new AsPassport("1", "User"), storage, schema)
+                .Make(new AsIDCard("1", "User"), storage, schema)
                 .Mutate(new { LastName = "Saveman" });
 
             Assert.Equal(
@@ -170,7 +171,7 @@ namespace Xemo.Tests
         {
             var users = new ConcurrentDictionary<string, object>();
             var xemo =
-                XoRam.Make(new AsPassport("1", "User"), users,
+                XoRam.Make(new AsIDCard("1", "User"), users,
                     new
                     {
                         FirstName = "Ramirez",
