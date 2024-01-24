@@ -10,35 +10,37 @@ namespace Xemo.Xemo
     public sealed class XoFile : XoEnvelope
     {
         public XoFile(FileInfo storage) : this(
-            string.Empty, storage
+            string.Empty, string.Empty, storage
         )
         { }
 
-        public XoFile(string id, FileInfo storage) : base(
-            new XoFile<object>(id, storage, new List<object>() { new object() })
+        public XoFile(string id, string subject, FileInfo storage) : base(
+            new XoFile<object>(id, subject, storage, new List<object>() { new object() })
         )
         { }
     }
 
     public sealed class XoFile<TContent> : IXemo
     {
-        private readonly string id;
+        private readonly IIDCard passport;
         private readonly FileInfo storage;
         private readonly TContent schema;
 
-        public XoFile(string id, FileInfo storage) : this(
-            id, storage, default(TContent)
+        public XoFile(string id, string kind, FileInfo storage) : this(
+            id, kind, storage, default(TContent)
         )
         { }
 
-        public XoFile(string id, FileInfo memory, TContent schema)
+        public XoFile(string id, string subject, FileInfo memory, TContent schema)
         {
-            this.id = id;
+            this.passport = new AsPassport(id, subject);
             this.storage = memory;
             this.schema = schema;
         }
 
-        public string ID() => this.id;
+        public IIDCard Card() => this.passport;
+
+        public IIDCard IID() => this.passport;
 
         public TSlice Fill<TSlice>(TSlice wanted)
         {
@@ -77,7 +79,7 @@ namespace Xemo.Xemo
                         )
                     ).From(mutation);
                 var newID = ReflectionMerge.Fill(new Identifier()).From(newState).ID;
-                if (newID != this.id)
+                if (newID != this.passport.ID())
                 {
                     throw new InvalidOperationException("ID change is not supported.");
                 }
@@ -89,7 +91,8 @@ namespace Xemo.Xemo
 
         public IXemo Schema<TSchema>(TSchema schema) =>
             new XoFile<TSchema>(
-                this.id,
+                this.passport.ID(),
+                this.passport.Kind(),
                 this.storage,
                 schema
             );

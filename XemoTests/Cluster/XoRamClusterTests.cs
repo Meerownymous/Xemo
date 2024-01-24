@@ -52,7 +52,7 @@ namespace Xemo.Cluster.Tests
                     .Create(
                         new { Name = "Dobert" }
                     )
-                .ID()
+                .Card().ID()
             );
         }
 
@@ -64,7 +64,7 @@ namespace Xemo.Cluster.Tests
                 new XoRamCluster()
                     .Schema(new { ID = "", Name = "" })
                     .Create(new { ID = "1", Name = "Dobert" })
-                .ID()
+                .Card().ID()
             );
         }
 

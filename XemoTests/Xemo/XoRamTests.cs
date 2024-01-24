@@ -8,20 +8,21 @@ namespace Xemo.Tests
     public sealed class XoRamTests
     {
         [Fact]
-        public void DeliversID()
+        public void CreatesWithIDInSlice()
         {
             Assert.Equal(
                 "1",
                 new
                 {
+                    ID = "1",
                     FirstName = "Ramirez",
                     LastName = "Memorius"
-                }.AsXemo(new XoRam("1")).ID()
+                }.AllocatedXemo("User", new Ram()).Card().ID()
             );
         }
 
         [Fact]
-        public void CreatesID()
+        public void AutoGeneratesIDWhenMissingInSlice()
         {
             Assert.True(
                 Guid.TryParse(
@@ -29,7 +30,9 @@ namespace Xemo.Tests
                     {
                         FirstName = "Ramirez",
                         LastName = "Memorius"
-                    }.AsXemo(new XoRam()).ID(),
+                    }.AllocatedXemo("User", new Ram())
+                    .Card()
+                    .ID(),
                     out _
                 )
             );
@@ -41,13 +44,20 @@ namespace Xemo.Tests
             var schema =
                 new
                 {
-                    FirstName = "Ramirez",
-                    LastName = "Memorius"
+                    FirstName = "",
+                    LastName = ""
                 };
 
             Assert.Equal(
                 "Ramirez",
-                schema.AsXemo(new XoRam())
+                schema.Allocated("User", new Ram())
+                    .Create(
+                        new
+                        {
+                            FirstName = "Stephano",
+                            LastName = "Memorius"
+                        }
+                    )
                     .Mutate(new { FirstName = "Ramirez" })
                     .Fill(schema)
                     .FirstName
@@ -57,7 +67,7 @@ namespace Xemo.Tests
         public void RejectsIDChange()
         {
             Assert.Throws<InvalidOperationException>(() =>
-                new XoRam("1")
+                new XoRam("User")
                     .Schema(
                         new
                         {
@@ -78,7 +88,7 @@ namespace Xemo.Tests
         public void MutatesInformation()
         {
             var info =
-                new XoRam().Schema(
+                new XoRam("User").Schema(
                     new
                     {
                         FirstName = "Ramirez",
@@ -97,7 +107,7 @@ namespace Xemo.Tests
         public void PreservesInformationOnMutation()
         {
             var info =
-                new XoRam().Schema(
+                new XoRam("User").Schema(
                     new
                     {
                         FirstName = "Ramirez",
@@ -116,7 +126,7 @@ namespace Xemo.Tests
         public void RemutatesInformation()
         {
             var info =
-                new XoRam().Schema(
+                new XoRam("User").Schema(
                     new
                     {
                         FirstName = "Ramirez",
@@ -143,7 +153,7 @@ namespace Xemo.Tests
                 };
             var storage = RamStorage.WithSchema(schema);
             XoRam
-                .Make("1", storage, schema)
+                .Make(new AsPassport("1", "User"), storage, schema)
                 .Mutate(new { LastName = "Saveman" });
 
             Assert.Equal(
@@ -158,9 +168,9 @@ namespace Xemo.Tests
         [Fact]
         public void AllowsConcurrency()
         {
-            var storage = new ConcurrentDictionary<string, object>();
+            var users = new ConcurrentDictionary<string, object>();
             var xemo =
-                XoRam.Make("1", storage,
+                XoRam.Make(new AsPassport("1", "User"), users,
                     new
                     {
                         FirstName = "Ramirez",

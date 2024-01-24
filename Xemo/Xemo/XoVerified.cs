@@ -20,7 +20,12 @@ namespace Xemo
             this.validations = valid;
         }
 
-        public string ID() =>
+        public IIDCard Card() =>
+            throw new InvalidOperationException(
+                "This is a verify object, it does not have an ID."
+            );
+
+        public IIDCard IID() =>
             throw new InvalidOperationException(
                 "This is a verify object, it does not have an ID."
             );

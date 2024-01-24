@@ -16,8 +16,8 @@ namespace Xemo.Cluster
         public IXemoCluster Schema<TSchema>(TSchema schema) =>
             new XoSpawnCluster(this.spawnGuard, this.origin.Schema(schema));
 
-        //public IXemoCluster With<TNew>(TNew plan) =>
-        //    this.origin.With(this.spawnGuard.Fill(plan));
+        public IXemo Xemo(string id) =>
+            this.origin.Xemo(id);
 
         public IXemo Create<TNew>(TNew plan) =>
             this.origin.Create(this.spawnGuard.Fill(plan));

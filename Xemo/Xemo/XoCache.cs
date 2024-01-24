@@ -63,7 +63,9 @@ namespace Xemo
             this.cache = cache;
         }
 
-        public string ID() => this.origin.ID();
+        public IIDCard Card() => this.origin.Card();
+
+        //public IIdentifier IID() => this.origin.IID();
 
         public TSlice Fill<TSlice>(TSlice wanted)
         {
@@ -72,7 +74,7 @@ namespace Xemo
                 .From(
                     this.cache
                         .GetOrAdd(
-                            this.ID(),
+                            this.Card().ID(),
                             () => this.origin.Fill(this.Schema())
                         )
                 );
@@ -88,7 +90,7 @@ namespace Xemo
         public IXemo Mutate<TSlice>(TSlice mutation)
         {
             this.cache.AddOrUpdate(
-                this.ID(),
+                this.Card().ID(),
                 key =>
                 {
                     var newState =
@@ -96,7 +98,7 @@ namespace Xemo
                             this.origin.Fill(this.schema)
                         ).From(mutation);
                     var newID = ReflectionMerge.Fill(new Identifier()).From(newState).ID;
-                    if (newID != string.Empty && newID != this.ID())
+                    if (newID != string.Empty && newID != this.Card().ID())
                     {
                         throw new InvalidOperationException("ID change is not supported.");
                     }

@@ -8,23 +8,24 @@ namespace Xemo.Examples.Todo
 	/// </summary>
 	public sealed class Todo : XoEnvelope
 	{
-        public Todo(string subject, IXemo memory) : base(() =>
+        public Todo(string subject, IMem memory) : base(() =>
 			new
 			{
 				Done = false,
 				Created = DateTime.Now,
-				Subject = subject
-			}.AsXemo(memory)
+				Subject = subject,
+				Author = ""
+			}.AsXemo("todo", memory)
 		)
         { }
 
-        public Todo(IXemo memory) : base(() =>
+        public Todo(IMem memory) : base(() =>
 			new
 			{
 				Done = false,
 				Created = DateTime.Now,
 				Subject = ""
-			}.AsXemo(memory)
+			}.AsXemo("todo", memory)
 		)
 		{ }
 	}

@@ -17,6 +17,9 @@ namespace Xemo.Cluster
             this.cache = cache;
         }
 
+        public IXemo Xemo(string id) =>
+            this.origin.Xemo(id);
+
         public IXemoCluster Schema<TSchema>(TSchema schema) =>
             this.origin.Schema(schema);
 

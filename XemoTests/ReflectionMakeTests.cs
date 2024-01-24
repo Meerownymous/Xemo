@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using Xemo;
+﻿using System.Diagnostics;
 using Xunit;
 
 namespace Xemo.Make.Tests
@@ -121,23 +119,22 @@ namespace Xemo.Make.Tests
         }
 
         [Fact(Skip = "For performane analysis only")]
+        //[Fact]
         public void Investigation()
         {
-            var id = new Example { Number = 123, Nested = new NestedExample { NestedNumber = 100 } };
-
             var sw = new Stopwatch();
             sw.Start();
             for (var i = 0; i < 1000000; i++)
             {
                 Assert.Equal(
                     123,
-                    ReflectionMake.Fill(new Example())
-                        .From(
-                            new { Nested = new { NestedNumber = 123 } }
-                        )
-                        .Nested
-                        .NestedNumber
-                    );
+                ReflectionMake.Fill(new Example())
+                    .From(
+                        new { Nested = new { NestedNumber = 123 } }
+                    )
+                    .Nested
+                    .NestedNumber
+                );
             }
             sw.Stop();
 
@@ -166,6 +163,12 @@ namespace Xemo.Make.Tests
             public int Number { get; set; }
             public NestedExample Nested { get; set; }
             public NestedExample[] Nesteds { get; set; }
+        }
+
+        internal sealed class Example2
+        {
+            public int Number { get; set; }
+            public NestedExample Nested { get; set; }
         }
 
         internal sealed class NestedExample

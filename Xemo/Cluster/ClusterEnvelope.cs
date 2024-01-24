@@ -26,6 +26,9 @@ namespace Xemo.Cluster
             this.core = core;
         }
 
+        public IXemo Xemo(string id) =>
+            this.core.Xemo(id);
+
         public IXemoCluster Schema<TContent>(TContent schema) =>
             this.core.Schema(schema);
 

@@ -23,8 +23,8 @@
             this.core = core;
         }
 
-        public string ID() =>
-            this.core.ID();
+        public IIDCard Card() =>
+            this.core.Card();
 
         public TSlice Fill<TSlice>(TSlice wanted) =>
             this.core.Fill(wanted);

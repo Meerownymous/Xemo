@@ -14,7 +14,7 @@ namespace XemoTests.Xemo
                 "Mike",
                 new AsXemo(
                     new { Name = "Mike" },
-                    new XoRam()
+                    new XoRam("User")
                 ).Fill(new { Name = ""})
                 .Name
             );

@@ -11,21 +11,21 @@ namespace Xemo.Examples.Todo
         /// <summary>
         /// All todos which exist.
         /// </summary>
-        public AllTodos(IXemoCluster storage) : base(
+        public AllTodos(IMem memory) : base(
             new LazyCluster(() =>
                 new XoSpawnCluster(
                     XoSpawn.Schema(
                         new { Subject = "", Due = DateTime.MinValue },
                         todo => (todo.Due > DateTime.Now, "Due date must be in the future.")
                     ),
-                    storage.Schema(
+                    memory.Allocate("todo",
                         new
                         {
                             Done = false,
                             Due = DateTime.Now,
                             Subject = ""
                         }
-                    )
+                    ).Cluster("todo")
                 )
 			)
 		)

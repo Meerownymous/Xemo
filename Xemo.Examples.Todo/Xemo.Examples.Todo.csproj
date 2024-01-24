@@ -20,6 +20,7 @@
 <PrivateAssets>all</PrivateAssets>
 </PackageReference>
     <PackageReference Include="Snapshooter.Xunit" Version="0.13.0" />
+    <PackageReference Include="NModbus" Version="3.0.81" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Xemo\Xemo.csproj" />

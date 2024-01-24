@@ -29,6 +29,14 @@ namespace Xemo.Cluster
             this.match = match;
         }
 
+        public IXemo Xemo(string id)
+        {
+            var xemo = this.origin.Xemo(id);
+            if (!this.match(xemo.Fill(filterSlice)))
+                throw new ArgumentException($"'{id}' does not exist or does not match the filter critera.");
+            return xemo;
+        }
+
         public IXemoCluster Schema<TContent>(TContent schema) =>
             new XoFiltered<TFilterSlice>(
                 this.origin.Schema(schema), this.filterSlice, this.match

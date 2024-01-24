@@ -10,7 +10,7 @@ namespace Xemo.Examples.Todo
         [Fact]
         public void ListsTodos()
         {
-            var todos = new AllTodos(new XoRamCluster());
+            var todos = new AllTodos(new Ram());
             todos.Create(new { Subject = "List me", Due = DateTime.Now + new TimeSpan(24,0,0,0) });
             Assert.Equal(
                 "List me",
@@ -23,7 +23,7 @@ namespace Xemo.Examples.Todo
         [Fact]
         public void CreatesTodo()
         {
-            var todos = new AllTodos(new XoRamCluster());
+            var todos = new AllTodos(new Ram());
             todos.Create(
                 new
                 {
@@ -43,7 +43,7 @@ namespace Xemo.Examples.Todo
         public void RejectsWrongDueDate()
         {
             Assert.Throws<ArgumentException>(() =>
-                new AllTodos(new XoRamCluster())
+                new AllTodos(new Ram())
                     .Create(
                         new
                         {

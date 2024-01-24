@@ -16,7 +16,7 @@ namespace Xemo.Information
             this.core = new Lazy<IXemo>(origin);
         }
 
-        public string ID() => this.core.Value.ID();
+        public IIDCard Card() => this.core.Value.Card();
 
         public TSlice Fill<TSlice>(TSlice wanted) =>
             this.core.Value.Fill(wanted);

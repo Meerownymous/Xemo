@@ -8,7 +8,7 @@ namespace Xemo.Examples.Todo
         [Fact]
         public void ListsOnlyDone()
         {
-            var cluster = new AllTodos(new XoRamCluster());
+            var cluster = new AllTodos(new Ram());
             cluster
                 .Create(
                     new
@@ -30,7 +30,7 @@ namespace Xemo.Examples.Todo
         [Fact]
         public void DeliversDone()
         {
-            var cluster = new AllTodos(new XoRamCluster());
+            var cluster = new AllTodos(new Ram());
             cluster.Create(
                 new
                 {

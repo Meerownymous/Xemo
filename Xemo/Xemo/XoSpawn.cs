@@ -14,7 +14,7 @@
             this.inner = XoVerified.By(minimum, valid);
         }
 
-        public string ID() => this.inner.ID();
+        public IIDCard Card() => this.inner.Card();
 
         public TSlice Fill<TSlice>(TSlice wanted)
         {

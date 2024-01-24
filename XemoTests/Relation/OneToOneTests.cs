@@ -7,39 +7,67 @@ namespace XemoTests.Relation
 {
     public sealed class OneToOneTests
     {
-        [Fact(Skip = "Subject to redesign")]
+        [Fact]
         public void Links()
         {
+            var mem = new Ram();
             var user =
-                new XoRam().Schema(new { Username = "Bob" });
+                mem.Allocate("user", new { Firstname = "", Lastname = "" })
+                    .Cluster("user")
+                    .Create(new { Firstname = "Mario", Lastname = "Anonymez" });
 
-            var friend =
-                new XoRam().Schema(new { Username = "Jay" });
-
-            var relationMemory =
-                new XoRam()
-                    .Schema(new { Name = "", LeftID = "", RightID = "" });
-
-            new OneToOne(
-                user,
-                id => id == friend.ID() ? friend : new XoRam(),
-                name => relationMemory,
-                "BestFriend"
-            )
-            .Link(friend);
+            var todo =
+                mem.Allocate(
+                    "todo",
+                    new
+                    {
+                        Subject = "", Due = DateTime.MinValue, Author = user.Card()
+                    }
+                )
+                .Cluster("todo")
+                .Create(new { Subject = "Succeed", Due = DateTime.Now, Author = user });
 
             Assert.Equal(
-                "Jay",
-                new OneToOne(
-                    user,
-                    id => id == friend.ID() ? friend : new XoRam(),
-                    name => relationMemory,
-                    "BestFriend"
-                )
-                .Target()
-                .Fill(new { Username = "" })
-                .Username
+                "Succeed",
+                todo.Fill(new { Subject = "" }).Subject
             );
+
+            //new OneToOne2(todo, author, new XoRam(), "Author");
+        }
+
+        [Fact(Skip = "Subject to redesign")]
+        public void Links2()
+        {
+            //var user =
+            //    new XoRam().Schema(new { Username = "Bob" });
+
+            //var friend =
+            //    new XoRam().Schema(new { Username = "Jay" });
+
+            //var relationMemory =
+            //    new XoRam()
+            //        .Schema(new { Name = "", LeftID = "", RightID = "" });
+
+            //new OneToOne2(
+            //    user,
+            //    id => id == friend.ID() ? friend : new XoRam(),
+            //    name => relationMemory,
+            //    "BestFriend"
+            //)
+            //.Link(friend);
+
+            //Assert.Equal(
+            //    "Jay",
+            //    new OneToOne2(
+            //        user,
+            //        id => id == friend.ID() ? friend : new XoRam(),
+            //        name => relationMemory,
+            //        "BestFriend"
+            //    )
+            //    .Target()
+            //    .Fill(new { Username = "" })
+            //    .Username
+            //);
         }
     }
 }

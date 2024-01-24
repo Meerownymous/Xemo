@@ -18,6 +18,9 @@ namespace Xemo.Cluster
             this.origin = new Lazy<IXemoCluster>(origin);
 		}
 
+        public IXemo Xemo(string id) =>
+            this.origin.Value.Xemo(id);
+
         public IXemoCluster Schema<TSchema>(TSchema schema) =>
             new LazyCluster(() => this.origin.Value.Schema(schema));
 

@@ -10,14 +10,16 @@ namespace Xemo
     /// </summary>
     public sealed class XoRam : IXemo
     {
-        private readonly IText id;
+        private readonly IIDCard passport;
 
         /// <summary>
         /// Information stored in RAM.
         /// Before using, you need to define a schema, calling
         /// Schema(propertyObject).
         /// </summary>
-        public XoRam() : this(AsText._(() => Guid.NewGuid().ToString()))
+        public XoRam(string subject) : this(
+            new LazyPassport(() => Guid.NewGuid().ToString(), subject)
+        )
         { }
 
         /// <summary>
@@ -25,7 +27,7 @@ namespace Xemo
         /// Before using, you need to define a schema, calling
         /// Schema(propertyObject).
         /// </summary>
-        public XoRam(string id) : this(AsText._(id))
+        public XoRam(string subject, string id) : this(new AsPassport(subject, id))
         { }
 
         /// <summary>
@@ -33,24 +35,24 @@ namespace Xemo
         /// Before using, you need to define a schema, calling
         /// Schema(propertyObject).
         /// </summary>
-        public XoRam(IText id)
+        public XoRam(IIDCard id)
         {
-            this.id = Sticky._(id);
+            this.passport = id;
         }
 
         public TSlice Fill<TSlice>(TSlice wanted) =>
             throw new InvalidOperationException("Define a schema first.");
 
-        public string ID() => this.id.AsString();
+        public IIDCard Card() => this.passport;
 
         public IXemo Mutate<TSlice>(TSlice mutation) =>
             throw new InvalidOperationException("Define a schema first.");
 
         public IXemo Schema<TSchema>(TSchema schema) =>
-            new XoRam<TSchema>(this.id.AsString(), new ConcurrentDictionary<string, TSchema>(), schema);
+            new XoRam<TSchema>(this.passport, new ConcurrentDictionary<string, TSchema>(), schema);
 
         public static XoRam<TSchema> Make<TSchema>(
-            string id, ConcurrentDictionary<string, TSchema> storage, TSchema schema
+            IIDCard id, ConcurrentDictionary<string, TSchema> storage, TSchema schema
         ) =>
             new XoRam<TSchema>(id, storage, schema);
     }
@@ -60,7 +62,7 @@ namespace Xemo
     /// </summary>
     public sealed class XoRam<TContent> : IXemo
     {
-        private readonly Lazy<string> id;
+        private readonly IIDCard passport;
 
         /// <summary>
         /// Storage of Xemos addressable by unique strings.
@@ -71,13 +73,13 @@ namespace Xemo
         /// <summary>
         /// Information stored in RAM.
         /// </summary>
-        public XoRam() : this(string.Empty)
+        public XoRam() : this(new BlankPassport())
         { }
 
         /// <summary>
         /// Information stored in RAM.
         /// </summary>
-        public XoRam(string id) : this(
+        public XoRam(IIDCard id) : this(
             id,
             new ConcurrentDictionary<string, TContent>(),
             default(TContent)
@@ -88,7 +90,7 @@ namespace Xemo
         /// Information stored in RAM.
         /// </summary>
         public XoRam(
-            string id,
+            IIDCard id,
             ConcurrentDictionary<string, TContent> storage
         ) : this(
             id, storage, default(TContent)
@@ -99,23 +101,23 @@ namespace Xemo
         /// Information stored in RAM.
         /// </summary>
         public XoRam(
-            string id,
+            IIDCard id,
             ConcurrentDictionary<string, TContent> storage,
             TContent schema
         )
         {
-            this.id = new Lazy<string>(() => id);
+            this.passport = id;
             this.storage = storage;
             this.schema = schema;
         }
 
-        public string ID() => this.id.Value;
+        public IIDCard Card() => this.passport;
 
         public TSlice Fill<TSlice>(TSlice wanted)
         {
             if (!this.HasSchema())
                 throw new InvalidOperationException("Define a schema prior to filling.");
-            TContent current = (TContent)storage.GetValueOrDefault(this.id.Value, this.schema);
+            TContent current = (TContent)storage.GetValueOrDefault(this.passport.ID(), this.schema);
             return ReflectionMerge.Fill(wanted).From(current);
         }
 
@@ -131,12 +133,12 @@ namespace Xemo
             if (!this.HasSchema())
                 throw new InvalidOperationException("Define a schema prior to mutation.");
             this.storage.AddOrUpdate(
-                this.id.Value,
+                this.passport.ID(),
                 key =>
                 {
                     var newState = ReflectionMerge.Fill(this.schema).From(mutation);
                     var newID = ReflectionMerge.Fill(new Identifier()).From(newState).ID;
-                    if (newID != string.Empty && newID != this.id.Value)
+                    if (newID != string.Empty && newID != this.passport.ID())
                     {
                         throw new InvalidOperationException("ID change is not supported.");
                     }

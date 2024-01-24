@@ -17,7 +17,17 @@ namespace Xemo.Cluster
         /// use this cluster.
         /// </summary>
         public XoFileCluster(DirectoryInfo home) : base(
-            new XoFileCluster<object>(home)
+            new XoFileCluster<object>(string.Empty, home)
+        )
+        { }
+
+        /// <summary>
+        /// Cluster saved in files.
+        /// You must call .Schema(...) to define a content schema, before you can
+        /// use this cluster.
+        /// </summary>
+        public XoFileCluster(string subject, DirectoryInfo home) : base(
+            new XoFileCluster<object>(subject, home)
         )
         { }
     }
@@ -30,6 +40,7 @@ namespace Xemo.Cluster
     public sealed class XoFileCluster<TContent> : IXemoCluster
     {
         private readonly TContent schema;
+        private readonly string subject;
         private readonly DirectoryInfo home;
 
         /// <summary>
@@ -37,7 +48,9 @@ namespace Xemo.Cluster
         /// You can use <see cref="XoFileCluster"/> if you want to setup a
         /// FileCluster with an anonymous type.
         /// </summary>
-        public XoFileCluster(DirectoryInfo home) : this(home, default(TContent))
+        public XoFileCluster(string subject, DirectoryInfo home) : this(
+            subject, home, default(TContent)
+        )
         { }
 
         /// <summary>
@@ -45,10 +58,18 @@ namespace Xemo.Cluster
         /// You can use <see cref="XoFileCluster"/> if you want to setup a
         /// FileCluster with an anonymous type.
         /// </summary>
-        public XoFileCluster(DirectoryInfo home, TContent schema)
+        public XoFileCluster(string subject, DirectoryInfo home, TContent schema)
         {
             this.schema = schema;
+            this.subject = subject;
             this.home = home;
+        }
+
+        public IXemo Xemo(string id)
+        {
+            if (!File.Exists(MemoryPath(id)))
+                throw new InvalidOperationException($"'{id}' does not exist.");
+            return new XoFile<TContent>(id, this.subject, new FileInfo(MemoryPath(id)));
         }
 
         public IXemoCluster With<TNew>(TNew plan)
@@ -58,7 +79,7 @@ namespace Xemo.Cluster
         }
 
         public IXemoCluster Schema<TSchema>(TSchema schema) =>
-            new XoFileCluster<TSchema>(this.home, schema);
+            new XoFileCluster<TSchema>(this.subject, this.home, schema);
 
         public IXemo Create<TNew>(TNew plan)
         {
@@ -75,7 +96,7 @@ namespace Xemo.Cluster
                     throw new InvalidOperationException($"Cannot create '{id}' because it already exists.");
                 writer.Write(JsonConvert.SerializeObject(plan));
             }
-            return new XoFile<TContent>(id, new FileInfo(MemoryPath(id)));
+            return new XoFile<TContent>(id, this.subject, new FileInfo(MemoryPath(id)));
         }
 
         public IEnumerator<IXemo> GetEnumerator()
@@ -87,6 +108,7 @@ namespace Xemo.Cluster
                     yield return
                         new XoFile<TContent>(
                             directory.Name,
+                            this.subject,
                             new FileInfo(contentFile),
                             this.schema
                         );
@@ -104,10 +126,10 @@ namespace Xemo.Cluster
         {
             foreach (var xemo in this)
             {
-                using (var file = Memory(xemo.ID()))
+                using (var file = Memory(xemo.Card().ID()))
                 {
                     file.SetLength(0);
-                    File.Delete(MemoryPath(xemo.ID()));
+                    File.Delete(MemoryPath(xemo.Card().ID()));
                 }
             }
             return this;
@@ -118,7 +140,7 @@ namespace Xemo.Cluster
 
         private FileStream Memory(string id)
         {
-            var itemHome = Path.Combine(this.home.FullName, id);
+            var itemHome = Path.Combine(this.home.FullName, this.subject, id);
             if (!Directory.Exists(itemHome))
                 Directory.CreateDirectory(itemHome);
             return
@@ -128,7 +150,7 @@ namespace Xemo.Cluster
         }
 
         private string MemoryPath(string id) =>
-            Path.Combine(this.home.FullName, id, "content.json");
+            Path.Combine(this.home.FullName, this.subject, id, "content.json");
     }
 }
 

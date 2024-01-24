@@ -16,22 +16,22 @@ namespace Xemo
 
     public sealed class XoRamCluster<TContent> : IXemoCluster
     {
-        private object lck;
+        private string subject;
         private readonly Lazy<List<string>> index;
         private readonly ConcurrentDictionary<string, TContent> storage;
         private readonly TContent schema;
 
         public XoRamCluster() : this(
-            new ConcurrentDictionary<string, TContent>(), default(TContent)
+            string.Empty, new ConcurrentDictionary<string, TContent>(), default(TContent)
         )
         { }
 
-        public XoRamCluster(ConcurrentDictionary<string, TContent> storage, TContent schema)
+        public XoRamCluster(string subject, ConcurrentDictionary<string, TContent> storage, TContent schema)
         {
-            this.lck = new object();
+            this.subject = subject;
             this.index = new Lazy<List<string>>(() =>
             {
-                lock (this.lck)
+                lock (this.subject)
                 {
                     var index = new List<string>(storage.Keys);
                     index.Sort();
@@ -45,11 +45,14 @@ namespace Xemo
         public IEnumerator<IXemo> GetEnumerator()
         {
             foreach (var key in this.index.Value)
-                yield return new XoRam<TContent>(key, this.storage, this.schema);
+                yield return new XoRam<TContent>(new AsPassport(key, this.subject), this.storage, this.schema);
         }
 
+        public IXemo Xemo(string id) =>
+            new XoRam<TContent>(new AsPassport(id, this.subject), this.storage, this.schema);
+
         public IXemoCluster Schema<TSchema>(TSchema schema) =>
-            new XoRamCluster<TSchema>(new ConcurrentDictionary<string, TSchema>(), schema);
+            new XoRamCluster<TSchema>(this.subject, new ConcurrentDictionary<string, TSchema>(), schema);
 
         public IXemoCluster Reduced<TQuery>(TQuery blueprint, Func<TQuery, bool> matches) =>
             new XoFiltered<TQuery>(this, blueprint, matches);
@@ -60,8 +63,8 @@ namespace Xemo
             {
                 lock (this.index)
                 {
-                    if (this.storage.TryRemove(xemo.ID(), out _))
-                        this.index.Value.Remove(xemo.ID());
+                    if (this.storage.TryRemove(xemo.Card().ID(), out _))
+                        this.index.Value.Remove(xemo.Card().ID());
                 }
             }
             return this;
@@ -84,7 +87,7 @@ namespace Xemo
                 (key) =>
                 {
                     var merged = this.schema.XoMerge(input);
-                    lock (this.lck)
+                    lock (this.subject)
                     {
                         this.index.Value.Add(key);
                         this.index.Value.Sort();
@@ -97,7 +100,12 @@ namespace Xemo
                     throw new ApplicationException($"Expected '{id}' to not exist, but it does: {existing}.");
                 }
             );
-            return new XoRam<TContent>(id, this.storage, this.schema);
+            return
+                new XoRam<TContent>(
+                    new AsPassport(id, this.subject),
+                    this.storage,
+                    this.schema
+                );
         }
 
         IEnumerator IEnumerable.GetEnumerator()
