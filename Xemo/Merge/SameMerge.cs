@@ -7,7 +7,7 @@ namespace Xemo
     /// if they are not null. Fastest way of merging because no type checks are
     /// necessary.
     /// </summary>
-    public sealed class SameMerge<TOutput> : IPipe<TOutput>
+    public sealed class SameMerge<TOutput> : IMake<TOutput>
     {
         private readonly TOutput target;
 

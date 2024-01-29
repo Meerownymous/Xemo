@@ -147,7 +147,7 @@ namespace Xemo
                 },
                 (key, existing) =>
                 {
-                    var newState = ReflectionMerge.Fill((TContent)existing).From(mutation);
+                    var newState = ReflectionMerge.Fill(existing).From(mutation);
                     var newID = ReflectionMerge.Fill(new Identifier()).From(newState).ID;
                     if (newID != string.Empty
                         && newID != ReflectionMake.Fill(new Identifier()).From(existing).ID

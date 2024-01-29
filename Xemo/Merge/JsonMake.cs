@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Xemo
 {
-    public sealed class JsonMake<TOutput> : IPipe<TOutput>
+    public sealed class JsonMake<TOutput> : IMake<TOutput>
     {
         public JsonMake()
         {

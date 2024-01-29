@@ -8,7 +8,7 @@ namespace Xemo
     /// setting the target properties from the source property values,
     /// can be handy when the target of the merge is a property object.
     /// </summary>
-    public sealed class ReflectionFill<TOutput> : IPipe<TOutput>
+    public sealed class ReflectionFill<TOutput> : IMake<TOutput>
     {
         private readonly TOutput target;
 
@@ -33,7 +33,7 @@ namespace Xemo
 
         private object IntoProperties<TInput>(object output, TInput input)
         {
-            if (input != null)
+            if (input != null && output != null)
             {
                 var inType = input.GetType();
                 foreach (var outProp in output.GetType().GetProperties())

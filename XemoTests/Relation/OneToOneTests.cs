@@ -16,7 +16,7 @@ namespace XemoTests.Relation
                         new
                         {
                             Name = "",
-                            Friend = new OneToOne("mallrats")
+                            Friend = new OneToOne("Mallrats")
                         }
                     )
                     .Cluster("Mallrats");

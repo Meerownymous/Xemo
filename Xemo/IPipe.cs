@@ -1,7 +1,7 @@
 ﻿using System;
 namespace Xemo
 {
-    public interface IPipe<TOutput>
+    public interface IMake<TOutput>
     {
         TOutput From<TInput>(TInput input);
     }

@@ -10,7 +10,7 @@ namespace Xemo
     /// data is copied into the target property.
     /// Works with anonymous types, both input and output.
     /// </summary>
-    public sealed class ReflectionMerge<TOutput> : IPipe<TOutput>
+    public sealed class ReflectionMerge<TOutput> : IMake<TOutput>
     {
         private readonly TOutput target;
 

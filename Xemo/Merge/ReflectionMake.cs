@@ -3,7 +3,7 @@ using Tonga.Scalar;
 
 namespace Xemo
 {
-    public sealed class ReflectionMake<TOutput> : IPipe<TOutput>
+    public sealed class ReflectionMake<TOutput> : IMake<TOutput>
     {
         public ReflectionMake()
         { }
