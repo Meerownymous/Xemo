@@ -1,53 +1,39 @@
-﻿using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Reflection;
+﻿using System.Reflection;
 using Tonga.Scalar;
-using Xemo.Merge;
 
-namespace Xemo
+namespace Xemo.Mutation
 {
-    /// <summary>
-    /// Flexible merge of one object into a target object, disregarding types of
-    /// the objects. If the source property type matches the target property type,
-    /// or one or both are an anonymous type, data is copied into the target property.
-    /// </summary>
-    public sealed class ReflectionMerge2<TOutput> : IMake<TOutput>
+    public static class Merge
     {
-        private readonly TOutput target;
-        private readonly IsCompatible isCompatible;
-        private readonly IsAnonymous isAnonymous;
-        private readonly IsPrimitive isPrimitive;
+        
+        public static Merge<TTarget> Target<TTarget>(
+            TTarget target,
+            Func<PropertyInfo, object, PropertyInfo, object, object> solveRelation
+        ) =>
+            new Merge<TTarget>(target, solveRelation);
 
-        /// <summary>
-        /// Flexible merge of one object into a target object, disregarding types of
-        /// the objects. If the source property type matches the target property type,
-        /// or one or both are an anonymous type, data is copied into the target property.
-        /// </summary>
-        public ReflectionMerge2(TOutput target) : this(
-            target,
-            new ConcurrentDictionary<Type, bool>(),
-            new ConcurrentDictionary<Type, bool>()
-        )
+        public static Merge<TTarget> Target<TTarget>(TTarget target) =>
+            new Merge<TTarget>(target);
+    }
+
+    public sealed class Merge<TTarget> : IMutation<TTarget>
+    {
+        private readonly TTarget target;
+        private readonly Func<PropertyInfo, object, PropertyInfo, object, object> solveRelation;
+
+        public Merge(TTarget target) : this(target, (t1, o1, t2, o2) => false)
         { }
 
-        /// <summary>
-        /// Flexible merge of one object into a target object, disregarding types of
-        /// the objects. If the source property type matches the target property type,
-        /// or one or both are an anonymous type, data is copied into the target property.
-        /// </summary>
-        private ReflectionMerge2(TOutput target,
-            ConcurrentDictionary<Type, bool> isAnonymousCache,
-            ConcurrentDictionary<Type, bool> isNumberCache
-        )
+        public Merge(TTarget target, Func<PropertyInfo, object, PropertyInfo, object, object> solveRelation)
         {
             this.target = target;
-            this.isAnonymous = new IsAnonymous(isAnonymousCache);
-            this.isCompatible = new IsCompatible(isNumberCache, isAnonymousCache);
-            this.isPrimitive = new IsPrimitive();
+            this.solveRelation = solveRelation;
         }
 
-        public TOutput From<TInput>(TInput input) =>
-            (TOutput)Merged(typeof(TOutput), this.target, input);
+        public TTarget Post<TPatch>(TPatch patch)
+        {
+            return (TTarget)Merged(typeof(TTarget), this.target, patch);
+        }
 
         private object Merged<TInput>(Type outType, object output, TInput input)
         {
@@ -88,7 +74,11 @@ namespace Xemo
                         }
                         else if (IsRelation(outProp.PropertyType))
                         {
-                            Debug.WriteLine($"Should now solve {outProp.Name}");
+                            values[collected] =
+                                this.solveRelation(
+                                    outProp, outProp.GetValue(this.target),
+                                    inProp, inProp.GetValue(input)
+                                );
                         }
                         else
                         {
@@ -151,9 +141,13 @@ namespace Xemo
                 or TypeCode.UInt16 or TypeCode.UInt32 or TypeCode.UInt64;
         }
 
-        private bool IsPrimitive(PropertyInfo prop)
+        private static bool IsPrimitive(PropertyInfo prop)
         {
-            return this.isPrimitive.Invoke(prop.PropertyType);
+            var type = prop.PropertyType;
+            return
+                (type.IsArray ?
+                    type.MemberType.GetTypeCode() : Type.GetTypeCode(type)
+                ) != TypeCode.Object;
         }
 
         private static bool IsAnonymous(Type type) => type.Namespace == null;
@@ -164,10 +158,5 @@ namespace Xemo
                 || propType.IsAssignableTo(typeof(IRelation<IXemoCluster>));
         }
     }
-
-    public static class ReflectionMerge2
-    {
-        public static ReflectionMerge2<TOutput> Fill<TOutput>(TOutput output) =>
-            new ReflectionMerge2<TOutput>(output);
-    }
 }
+

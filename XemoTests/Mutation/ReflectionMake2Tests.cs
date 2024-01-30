@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Xunit;
 
-namespace Xemo.Make.Tests
+namespace Xemo.Mutation.Tests
 {
     public sealed class ReflectionMake2Tests
     {
@@ -112,11 +112,11 @@ namespace Xemo.Make.Tests
         public void DoesNotChangeConcreteInput()
         {
 
-            var example = new Example() { Number = 0 };
+            var example = new Example() { Number = 100 };
 
-            ReflectionMerge2.Fill(example).From(new { Number = 100  });
+            ReflectionMerge2.Fill(example).From(new { Number = 999  });
             Assert.Equal(
-                0,
+                100,
                 example.Number
             );
         }
@@ -134,8 +134,8 @@ namespace Xemo.Make.Tests
             );
         }
 
-        //[Fact(Skip = "For performane analysis only")]
-        [Fact]
+        [Fact(Skip = "For performance analysis only")]
+        //[Fact]
         public void Investigation()
         {
             var sw = new Stopwatch();

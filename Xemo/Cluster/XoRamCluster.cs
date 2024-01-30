@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using Xemo.Cluster;
 using Xemo.IDCard;
+using Xemo.Mutation;
 
 namespace Xemo
 {
@@ -101,7 +102,7 @@ namespace Xemo
             this.storage.AddOrUpdate(id,
                 (key) =>
                 {
-                    var merged = this.schema.XoMerge(input);
+                    var merged = ReflectionMake2.Fill(this.schema, this.home).From(input);
                     lock (this.subject)
                     {
                         this.index.Value.Add(key);

@@ -1,4 +1,4 @@
-﻿namespace Xemo
+﻿namespace Xemo.Mutation
 {
     /// <summary>
     /// Merges one object's property values into another object's properties.
@@ -11,7 +11,7 @@
         /// object.
         /// </summary>
         public static TResult XoMerge<TResult>(this TResult schema, object source) =>
-            new ReflectionMerge<TResult>(schema).From(source);
+            new ReflectionMerge2<TResult>(schema).From(source);
 
         /// <summary>
         /// Merges one object's property values into another object's properties by

@@ -2,7 +2,7 @@
 using System.Reflection;
 using Tonga;
 
-namespace Xemo.Merge
+namespace Xemo.Mutation
 {
     public sealed class IsCompatible : IFunc<Type, Type, bool>
     {

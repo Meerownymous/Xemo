@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Xunit;
 
-namespace Xemo.Make.Tests
+namespace Xemo.Mutation.Tests
 {
     public sealed class UncheckedMakeTests
     {

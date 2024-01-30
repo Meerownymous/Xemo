@@ -3,6 +3,7 @@ using Tonga;
 using Tonga.Text;
 using Xemo.IDCard;
 using Xemo.Information;
+using Xemo.Mutation;
 
 namespace Xemo
 {
@@ -118,8 +119,8 @@ namespace Xemo
         {
             if (!this.HasSchema())
                 throw new InvalidOperationException("Define a schema prior to filling.");
-            TContent current = (TContent)storage.GetValueOrDefault(this.passport.ID(), this.schema);
-            return ReflectionMerge.Fill(wanted).From(current);
+            TContent current = storage.GetValueOrDefault(this.passport.ID(), this.schema);
+            return ReflectionMerge2.Fill(wanted).From(current);
         }
 
         public IXemo Schema<TSchema>(TSchema schema)

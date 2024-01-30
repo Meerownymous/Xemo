@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Xemo
+namespace Xemo.Mutation
 {
     public sealed class JsonMake<TOutput> : IMake<TOutput>
     {

@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Tonga.Scalar;
 
-namespace Xemo
+namespace Xemo.Mutation
 {
     /// <summary>
     /// Merges one object's property values into another object's properties by

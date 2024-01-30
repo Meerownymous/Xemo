@@ -1,16 +1,11 @@
-﻿using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Reflection;
-using Xemo.Merge;
+﻿using System.Diagnostics;
 using Xunit;
 
-namespace XemoTests.Merge
+namespace Xemo.Mutation.Tests
 {
-    public sealed class IsPrimitiveTests
+    public sealed class IsNumberTests
     {
         [Theory]
-        [InlineData("String")]
-        [InlineData("Strings")]
         [InlineData("Int")]
         [InlineData("Ints")]
         [InlineData("UInt")]
@@ -25,22 +20,15 @@ namespace XemoTests.Merge
         [InlineData("Decimals")]
         [InlineData("Float")]
         [InlineData("Floats")]
-        [InlineData("Byte")]
-        [InlineData("Bytes")]
-        [InlineData("SByte")]
-        [InlineData("SBytes")]
-        [InlineData("Char")]
-        [InlineData("Chars")]
         [InlineData("Single")]
         [InlineData("Singles")]
-        public void DetectsPrimitive(string prop)
+        public void DetectsNumber(string prop)
         {
             Assert.True(
-                new IsPrimitive()
+                new IsNumber()
                     .Invoke(
                         new
                         {
-                            String = "",
                             Int = 0,
                             UInt = 0U,
                             Long = 0L,
@@ -49,10 +37,8 @@ namespace XemoTests.Merge
                             Decimal = new decimal(0.0),
                             Float = 0F,
                             Byte = 0x00,
+                            Single = (Single)0,
                             SByte = (sbyte)0x00,
-                            Char = 'A',
-                            Single = 0F,
-                            Strings = new string[0],
                             Ints = new int[] { 0 },
                             UInts = new uint[] { 0U },
                             Longs = new long[] { 0L },
@@ -60,9 +46,6 @@ namespace XemoTests.Merge
                             Doubles = new double[] { 0D },
                             Decimals = new decimal[] { new decimal(0.0) },
                             Floats = new float[] { 0F },
-                            Bytes = new byte[] { 0x00 },
-                            SBytes = new sbyte[] { (sbyte)0x00 },
-                            Chars = new char[] { 'A' },
                             Singles = new Single[] { 0F }
                         }
                         .GetType()
@@ -90,6 +73,7 @@ namespace XemoTests.Merge
         }
 
         [Fact(Skip = "For performance measurements only")]
+        //[Fact]
         public void ComprePerformance()
         {
             var prop = new { P = "" }.GetType().GetProperty("P");
@@ -99,7 +83,7 @@ namespace XemoTests.Merge
             sw.Start();
             for (var i = 0; i < 1024 * 1024 * 64; i++)
             {
-                _ = check.Invoke(prop.PropertyType);
+                _ = check.Invoke(new { P = "" }.GetType().GetProperty("P").PropertyType);
             }
             sw.Stop();
             var cached = sw.ElapsedMilliseconds;
@@ -108,7 +92,7 @@ namespace XemoTests.Merge
             sw.Start();
             for (var i = 0; i < 1024 * 1024 * 64; i++)
             {
-                var t = prop.PropertyType;
+                var t = new { P = "" }.GetType().GetProperty("P").PropertyType;
                 var code = t.IsArray ? t.MemberType.GetTypeCode() : Type.GetTypeCode(t);
                 _ = code != TypeCode.Object;
             }

@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Reflection;
 using Xunit;
 
-namespace XemoTests.Merge
+namespace Xemo.Mutation.Tests
 {
     public sealed class AnonymousConstructorTests
     {

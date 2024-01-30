@@ -1,0 +1,324 @@
+﻿using System.Diagnostics;
+using System.Reflection;
+using Xemo.Relation;
+using Xemo.Xemo;
+using Xunit;
+
+namespace Xemo.Mutation.Tests
+{
+    public sealed class MergeTests
+    {
+        [Fact]
+        public void FillsPropertyObjects()
+        {
+            Assert.Equal(
+                9,
+                Merge
+                    .Target(new Example())
+                    .Post(
+                        new { Number = 9 }
+                    )
+                    .Number
+            );
+        }
+
+        [Fact]
+        public void FillsNestedPropertyObjects()
+        {
+            Assert.Equal(
+                100,
+                Merge
+                    .Target(new Example())
+                    .Post(
+                        new { Nested = new NestedExample { NestedNumber = 100 } }
+                    )
+                    .Nested
+                    .NestedNumber
+            );
+        }
+
+        [Fact]
+        public void UsesGivenSolveStrategy()
+        {
+            var solved = false;
+            Merge
+                .Target(
+                    new
+                    {
+                        Todo = "Succeed",
+                        Author = new OneToOne("User")
+                    },
+                    (p1, o1, p2, o2) => { solved = true; return null; }
+                )
+                .Post(
+                    new { Author = new XoDead() }
+                );
+
+            Assert.True(solved);
+        }
+
+        [Fact]
+        public void PutsTargetPropertyIntoSolve()
+        {
+            PropertyInfo result = default(PropertyInfo);
+            var schema =
+                new
+                {
+                    Todo = "Succeed",
+                    Author = new OneToOne("User")
+                };
+
+            Merge
+                .Target(schema)
+                .Post(
+                    new { Author = new XoDead() }
+                );
+
+            Assert.Equal(schema.GetType().GetProperty("Author"), result);
+        }
+
+        [Fact]
+        public void PutsTargetPropertyValueIntoSolve()
+        {
+            object result = default;
+            var schema =
+                new
+                {
+                    Todo = "Succeed",
+                    Author = new OneToOne("User")
+                };
+
+            Merge
+                .Target(schema,
+                    (p1, o1, p2, o2) => { result = o1; return null; }
+                )
+                .Post(new { Author = new XoDead() });
+
+            Assert.Equal(schema.Author, result);
+        }
+
+        [Fact]
+        public void PutsSourcePropertyIntoSolve()
+        {
+            PropertyInfo result = default(PropertyInfo);
+            var patch = new { Author = new XoDead() };
+
+            Merge
+                .Target(
+                    new
+                    {
+                        Todo = "Succeed",
+                        Author = new OneToOne("User")
+                    },
+                    (p1, o1, p2, o2) => { result = p2; return null; }
+                )
+                .Post(patch);
+
+            Assert.Equal(patch.GetType().GetProperty("Author"), result);
+        }
+
+        [Fact]
+        public void PutsSourcePropertyValueIntoSolve()
+        {
+            object result = default;
+            var patch = new { Author = new XoDead() };
+
+            Merge
+                .Target(
+                    new
+                    {
+                        Todo = "Succeed",
+                        Author = new OneToOne("User")
+                    },
+                    (p1, o1, p2, o2) => { result = o2; return null; }
+                )
+                .Post(patch);
+
+            Assert.Equal(patch.Author, result);
+        }
+
+        [Fact]
+        public void PutsPostedPropertyIntoSolve()
+        {
+            var relationName = "";
+            Merge
+                .Target(
+                    new
+                    {
+                        Todo = "Succeed",
+                        Author = new OneToOne("User")
+                    },
+                    (p1, o1, p2, o2) => { relationName = p2.Name; return null; }
+                )
+                .Post(
+                    new { Another = new XoDead() }
+                );
+
+            Assert.Equal("Author", relationName);
+        }
+
+        [Fact]
+        public void FillsPropertyObjectPrimitiveArrays()
+        {
+            Assert.Equal(
+                100,
+                Merge.Target(new Example { Numbers = new int[0] })
+                    .Post(
+                        new Example { Numbers = new[] { 100 } }
+                    )
+                    .Numbers[0]
+            );
+        }
+
+        [Fact]
+        public void FillsPropertyObjectArrays()
+        {
+            Assert.Equal(
+                123,
+                Merge.Target(new Example())
+                    .Post(
+                        new Example
+                        {
+                            Nesteds = new NestedExample[]
+                            {
+                                new NestedExample() { NestedNumber = 123 }
+                            }
+                        }
+                    )
+                    .Nesteds[0]
+                    .NestedNumber
+            );
+        }
+
+        [Fact]
+        public void FillsAnonymousObjects()
+        {
+            Assert.Equal(
+                100,
+                Merge
+                    .Target(new { Number = 0 })
+                    .Post(
+                        new { Number = 100 }
+                    )
+                    .Number
+            );
+        }
+
+        [Fact]
+        public void FillsNestedAnonymousObjects()
+        {
+            Assert.Equal(
+                100,
+                Merge
+                    .Target(new { Nested = new { NestedNumber = 0 } })
+                    .Post(
+                        new { Nested = new { NestedNumber = 100 } }
+                    )
+                    .Nested
+                    .NestedNumber
+            );
+        }
+
+        [Fact]
+        public void FillsAnonymousPrimitiveArrays()
+        {
+            Assert.Equal(
+                100,
+                Merge.Target(new { Numbers = new int[0] })
+                    .Post(
+                        new { Numbers = new[] { 100 } }
+                    )
+                    .Numbers[0]
+            );
+        }
+
+        [Fact]
+        public void DoesNotChangeConcreteInput()
+        {
+
+            var example = new Example() { Number = 100 };
+
+            Merge.Target(example)
+                .Post(new { Number = 999  });
+            Assert.Equal(
+                100,
+                example.Number
+            );
+        }
+
+        [Fact]
+        public void FillsAnonymousObjectArrays()
+        {
+            Assert.Equal(
+                123,
+                Merge.Target(new { Things = new[] { new { ID = 0 } } })
+                    .Post(
+                        new { Things = new[] { new { ID = 123 } } }
+                    )
+                    .Things[0].ID
+            );
+        }
+
+        [Fact(Skip = "For performance analysis only")]
+        //[Fact]
+        public void Investigation()
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+
+            var merge = new Merge<Example>(new Example());
+            for (var i = 0; i < 1000000; i++)
+            {
+                Assert.Equal(
+                    123,
+                    merge
+                        .Post(
+                            new { Nested = new { NestedNumber = 123 } }
+                        )
+                        .Nested
+                        .NestedNumber
+                );
+            }
+            sw.Stop();
+
+            var sw2 = new Stopwatch();
+            sw2.Start();
+            for (var i = 0; i < 1000000; i++)
+            {
+                Assert.Equal(
+                    123,
+                    Merge
+                        .Target(new Example())
+                        .Post(
+                            new { Nested = new { NestedNumber = 123 } }
+                        )
+                        .Nested
+                        .NestedNumber
+                );
+            }
+            sw2.Stop();
+
+            Debug.WriteLine($"{sw.ElapsedMilliseconds} vs {sw2.ElapsedMilliseconds}");
+        }
+
+        internal sealed class Example
+        {
+            public int[] Numbers { get; set; }
+            public int Number { get; set; }
+            public NestedExample Nested { get; set; }
+            public NestedExample[] Nesteds { get; set; }
+        }
+
+        internal sealed class Example2
+        {
+            public int Number { get; set; }
+            public NestedExample Nested { get; set; }
+        }
+
+        internal sealed class NestedExample
+        {
+            public int NestedNumber { get; set; }
+        }
+    }
+}
+

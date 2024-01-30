@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Tonga;
 
-namespace Xemo.Merge
+namespace Xemo.Mutation
 {
     public sealed class IsAnonymous : IFunc<Type, bool>
     {

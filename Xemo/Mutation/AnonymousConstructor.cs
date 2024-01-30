@@ -2,7 +2,7 @@
 using System.Reflection;
 using Tonga;
 
-namespace XemoTests.Merge
+namespace Xemo.Mutation
 {
     public static class AnonymousConstructor
     {

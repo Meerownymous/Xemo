@@ -28,7 +28,6 @@ namespace XemoTests.Relation
                 jay.Fill(
                     new
                     {
-                        Name = "",
                         Friend = new
                         {
                             Name = ""

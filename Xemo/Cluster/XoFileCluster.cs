@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using Newtonsoft.Json;
+using Xemo.Mutation;
 using Xemo.Xemo;
 
 namespace Xemo.Cluster
