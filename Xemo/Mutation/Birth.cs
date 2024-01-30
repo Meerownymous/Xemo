@@ -3,7 +3,7 @@
     /// <summary>
     /// Birth of new data following a given schema.
     /// </summary>
-    public sealed class Birth<TContent> : IMutation<TContent>
+    public sealed class Birth<TContent> : IFlow<TContent>
     {
         private readonly string subject;
         private readonly TContent schema;

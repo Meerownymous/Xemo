@@ -8,7 +8,7 @@ namespace Xemo.Mutation
     {
         public static Merge<TTarget> Target<TTarget>(
             TTarget target,
-            Func<IIDCard, IIDCard, IIDCard> solveRelation
+            Func<object, IIDCard, object> solveRelation
         ) =>
             new Merge<TTarget>(target, solveRelation);
 
@@ -16,21 +16,21 @@ namespace Xemo.Mutation
             new Merge<TTarget>(target);
     }
 
-    public sealed class Merge<TTarget> : IMutation<TTarget>
+    public sealed class Merge<TTarget> : IFlow<TTarget>
     {
         private readonly TTarget target;
-        private readonly Func<IIDCard, IIDCard, IIDCard> solve1To1;
+        private readonly Func<object, IIDCard, object> solve1To1;
 
         public Merge(TTarget target) : this(target, (targetCard, patchCard) => patchCard)
         { }
 
         public Merge(
             TTarget target,
-            Func<IIDCard, IIDCard, IIDCard> solve1to1
+            Func<object, IIDCard, object> solve1to1
         )
         {
             this.target = target;
-            solve1To1 = solve1to1;
+            this.solve1To1 = solve1to1;
         }
 
         public TTarget Post<TPatch>(TPatch patch)
@@ -80,7 +80,7 @@ namespace Xemo.Mutation
                             var incoming = inProp.GetValue(input);
                             values[collected] =
                                 this.solve1To1(
-                                    (IIDCard)outProp.GetValue(this.target),
+                                    outProp.GetValue(this.target),
                                     incoming.GetType().IsAssignableTo(typeof(IXemo)) ?
                                     (incoming as IXemo).Card() :
                                     (incoming as IIDCard)
@@ -161,7 +161,7 @@ namespace Xemo.Mutation
         private static bool IsSolvableRelation(Type leftPropType, Type rightPropType)
         {
             return leftPropType.IsAssignableTo(typeof(IIDCard))
-                &&
+                ||
                 (
                     rightPropType.IsAssignableTo(typeof(IXemo))
                     ||

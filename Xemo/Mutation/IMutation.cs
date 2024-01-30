@@ -3,7 +3,7 @@
     /// <summary>
     /// A data mutation.
     /// </summary>
-    public interface IMutation<TTarget>
+    public interface IFlow<TTarget>
     {
         TTarget Post<TPatch>(TPatch patch);
     }

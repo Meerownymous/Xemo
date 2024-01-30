@@ -106,14 +106,15 @@ namespace Xemo
             this.storage.AddOrUpdate(id,
                 (key) =>
                 {
-                    var merged = ReflectionMake2.Fill(this.schema, this.home).From(input);
+                    var newItem =
+                        Birth.Schema(this.subject, this.schema, this.home)
+                            .Post(input);
                     lock (this.subject)
                     {
                         this.index.Value.Add(key);
                         this.index.Value.Sort();
-                        Debug.WriteLine(string.Join(' ', this.index.Value.ToArray()));
                     }
-                    return merged;
+                    return newItem;
                 },
                 (key, existing) =>
                 {

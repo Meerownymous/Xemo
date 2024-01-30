@@ -36,7 +36,7 @@ namespace Xemo.Mutation
         }
 
         public TOutput From<TInput>(TInput input) =>
-            (TOutput)Merged(typeof(TOutput), this.target, input);
+            (TOutput)Merged(this.target.GetType(), this.target, input);
 
         private object Merged<TInput>(Type outType, object output, TInput input)
         {
