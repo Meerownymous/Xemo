@@ -60,6 +60,7 @@ namespace Xemo
                 yield return new XoRam<TContent>(
                     new AsIDCard(key, this.subject),
                     this.storage,
+                    this.home,
                     this.schema
                 );
         }
@@ -68,7 +69,7 @@ namespace Xemo
         {
             if (!this.storage.ContainsKey(id))
                 throw new ArgumentException($"{this.subject} '{id}' does not exist.");
-            return new XoRam<TContent>(new AsIDCard(id, this.subject), this.storage, this.schema);
+            return new XoRam<TContent>(new AsIDCard(id, this.subject), this.storage, this.home, this.schema);
         }
 
         public IXemoCluster Schema<TSchema>(TSchema schema) =>
@@ -125,6 +126,7 @@ namespace Xemo
                 new XoRam<TContent>(
                     new AsIDCard(id, this.subject),
                     this.storage,
+                    this.home,
                     this.schema
                 );
         }

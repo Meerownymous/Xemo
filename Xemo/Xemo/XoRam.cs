@@ -70,6 +70,7 @@ namespace Xemo
         /// Storage of Xemos addressable by unique strings.
         /// </summary>
         private readonly ConcurrentDictionary<string, TContent> storage;
+        private readonly IMem mem;
         private readonly TContent schema;
 
         /// <summary>
@@ -83,19 +84,7 @@ namespace Xemo
         /// </summary>
         public XoRam(IIDCard id) : this(
             id,
-            new ConcurrentDictionary<string, TContent>(),
-            default(TContent)
-        )
-        { }
-
-        /// <summary>
-        /// Information stored in RAM.
-        /// </summary>
-        public XoRam(
-            IIDCard id,
-            ConcurrentDictionary<string, TContent> storage
-        ) : this(
-            id, storage, default(TContent)
+            new ConcurrentDictionary<string, TContent>()
         )
         { }
 
@@ -106,10 +95,53 @@ namespace Xemo
             IIDCard id,
             ConcurrentDictionary<string, TContent> storage,
             TContent schema
+        ) : this(
+            id,
+            storage,
+            new DeadMem("This Xemo has not been setup to support relations."),
+            schema
+        )
+        { }
+
+        /// <summary>
+        /// Information stored in RAM.
+        /// </summary>
+        public XoRam(
+            IIDCard id,
+            ConcurrentDictionary<string, TContent> storage
+        ) : this(
+            id,
+            storage,
+            new DeadMem("This Xemo has not been setup to support relations."),
+            default(TContent)
+        )
+        { }
+
+        /// <summary>
+        /// Information stored in RAM.
+        /// </summary>
+        public XoRam(
+            IIDCard id,
+            ConcurrentDictionary<string, TContent> storage,
+            IMem mem
+        ) : this(
+            id, storage, mem, default(TContent)
+        )
+        { }
+
+        /// <summary>
+        /// Information stored in RAM.
+        /// </summary>
+        public XoRam(
+            IIDCard id,
+            ConcurrentDictionary<string, TContent> storage,
+            IMem mem,
+            TContent schema
         )
         {
             this.passport = id;
             this.storage = storage;
+            this.mem = mem;
             this.schema = schema;
         }
 
@@ -120,7 +152,7 @@ namespace Xemo
             if (!this.HasSchema())
                 throw new InvalidOperationException("Define a schema prior to filling.");
             TContent current = storage.GetValueOrDefault(this.passport.ID(), this.schema);
-            return ReflectionMerge2.Fill(wanted).From(current);
+            return DeepSlice.Schema(wanted, this.mem).Post(current);
         }
 
         public IXemo Schema<TSchema>(TSchema schema)
@@ -138,8 +170,8 @@ namespace Xemo
                 this.passport.ID(),
                 key =>
                 {
-                    var newState = ReflectionMerge.Fill(this.schema).From(mutation);
-                    var newID = ReflectionMerge.Fill(new Identifier()).From(newState).ID;
+                    var newState = Patch.Target(this.schema, this.mem).Post(mutation);
+                    var newID = Merge.Target(new Identifier()).Post(newState).ID;
                     if (newID != string.Empty && newID != this.passport.ID())
                     {
                         throw new InvalidOperationException("ID change is not supported.");
@@ -148,10 +180,10 @@ namespace Xemo
                 },
                 (key, existing) =>
                 {
-                    var newState = ReflectionMerge.Fill(existing).From(mutation);
-                    var newID = ReflectionMerge.Fill(new Identifier()).From(newState).ID;
+                    var newState = Patch.Target(this.schema, this.mem).Post(mutation);
+                    var newID = Merge.Target(new Identifier()).Post(newState).ID;
                     if (newID != string.Empty
-                        && newID != ReflectionMake.Fill(new Identifier()).From(existing).ID
+                        && newID != Merge.Target(new Identifier()).Post(existing).ID
                     )
                     {
                         throw new InvalidOperationException("ID change is not supported.");

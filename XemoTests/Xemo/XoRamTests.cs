@@ -64,6 +64,73 @@ namespace Xemo.Tests
                     .FirstName
             );
         }
+
+        [Fact]
+        public void SolvesRelations()
+        {
+            var schema =
+                new
+                {
+                    Name = "",
+                    Friend = Link.One("User")
+                };
+            var mem = new Ram().Allocate("User", schema);
+
+            var donald = mem.Cluster("User").Create(new { Name = "Donald" });
+            var daisy = mem.Cluster("User").Create(new { Name = "Daisy", Friend = donald });
+
+            Assert.Equal(
+                "Donald",
+                daisy.Fill(
+                    new
+                    {
+                        Friend = new { Name = "" }
+                    }
+                ).Friend.Name
+            );
+        }
+
+        [Fact]
+        public void MutatesRelations()
+        {
+            var schema =
+                new
+                {
+                    Name = "",
+                    Friend = Link.One("User")
+                };
+            var mem = new Ram().Allocate("User", schema);
+
+            var donald = mem.Cluster("User").Create(new { Name = "Donald" });
+            var daisy = mem.Cluster("User").Create(new { Name = "Daisy", Friend = donald });
+            var gustav = mem.Cluster("User").Create(new { Name = "Gustav" });
+
+            daisy
+                .Mutate(
+                    new
+                    {
+                        Friend = gustav
+                    }
+                );
+
+            Assert.Equal(
+                "Gustav",
+                daisy
+                    .Mutate(
+                        new
+                        {
+                            Friend = gustav
+                        }
+                    )
+                    .Fill(
+                        new
+                        {
+                            Friend = new { Name = "" }
+                        }
+                    ).Friend.Name
+            );
+        }
+
         [Fact]
         public void RejectsIDChange()
         {

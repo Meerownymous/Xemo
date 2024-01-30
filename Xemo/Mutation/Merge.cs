@@ -35,7 +35,7 @@ namespace Xemo.Mutation
 
         public TTarget Post<TPatch>(TPatch patch)
         {
-            return (TTarget)Merged(typeof(TTarget), this.target, patch);
+            return (TTarget)Merged(this.target.GetType(), this.target, patch);
         }
 
         private object Merged<TInput>(Type outType, object output, TInput input)
