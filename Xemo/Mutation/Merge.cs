@@ -1,14 +1,14 @@
 ﻿using System.Reflection;
 using Tonga.Scalar;
+using Xemo.IDCard;
 
 namespace Xemo.Mutation
 {
     public static class Merge
     {
-        
         public static Merge<TTarget> Target<TTarget>(
             TTarget target,
-            Func<PropertyInfo, object, PropertyInfo, object, object> solveRelation
+            Func<IIDCard, IIDCard, IIDCard> solveRelation
         ) =>
             new Merge<TTarget>(target, solveRelation);
 
@@ -19,15 +19,18 @@ namespace Xemo.Mutation
     public sealed class Merge<TTarget> : IMutation<TTarget>
     {
         private readonly TTarget target;
-        private readonly Func<PropertyInfo, object, PropertyInfo, object, object> solveRelation;
+        private readonly Func<IIDCard, IIDCard, IIDCard> solve1To1;
 
-        public Merge(TTarget target) : this(target, (t1, o1, t2, o2) => false)
+        public Merge(TTarget target) : this(target, (targetCard, patchCard) => patchCard)
         { }
 
-        public Merge(TTarget target, Func<PropertyInfo, object, PropertyInfo, object, object> solveRelation)
+        public Merge(
+            TTarget target,
+            Func<IIDCard, IIDCard, IIDCard> solve1to1
+        )
         {
             this.target = target;
-            this.solveRelation = solveRelation;
+            solve1To1 = solve1to1;
         }
 
         public TTarget Post<TPatch>(TPatch patch)
@@ -72,12 +75,15 @@ namespace Xemo.Mutation
                         {
                             values[collected] = inProp.GetValue(input);
                         }
-                        else if (IsRelation(outProp.PropertyType))
+                        else if (IsSolvableRelation(outProp.PropertyType, inProp.PropertyType))
                         {
+                            var incoming = inProp.GetValue(input);
                             values[collected] =
-                                this.solveRelation(
-                                    outProp, outProp.GetValue(this.target),
-                                    inProp, inProp.GetValue(input)
+                                this.solve1To1(
+                                    (IIDCard)outProp.GetValue(this.target),
+                                    incoming.GetType().IsAssignableTo(typeof(IXemo)) ?
+                                    (incoming as IXemo).Card() :
+                                    (incoming as IIDCard)
                                 );
                         }
                         else
@@ -152,10 +158,17 @@ namespace Xemo.Mutation
 
         private static bool IsAnonymous(Type type) => type.Namespace == null;
 
-        private static bool IsRelation(Type propType)
+        private static bool IsSolvableRelation(Type leftPropType, Type rightPropType)
         {
-            return propType.IsAssignableTo(typeof(IRelation<IXemo>))
-                || propType.IsAssignableTo(typeof(IRelation<IXemoCluster>));
+            return leftPropType.IsAssignableTo(typeof(IIDCard))
+                &&
+                (
+                    rightPropType.IsAssignableTo(typeof(IXemo))
+                    ||
+                    rightPropType.IsAssignableTo(typeof(IIDCard))
+                );
+            //return propType.IsAssignableTo(typeof(IRelation<IXemo>))
+            //    || propType.IsAssignableTo(typeof(IRelation<IXemoCluster>));
         }
     }
 }

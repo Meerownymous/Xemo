@@ -73,7 +73,7 @@ namespace Xemo.Mutation
                             var inputIsXemo = inProp.PropertyType.IsAssignableTo(typeof(IXemo));
                             if(inputIsXemo)
                                 values[collected] =
-                                    new OneToOne(
+                                    new RelOneToOne(
                                         (IXemo)inProp.GetValue(input),
                                         relationSchema.TargetSubject(),
                                         this.mem

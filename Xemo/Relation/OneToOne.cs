@@ -2,13 +2,13 @@
 
 namespace Xemo.Relation
 {
-    public sealed class OneToOne : IRelation<IXemo>
+    public sealed class RelOneToOne : IRelation<IXemo>
     {
         private readonly IXemo source;
         private readonly string subject;
         private readonly IMem mem;
 
-        public OneToOne(
+        public RelOneToOne(
             string targetSubject
         ) : this(
             new XoDead(),
@@ -17,7 +17,7 @@ namespace Xemo.Relation
         )
         { }
 
-        public OneToOne(
+        public RelOneToOne(
             IXemo source,
             string targetSubject,
             IMem mem

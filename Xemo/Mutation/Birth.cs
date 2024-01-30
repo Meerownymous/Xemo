@@ -5,28 +5,43 @@
     /// </summary>
     public sealed class Birth<TContent> : IMutation<TContent>
     {
+        private readonly string subject;
         private readonly TContent schema;
         private readonly IMem mem;
 
         /// <summary>
         /// Birth of new data following a given schema.
         /// </summary>
-        public Birth(TContent schema, IMem mem)
+        public Birth(string subject, TContent schema, IMem mem)
         {
+            this.subject = subject;
             this.schema = schema;
             this.mem = mem;
         }
 
         public TContent Post<TPatch>(TPatch patch)
         {
-            throw new NotImplementedException();
+            var newItem =
+                Merge
+                    .Target(
+                        this.schema,
+                        (def, relation) => EnsureLinkable(relation)
+                    )
+                    .Post(patch);
+
+            return newItem;
+        }
+
+        private IIDCard EnsureLinkable(IIDCard card)
+        {
+            return this.mem.Xemo(card.Kind(), card.ID()).Card();
         }
     }
 
     public static class Birth
     {
-        public static Birth<TSchema> Schema<TSchema>(TSchema schema, IMem mem) =>
-            new Birth<TSchema>(schema, mem);
+        public static Birth<TSchema> Schema<TSchema>(string subject, TSchema schema, IMem mem) =>
+            new Birth<TSchema>(subject, schema, mem);
     }
 }
 

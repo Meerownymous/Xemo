@@ -3,9 +3,9 @@
     /// <summary>
     /// A data mutation.
     /// </summary>
-    public interface IMutation<TContent>
+    public interface IMutation<TTarget>
     {
-        TContent Post<TPatch>(TPatch patch);
+        TTarget Post<TPatch>(TPatch patch);
     }
 }
 

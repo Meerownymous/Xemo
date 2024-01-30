@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
-using Xemo.Relation;
+using Xemo.IDCard;
 using Xemo.Xemo;
 using Xunit;
 
@@ -46,115 +46,56 @@ namespace Xemo.Mutation.Tests
                     new
                     {
                         Todo = "Succeed",
-                        Author = new OneToOne("User")
+                        Author = Link.One("User")
                     },
-                    (p1, o1, p2, o2) => { solved = true; return null; }
+                    (leftID, rightID) => { solved = true; return rightID; }
                 )
                 .Post(
-                    new { Author = new XoDead() }
+                    new { Author = new AsIDCard("1", "User") }
                 );
 
             Assert.True(solved);
         }
 
         [Fact]
-        public void PutsTargetPropertyIntoSolve()
-        {
-            PropertyInfo result = default(PropertyInfo);
-            var schema =
-                new
-                {
-                    Todo = "Succeed",
-                    Author = new OneToOne("User")
-                };
-
-            Merge
-                .Target(schema)
-                .Post(
-                    new { Author = new XoDead() }
-                );
-
-            Assert.Equal(schema.GetType().GetProperty("Author"), result);
-        }
-
-        [Fact]
-        public void PutsTargetPropertyValueIntoSolve()
+        public void PutsTargetIDIntoSolve()
         {
             object result = default;
             var schema =
                 new
                 {
                     Todo = "Succeed",
-                    Author = new OneToOne("User")
+                    Author = Link.One("User")
                 };
 
             Merge
                 .Target(schema,
-                    (p1, o1, p2, o2) => { result = o1; return null; }
+                    (leftID, rightID) => { result = leftID; return rightID; }
                 )
-                .Post(new { Author = new XoDead() });
+                .Post(new { Author = new XoRam("User", "1") });
 
             Assert.Equal(schema.Author, result);
         }
 
         [Fact]
-        public void PutsSourcePropertyIntoSolve()
+        public void PutsSourceIDIntoSolve()
         {
-            PropertyInfo result = default(PropertyInfo);
-            var patch = new { Author = new XoDead() };
+            IIDCard result = default;
+
+            var patch = new { Author = new XoRam("User", "1") };
 
             Merge
                 .Target(
                     new
                     {
                         Todo = "Succeed",
-                        Author = new OneToOne("User")
+                        Author = Link.One("User")
                     },
-                    (p1, o1, p2, o2) => { result = p2; return null; }
+                    (targetID, patchID) => { result = patchID; return patchID; }
                 )
                 .Post(patch);
 
-            Assert.Equal(patch.GetType().GetProperty("Author"), result);
-        }
-
-        [Fact]
-        public void PutsSourcePropertyValueIntoSolve()
-        {
-            object result = default;
-            var patch = new { Author = new XoDead() };
-
-            Merge
-                .Target(
-                    new
-                    {
-                        Todo = "Succeed",
-                        Author = new OneToOne("User")
-                    },
-                    (p1, o1, p2, o2) => { result = o2; return null; }
-                )
-                .Post(patch);
-
-            Assert.Equal(patch.Author, result);
-        }
-
-        [Fact]
-        public void PutsPostedPropertyIntoSolve()
-        {
-            var relationName = "";
-            Merge
-                .Target(
-                    new
-                    {
-                        Todo = "Succeed",
-                        Author = new OneToOne("User")
-                    },
-                    (p1, o1, p2, o2) => { relationName = p2.Name; return null; }
-                )
-                .Post(
-                    new { Another = new XoDead() }
-                );
-
-            Assert.Equal("Author", relationName);
+            Assert.Equal(patch.Author.Card(), result);
         }
 
         [Fact]

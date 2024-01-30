@@ -64,8 +64,12 @@ namespace Xemo
                 );
         }
 
-        public IXemo Xemo(string id) =>
-            new XoRam<TContent>(new AsIDCard(id, this.subject), this.storage, this.schema);
+        public IXemo Xemo(string id)
+        {
+            if (!this.storage.ContainsKey(id))
+                throw new ArgumentException($"{this.subject} '{id}' does not exist.");
+            return new XoRam<TContent>(new AsIDCard(id, this.subject), this.storage, this.schema);
+        }
 
         public IXemoCluster Schema<TSchema>(TSchema schema) =>
             new XoRamCluster<TSchema>(this.home, this.subject, new ConcurrentDictionary<string, TSchema>(), schema);
