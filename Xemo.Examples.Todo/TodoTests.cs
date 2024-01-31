@@ -8,9 +8,21 @@ namespace Xemo.Examples.Todo
 		[Fact]
 		public void DeliversInformation()
 		{
-			Assert.Equal(
+			var mem =
+                new Ram().Allocate(
+					"todo",
+					new
+					{
+						Done = false,
+						Created = DateTime.Now,
+						Subject = "",
+						Author = ""
+					}
+				);
+
+            Assert.Equal(
 				"Succeed in Unittest",
-				new Todo("Succeed in Unittest", new Ram())
+				new Todo("Succeed in Unittest", mem)
 					.Fill(new { Subject = "" })
 					.Subject
 			);
@@ -19,7 +31,19 @@ namespace Xemo.Examples.Todo
         [Fact]
         public void MutatesInformation()
         {
-			var todo = new Todo("Succeed in Unittest", new Ram());
+            var mem =
+				new Ram().Allocate(
+					"todo",
+					new
+					{
+						Done = false,
+						Created = DateTime.Now,
+						Subject = "",
+						Author = ""
+					}
+				);
+
+            var todo = new Todo("Succeed in Unittest", mem);
 			todo.Mutate(new { Done = true });
 
             Assert.True(

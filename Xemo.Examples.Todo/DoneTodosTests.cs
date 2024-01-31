@@ -1,4 +1,5 @@
 ﻿using Tonga.Scalar;
+using Xemo.Xemo;
 using Xunit;
 
 namespace Xemo.Examples.Todo
@@ -45,10 +46,9 @@ namespace Xemo.Examples.Todo
             );
             Assert.Equal(
                 "I am done",
-                First._(
+                new XoFirst(
                     new DoneTodos(cluster)
                 )
-                .Value()
                 .Fill(
                     new { Subject = "", Due = DateTime.MinValue }
                 ).Subject

@@ -180,7 +180,7 @@ namespace Xemo
                 },
                 (key, existing) =>
                 {
-                    var newState = Patch.Target(this.schema, this.mem).Post(mutation);
+                    var newState = Patch.Target(existing, this.mem).Post(mutation);
                     var newID = Merge.Target(new Identifier()).Post(newState).ID;
                     if (newID != string.Empty
                         && newID != Merge.Target(new Identifier()).Post(existing).ID
