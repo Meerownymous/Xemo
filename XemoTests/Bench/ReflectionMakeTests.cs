@@ -1,17 +1,16 @@
 ﻿using System.Diagnostics;
 using Xunit;
 
-namespace Xemo.Mutation.Tests
+namespace Xemo.Bench.Tests
 {
-    public sealed class ReflectionMake2Tests
+    public sealed class ReflectionMakeTests
     {
         [Fact]
         public void FillsPropertyObjects()
         {
             Assert.Equal(
                 9,
-                ReflectionMerge2
-                    .Fill(new Example())
+                new ReflectionMake<Example>()
                     .From(
                         new { Number = 9 }
                     )
@@ -24,8 +23,7 @@ namespace Xemo.Mutation.Tests
         {
             Assert.Equal(
                 100,
-                ReflectionMerge2
-                    .Fill(new Example())
+                new ReflectionMake<Example>()
                     .From(
                         new { Nested = new NestedExample { NestedNumber = 100 } }
                     )
@@ -39,8 +37,7 @@ namespace Xemo.Mutation.Tests
         {
             Assert.Equal(
                 100,
-                ReflectionMerge2
-                    .Fill(new Example { Numbers = new int[0] })
+                ReflectionMake.Fill(new Example { Numbers = new int[0] })
                     .From(
                         new Example { Numbers = new[] { 100 } }
                     )
@@ -53,7 +50,7 @@ namespace Xemo.Mutation.Tests
         {
             Assert.Equal(
                 123,
-                ReflectionMerge2.Fill(new Example())
+                ReflectionMake.Fill(new Example())
                     .From(
                         new Example
                         {
@@ -73,7 +70,7 @@ namespace Xemo.Mutation.Tests
         {
             Assert.Equal(
                 100,
-                ReflectionMerge2.Fill(new { Number = 0 })
+                ReflectionMake.Fill(new { Number = 0 })
                     .From(
                         new { Number = 100 }
                     )
@@ -86,7 +83,7 @@ namespace Xemo.Mutation.Tests
         {
             Assert.Equal(
                 100,
-                ReflectionMerge2.Fill(new { Nested = new { NestedNumber = 0 } })
+                ReflectionMake.Fill(new { Nested = new { NestedNumber = 0 } })
                     .From(
                         new { Nested = new { NestedNumber = 100 } }
                     )
@@ -100,7 +97,7 @@ namespace Xemo.Mutation.Tests
         {
             Assert.Equal(
                 100,
-                ReflectionMerge2.Fill(new { Numbers = new int[0] })
+                ReflectionMake.Fill(new { Numbers = new int[0] })
                     .From(
                         new { Numbers = new[] { 100 } }
                     )
@@ -109,24 +106,11 @@ namespace Xemo.Mutation.Tests
         }
 
         [Fact]
-        public void DoesNotChangeConcreteInput()
-        {
-
-            var example = new Example() { Number = 100 };
-
-            ReflectionMerge2.Fill(example).From(new { Number = 999  });
-            Assert.Equal(
-                100,
-                example.Number
-            );
-        }
-
-        [Fact]
         public void FillsAnonymousObjectArrays()
         {
             Assert.Equal(
                 123,
-                ReflectionMerge2.Fill(new { Things = new[] { new { ID = 0 } } })
+                ReflectionMake.Fill(new { Things = new[] { new { ID = 0 } } })
                     .From(
                         new { Things = new[] { new { ID = 123 } } }
                     )
@@ -134,24 +118,22 @@ namespace Xemo.Mutation.Tests
             );
         }
 
-        [Fact(Skip = "For performance analysis only")]
+        [Fact(Skip = "For performane analysis only")]
         //[Fact]
         public void Investigation()
         {
             var sw = new Stopwatch();
             sw.Start();
-
-            var merge = new ReflectionMerge2<Example>(new Example());
             for (var i = 0; i < 1000000; i++)
             {
                 Assert.Equal(
                     123,
-                    merge
-                        .From(
-                            new { Nested = new { NestedNumber = 123 } }
-                        )
-                        .Nested
-                        .NestedNumber
+                ReflectionMake.Fill(new Example())
+                    .From(
+                        new { Nested = new { NestedNumber = 123 } }
+                    )
+                    .Nested
+                    .NestedNumber
                 );
             }
             sw.Stop();
@@ -162,8 +144,7 @@ namespace Xemo.Mutation.Tests
             {
                 Assert.Equal(
                     123,
-                    ReflectionMerge2
-                        .Fill(new Example())
+                    ReflectionMake.Fill(new Example())
                         .From(
                             new { Nested = new { NestedNumber = 123 } }
                         )

@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Reflection;
 using Tonga;
 
-namespace Xemo.Mutation
+namespace Xemo.Bench
 {
     public sealed class IsPrimitive : IFunc<Type, bool>
     {

@@ -17,7 +17,7 @@
     <None Remove="Old\" />
     <None Remove="Relation\" />
     <None Remove="IDCard\" />
-    <None Remove="Mutation\" />
+    <None Remove="Bench\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Cluster\" />
@@ -25,7 +25,7 @@
     <Folder Include="Old\" />
     <Folder Include="Relation\" />
     <Folder Include="IDCard\" />
-    <Folder Include="Mutation\" />
+    <Folder Include="Bench\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <NoWarn>CS8604,CS8603,CS8602,CS8601,CS8618</NoWarn>

@@ -1,7 +1,7 @@
 ﻿using System;
-namespace Xemo.Mutation
+namespace Xemo.Bench
 {
-    public sealed class Patch<TTarget> : IFlow<TTarget>
+    public sealed class Patch<TTarget> : IBench<TTarget>
     {
         private readonly TTarget target;
         private readonly IMem mem;
@@ -18,13 +18,23 @@ namespace Xemo.Mutation
                 Merge
                     .Target(
                         this.target,
-                        (o1, newLink) => AssertExists(newLink)
+                        (o1, newLink) => AssertExists(newLink),
+                        (o1, newLinks) => AssertExists(newLinks)
                     ).Post(patch);
         }
 
         private IIDCard AssertExists(IIDCard card)
         {
             return this.mem.Xemo(card.Kind(), card.ID()).Card();
+        }
+
+        private IIDCard[] AssertExists(IIDCard[] cards)
+        {
+            foreach(var card in cards)
+            {
+                this.mem.Xemo(card.Kind(), card.ID()).Card();
+            }
+            return cards;
         }
     }
 

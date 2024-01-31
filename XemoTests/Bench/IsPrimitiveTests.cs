@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Xunit;
 
-namespace Xemo.Mutation.Tests
+namespace Xemo.Bench.Tests
 {
     public sealed class IsPrimitiveTests
     {

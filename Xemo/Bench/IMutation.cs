@@ -1,9 +1,9 @@
-﻿namespace Xemo.Mutation
+﻿namespace Xemo.Bench
 {
     /// <summary>
     /// A data mutation.
     /// </summary>
-    public interface IFlow<TTarget>
+    public interface IBench<TTarget>
     {
         TTarget Post<TPatch>(TPatch patch);
     }

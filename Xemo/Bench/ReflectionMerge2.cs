@@ -1,42 +1,42 @@
 ﻿using System.Reflection;
 using Tonga.Scalar;
-using Xemo.IDCard;
 
-namespace Xemo.Mutation
+namespace Xemo.Bench
 {
-    public static class Merge
+    /// <summary>
+    /// Flexible merge of one object into a target object, disregarding types of
+    /// the objects. If the source property type matches the target property type,
+    /// or one or both are an anonymous type, data is copied into the target property.
+    /// </summary>
+    public sealed class ReflectionMerge2<TOutput> : IMake<TOutput>
     {
-        public static Merge<TTarget> Target<TTarget>(
-            TTarget target,
-            Func<object, IIDCard, object> solveRelation
-        ) =>
-            new Merge<TTarget>(target, solveRelation);
+        private readonly TOutput target;
+        private readonly IMem mem;
 
-        public static Merge<TTarget> Target<TTarget>(TTarget target) =>
-            new Merge<TTarget>(target);
-    }
-
-    public sealed class Merge<TTarget> : IFlow<TTarget>
-    {
-        private readonly TTarget target;
-        private readonly Func<object, IIDCard, object> solve1To1;
-
-        public Merge(TTarget target) : this(target, (targetCard, patchCard) => patchCard)
+        /// <summary>
+        /// Flexible merge of one object into a target object, disregarding types of
+        /// the objects. If the source property type matches the target property type,
+        /// or one or both are an anonymous type, data is copied into the target property.
+        /// </summary>
+        public ReflectionMerge2(TOutput target) : this(
+            target,
+            new DeadMem("relation resolving is not supported.")
+        )
         { }
 
-        public Merge(
-            TTarget target,
-            Func<object, IIDCard, object> solve1to1
-        )
+        /// <summary>
+        /// Flexible merge of one object into a target object, disregarding types of
+        /// the objects. If the source property type matches the target property type,
+        /// or one or both are an anonymous type, data is copied into the target property.
+        /// </summary>
+        public ReflectionMerge2(TOutput target, IMem mem)
         {
             this.target = target;
-            this.solve1To1 = solve1to1;
+            this.mem = mem;
         }
 
-        public TTarget Post<TPatch>(TPatch patch)
-        {
-            return (TTarget)Merged(this.target.GetType(), this.target, patch);
-        }
+        public TOutput From<TInput>(TInput input) =>
+            (TOutput)Merged(this.target.GetType(), this.target, input);
 
         private object Merged<TInput>(Type outType, object output, TInput input)
         {
@@ -75,16 +75,18 @@ namespace Xemo.Mutation
                         {
                             values[collected] = inProp.GetValue(input);
                         }
-                        else if (IsSolvableRelation(outProp.PropertyType, inProp.PropertyType))
+                        else if (IsRelation(inProp.PropertyType))
                         {
-                            var incoming = inProp.GetValue(input);
-                            values[collected] =
-                                this.solve1To1(
-                                    outProp.GetValue(this.target),
-                                    incoming.GetType().IsAssignableTo(typeof(IXemo)) ?
-                                    (incoming as IXemo).Card() :
-                                    (incoming as IIDCard)
-                                );
+                            //var inputIsXemo = inProp.PropertyType.IsAssignableTo(typeof(IXemo));
+                            var relation = (IRelation<IXemo>)inProp.GetValue(input);
+                            var id = relation.Target().Card().ID();
+                            //if(outProp.PropertyType)
+                            //IRelation<IXemo> relation = (IRelation<IXemo>)outProp.GetValue(output);
+                            //var target = relation.Target();
+                                //this.mem
+                                //    .Xemo(outProp.Name, outProp.GetValue(output).ToString())
+                                //    .Fill(input);
+                            //Debug.WriteLine($"Should now solve {outProp.Name}");
                         }
                         else
                         {
@@ -158,18 +160,19 @@ namespace Xemo.Mutation
 
         private static bool IsAnonymous(Type type) => type.Namespace == null;
 
-        private static bool IsSolvableRelation(Type leftPropType, Type rightPropType)
+        private static bool IsRelation(Type propType)
         {
-            return leftPropType.IsAssignableTo(typeof(IIDCard))
-                ||
-                (
-                    rightPropType.IsAssignableTo(typeof(IXemo))
-                    ||
-                    rightPropType.IsAssignableTo(typeof(IIDCard))
-                );
-            //return propType.IsAssignableTo(typeof(IRelation<IXemo>))
-            //    || propType.IsAssignableTo(typeof(IRelation<IXemoCluster>));
+            return propType.IsAssignableTo(typeof(IRelation<IXemo>))
+                || propType.IsAssignableTo(typeof(IRelation<IXemoCluster>));
         }
     }
-}
 
+    public static class ReflectionMerge2
+    {
+        public static ReflectionMerge2<TOutput> Fill<TOutput>(TOutput output, IMem mem) =>
+            new ReflectionMerge2<TOutput>(output, mem);
+
+        public static ReflectionMerge2<TOutput> Fill<TOutput>(TOutput output) =>
+            new ReflectionMerge2<TOutput>(output, new DeadMem("no relations supported."));
+    }
+}

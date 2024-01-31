@@ -2,7 +2,7 @@
 using System.Reflection;
 using Tonga.Scalar;
 
-namespace Xemo.Mutation
+namespace Xemo.Bench
 {
     /// <summary>
     /// Flexible merge of one object into a target object, disregarding types of

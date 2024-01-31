@@ -1,10 +1,6 @@
-﻿using System;
-using Xemo;
-using Xemo.IDCard;
-using Xemo.Mutation;
-using Xunit;
+﻿using Xunit;
 
-namespace XemoTests.Mutation
+namespace Xemo.Bench.Tests
 {
     public sealed class DeepSliceTests
     {

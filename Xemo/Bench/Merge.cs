@@ -1,32 +1,51 @@
 ﻿using System.Reflection;
+using Tonga.Enumerable;
 using Tonga.Scalar;
-using Xemo.Relation;
+using Xemo.IDCard;
 
-namespace Xemo.Mutation
+namespace Xemo.Bench
 {
-    /// <summary>
-    /// Flexible merge of one object into a target object, disregarding types of
-    /// the objects. If the source property type matches the target property type,
-    /// or one or both are an anonymous type, data is copied into the target property.
-    /// </summary>
-    public sealed class ReflectionMake2<TOutput> : IMake<TOutput>
+    public static class Merge
     {
-        private readonly TOutput target;
-        private readonly IMem mem;
+        public static Merge<TTarget> Target<TTarget>(
+            TTarget target,
+            Func<object, IIDCard, object> solve1to1,
+            Func<object, IIDCard[], object> solve1toMany
+        ) =>
+            new Merge<TTarget>(target, solve1to1, solve1toMany);
 
-        /// <summary>
-        /// Flexible merge of one object into a target object, disregarding types of
-        /// the objects. If the source property type matches the target property type,
-        /// or one or both are an anonymous type, data is copied into the target property.
-        /// </summary>
-        public ReflectionMake2(TOutput target, IMem mem)
+        public static Merge<TTarget> Target<TTarget>(TTarget target) =>
+            new Merge<TTarget>(target);
+    }
+
+    public sealed class Merge<TTarget> : IBench<TTarget>
+    {
+        private readonly TTarget target;
+        private readonly Func<object, IIDCard, object> solve1To1;
+        private readonly Func<object, IIDCard[], object> solve1ToMany;
+
+        public Merge(TTarget target) : this(
+            target,
+            (left, right) => right,
+            (left, right) => right
+        )
+        { }
+
+        public Merge(
+            TTarget target,
+            Func<object, IIDCard, object> solve1to1,
+            Func<object, IIDCard[], object> solve1toMany
+        )
         {
             this.target = target;
-            this.mem = mem;
+            this.solve1To1 = solve1to1;
+            this.solve1ToMany = solve1toMany;
         }
 
-        public TOutput From<TInput>(TInput input) =>
-            (TOutput)Merged(typeof(TOutput), this.target, input);
+        public TTarget Post<TPatch>(TPatch patch)
+        {
+            return (TTarget)Merged(this.target.GetType(), this.target, patch);
+        }
 
         private object Merged<TInput>(Type outType, object output, TInput input)
         {
@@ -65,19 +84,32 @@ namespace Xemo.Mutation
                         {
                             values[collected] = inProp.GetValue(input);
                         }
-                        else if (IsRelation(outProp.PropertyType))
+                        else if (IsSolvableRelation(outProp.PropertyType, inProp.PropertyType))
                         {
-                            IRelation<IXemo> relationSchema =
-                                (IRelation<IXemo>)outProp.GetValue(this.target);
-
-                            var inputIsXemo = inProp.PropertyType.IsAssignableTo(typeof(IXemo));
-                            if(inputIsXemo)
+                            var incoming = inProp.GetValue(input);
+                            if (incoming.GetType().IsArray)
+                            {
                                 values[collected] =
-                                    new RelOneToOne(
-                                        (IXemo)inProp.GetValue(input),
-                                        relationSchema.TargetSubject(),
-                                        this.mem
+                                    this.solve1ToMany(
+                                        outProp.GetValue(output),
+                                        incoming.GetType().GetElementType().IsAssignableTo(typeof(IXemo)) ?
+                                        Mapped._(
+                                            item => item.Card(),
+                                            incoming as IXemo[]
+                                        ).ToArray() :
+                                        (incoming as IIDCard[])
                                     );
+                            }
+                            else
+                            {
+                                values[collected] =
+                                    this.solve1To1(
+                                        outProp.GetValue(output),
+                                        incoming.GetType().IsAssignableTo(typeof(IXemo)) ?
+                                        (incoming as IXemo).Card() :
+                                        (incoming as IIDCard)
+                                    );
+                            }
                         }
                         else
                         {
@@ -145,22 +177,44 @@ namespace Xemo.Mutation
             var type = prop.PropertyType;
             return
                 (type.IsArray ?
-                    type.MemberType.GetTypeCode() : Type.GetTypeCode(type)
+                    Type.GetTypeCode(type.GetElementType()) : Type.GetTypeCode(type)
                 ) != TypeCode.Object;
         }
 
         private static bool IsAnonymous(Type type) => type.Namespace == null;
 
-        private static bool IsRelation(Type propType)
+        private static bool IsSolvableRelation(Type leftPropType, Type rightPropType)
         {
-            return propType.IsAssignableTo(typeof(IRelation<IXemo>))
-                || propType.IsAssignableTo(typeof(IRelation<IXemoCluster>));
+            return IsSolvable1To1Relation(leftPropType, rightPropType)
+                ||
+                IsSolvable1ToManyRelation(leftPropType, rightPropType);
+        }
+
+        private static bool IsSolvable1To1Relation(Type leftPropType, Type rightPropType)
+        {
+            return leftPropType.IsAssignableTo(typeof(IIDCard))
+                ||
+                (
+                    rightPropType.IsAssignableTo(typeof(IXemo))
+                    ||
+                    rightPropType.IsAssignableTo(typeof(IIDCard))
+                );
+        }
+
+        private static bool IsSolvable1ToManyRelation(Type leftPropType, Type rightPropType)
+        {
+            
+            return
+                leftPropType.IsArray && rightPropType.IsArray
+                &&
+                leftPropType.GetElementType().IsAssignableTo(typeof(IIDCard))
+                ||
+                (
+                    rightPropType.GetElementType().IsAssignableTo(typeof(IXemo))
+                    ||
+                    rightPropType.GetElementType().IsAssignableTo(typeof(IIDCard))
+                );
         }
     }
-
-    public static class ReflectionMake2
-    {
-        public static ReflectionMake2<TOutput> Fill<TOutput>(TOutput output, IMem mem) =>
-            new ReflectionMake2<TOutput>(output, mem);
-    }
 }
+

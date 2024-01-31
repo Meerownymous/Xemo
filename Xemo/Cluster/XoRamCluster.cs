@@ -1,9 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using Xemo.Cluster;
 using Xemo.IDCard;
-using Xemo.Mutation;
+using Xemo.Bench;
 
 namespace Xemo
 {
@@ -108,7 +107,7 @@ namespace Xemo
                 (key) =>
                 {
                     var newItem =
-                        Birth.Schema(this.subject, this.schema, this.home)
+                        Birth.Schema(this.schema, this.home)
                             .Post(input);
                     lock (this.subject)
                     {

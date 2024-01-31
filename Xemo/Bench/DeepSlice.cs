@@ -1,7 +1,9 @@
 ﻿using System;
-namespace Xemo.Mutation
+using Tonga.Enumerable;
+
+namespace Xemo.Bench
 {
-    public sealed class DeepSlice<TSlice> : IFlow<TSlice>
+    public sealed class DeepSlice<TSlice> : IBench<TSlice>
     {
         private readonly TSlice target;
         private readonly IMem mem;
@@ -20,6 +22,15 @@ namespace Xemo.Mutation
                     (left, rightID) =>
                     {
                         var result = mem.Xemo(rightID.Kind(), rightID.ID()).Fill(left);
+                        return result;
+                    },
+                    (left, rightIDs) =>
+                    {
+                        var result =
+                            Mapped._(
+                                rightID => mem.Xemo(rightID.Kind(), rightID.ID()).Fill(left),
+                                rightIDs
+                            ).ToArray();
                         return result;
                     }
                 ).Post(patch);

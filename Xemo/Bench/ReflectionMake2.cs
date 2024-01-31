@@ -1,14 +1,15 @@
 ﻿using System.Reflection;
 using Tonga.Scalar;
+using Xemo.Relation;
 
-namespace Xemo.Mutation
+namespace Xemo.Bench
 {
     /// <summary>
     /// Flexible merge of one object into a target object, disregarding types of
     /// the objects. If the source property type matches the target property type,
     /// or one or both are an anonymous type, data is copied into the target property.
     /// </summary>
-    public sealed class ReflectionMerge2<TOutput> : IMake<TOutput>
+    public sealed class ReflectionMake2<TOutput> : IMake<TOutput>
     {
         private readonly TOutput target;
         private readonly IMem mem;
@@ -18,25 +19,14 @@ namespace Xemo.Mutation
         /// the objects. If the source property type matches the target property type,
         /// or one or both are an anonymous type, data is copied into the target property.
         /// </summary>
-        public ReflectionMerge2(TOutput target) : this(
-            target,
-            new DeadMem("relation resolving is not supported.")
-        )
-        { }
-
-        /// <summary>
-        /// Flexible merge of one object into a target object, disregarding types of
-        /// the objects. If the source property type matches the target property type,
-        /// or one or both are an anonymous type, data is copied into the target property.
-        /// </summary>
-        public ReflectionMerge2(TOutput target, IMem mem)
+        public ReflectionMake2(TOutput target, IMem mem)
         {
             this.target = target;
             this.mem = mem;
         }
 
         public TOutput From<TInput>(TInput input) =>
-            (TOutput)Merged(this.target.GetType(), this.target, input);
+            (TOutput)Merged(typeof(TOutput), this.target, input);
 
         private object Merged<TInput>(Type outType, object output, TInput input)
         {
@@ -75,18 +65,19 @@ namespace Xemo.Mutation
                         {
                             values[collected] = inProp.GetValue(input);
                         }
-                        else if (IsRelation(inProp.PropertyType))
+                        else if (IsRelation(outProp.PropertyType))
                         {
-                            //var inputIsXemo = inProp.PropertyType.IsAssignableTo(typeof(IXemo));
-                            var relation = (IRelation<IXemo>)inProp.GetValue(input);
-                            var id = relation.Target().Card().ID();
-                            //if(outProp.PropertyType)
-                            //IRelation<IXemo> relation = (IRelation<IXemo>)outProp.GetValue(output);
-                            //var target = relation.Target();
-                                //this.mem
-                                //    .Xemo(outProp.Name, outProp.GetValue(output).ToString())
-                                //    .Fill(input);
-                            //Debug.WriteLine($"Should now solve {outProp.Name}");
+                            IRelation<IXemo> relationSchema =
+                                (IRelation<IXemo>)outProp.GetValue(this.target);
+
+                            var inputIsXemo = inProp.PropertyType.IsAssignableTo(typeof(IXemo));
+                            if(inputIsXemo)
+                                values[collected] =
+                                    new RelOneToOne(
+                                        (IXemo)inProp.GetValue(input),
+                                        relationSchema.TargetSubject(),
+                                        this.mem
+                                    );
                         }
                         else
                         {
@@ -167,12 +158,9 @@ namespace Xemo.Mutation
         }
     }
 
-    public static class ReflectionMerge2
+    public static class ReflectionMake2
     {
-        public static ReflectionMerge2<TOutput> Fill<TOutput>(TOutput output, IMem mem) =>
-            new ReflectionMerge2<TOutput>(output, mem);
-
-        public static ReflectionMerge2<TOutput> Fill<TOutput>(TOutput output) =>
-            new ReflectionMerge2<TOutput>(output, new DeadMem("no relations supported."));
+        public static ReflectionMake2<TOutput> Fill<TOutput>(TOutput output, IMem mem) =>
+            new ReflectionMake2<TOutput>(output, mem);
     }
 }

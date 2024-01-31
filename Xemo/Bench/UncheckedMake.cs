@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Tonga.Collection;
 using Tonga.Scalar;
 
-namespace Xemo.Mutation
+namespace Xemo.Bench
 {
     public sealed class UncheckedMake<TOutput> : IMake<TOutput>
     {

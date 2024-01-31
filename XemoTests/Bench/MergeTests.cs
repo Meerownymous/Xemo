@@ -4,7 +4,7 @@ using Xemo.IDCard;
 using Xemo.Xemo;
 using Xunit;
 
-namespace Xemo.Mutation.Tests
+namespace Xemo.Bench.Tests
 {
     public sealed class MergeTests
     {
@@ -38,7 +38,7 @@ namespace Xemo.Mutation.Tests
         }
 
         [Fact]
-        public void UsesGivenSolveStrategy()
+        public void UsesGivenSolve1to1Strategy()
         {
             var solved = false;
             Merge
@@ -48,7 +48,8 @@ namespace Xemo.Mutation.Tests
                         Todo = "Succeed",
                         Author = Link.One("User")
                     },
-                    (leftID, rightID) => { solved = true; return rightID; }
+                    (leftID, rightID) => { solved = true; return rightID; },
+                    (left, right) => throw new Exception("one to many is not tested here.")
                 )
                 .Post(
                     new { Author = new AsIDCard("1", "User") }
@@ -70,7 +71,8 @@ namespace Xemo.Mutation.Tests
 
             Merge
                 .Target(schema,
-                    (leftID, rightID) => { result = leftID; return rightID; }
+                    (leftID, rightID) => { result = leftID; return rightID; },
+                    (left, right) => throw new Exception("one to many is not tested here.")
                 )
                 .Post(new { Author = new XoRam("User", "1") });
 
@@ -91,7 +93,8 @@ namespace Xemo.Mutation.Tests
                         Todo = "Succeed",
                         Author = Link.One("User")
                     },
-                    (targetID, patchID) => { result = patchID; return patchID; }
+                    (left, right) => { result = right; return right; },
+                    (left, right) => throw new Exception("one to many is not tested here.")
                 )
                 .Post(patch);
 

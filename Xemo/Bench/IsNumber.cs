@@ -2,7 +2,7 @@
 using System.Reflection;
 using Tonga;
 
-namespace Xemo.Mutation
+namespace Xemo.Bench
 {
     public sealed class IsNumber : IFunc<Type, bool>
     {

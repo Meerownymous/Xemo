@@ -1,20 +1,18 @@
-﻿namespace Xemo.Mutation
+﻿namespace Xemo.Bench
 {
     /// <summary>
     /// Birth of new data following a given schema.
     /// </summary>
-    public sealed class Birth<TContent> : IFlow<TContent>
+    public sealed class Birth<TContent> : IBench<TContent>
     {
-        private readonly string subject;
         private readonly TContent schema;
         private readonly IMem mem;
 
         /// <summary>
         /// Birth of new data following a given schema.
         /// </summary>
-        public Birth(string subject, TContent schema, IMem mem)
+        public Birth(TContent schema, IMem mem)
         {
-            this.subject = subject;
             this.schema = schema;
             this.mem = mem;
         }
@@ -25,7 +23,8 @@
                 Merge
                     .Target(
                         this.schema,
-                        (def, relation) => EnsureLinkable(relation)
+                        (def, relation) => EnsureLinkable(relation),
+                        (def, relations) => EnsureLinkable(relations)
                     )
                     .Post(patch);
 
@@ -36,12 +35,21 @@
         {
             return this.mem.Xemo(card.Kind(), card.ID()).Card();
         }
+
+        private IIDCard[] EnsureLinkable(IIDCard[] cards)
+        {
+            foreach(var card in cards)
+            {
+                this.mem.Xemo(card.Kind(), card.ID()).Card();
+            }
+            return cards;
+        }
     }
 
     public static class Birth
     {
-        public static Birth<TSchema> Schema<TSchema>(string subject, TSchema schema, IMem mem) =>
-            new Birth<TSchema>(subject, schema, mem);
+        public static Birth<TSchema> Schema<TSchema>(TSchema schema, IMem mem) =>
+            new Birth<TSchema>(schema, mem);
     }
 }
 

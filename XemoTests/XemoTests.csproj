@@ -28,13 +28,13 @@
     <None Remove="Xemo\" />
     <None Remove="Cluster\" />
     <None Remove="Relation\" />
-    <None Remove="Mutation\" />
+    <None Remove="Bench\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Xemo\" />
     <Folder Include="Cluster\" />
     <Folder Include="Relation\" />
-    <Folder Include="Mutation\" />
+    <Folder Include="Bench\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Xemo\Xemo.csproj" />

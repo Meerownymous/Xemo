@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Tonga.Scalar;
 
-namespace Xemo.Mutation
+namespace Xemo.Bench
 {
     public sealed class ReflectionMake<TOutput> : IMake<TOutput>
     {

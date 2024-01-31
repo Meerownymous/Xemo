@@ -2,7 +2,7 @@
 using Xemo.IDCard;
 using Xunit;
 
-namespace Xemo.Mutation.Tests
+namespace Xemo.Bench.Tests
 {
     public sealed class BirthTests
     {
@@ -12,7 +12,6 @@ namespace Xemo.Mutation.Tests
             Assert.Equal(
                 "Timon",
                 Birth.Schema(
-                    "User",
                     new
                     {
                         Name = "",
@@ -35,7 +34,6 @@ namespace Xemo.Mutation.Tests
             Assert.Equal(
                 "Average",
                 Birth.Schema(
-                    "User",
                     new
                     {
                         Name = "",
@@ -76,7 +74,7 @@ namespace Xemo.Mutation.Tests
             Assert.Equal(
                 pumba.Card().ID(),
                 Birth
-                    .Schema("User", schema, mem)
+                    .Schema(schema, mem)
                     .Post(
                         new
                         {
@@ -112,7 +110,7 @@ namespace Xemo.Mutation.Tests
             Assert.Equal(
                 pumba.Card().ID(),
                 Birth
-                    .Schema("User", schema, mem)
+                    .Schema(schema, mem)
                     .Post(
                         new
                         {
@@ -138,7 +136,7 @@ namespace Xemo.Mutation.Tests
 
             Assert.Throws<ArgumentException>(() =>
                 Birth
-                    .Schema("User", schema, mem)
+                    .Schema(schema, mem)
                     .Post(
                         new
                         {
@@ -147,6 +145,94 @@ namespace Xemo.Mutation.Tests
                             BestFriend = new AsIDCard("19", "User")
                         }
                     )
+            );
+        }
+
+        [Fact]
+        public void LinksManyRelationByIDCard()
+        {
+            var mem = new Ram();
+            var schema =
+                new
+                {
+                    Name = "",
+                    BestFriends = Link.Many("User")
+                };
+
+            var tick =
+                mem.Allocate("User", schema)
+                    .Cluster("User")
+                    .Create(
+                        new
+                        {
+                            Name = "Tick"
+                        }
+                    );
+
+            var trick =
+                mem.Cluster("User")
+                    .Create(
+                        new
+                        {
+                            Name = "Trick"
+                        }
+                    );
+
+            Assert.Equal(
+                tick.Card().ID(),
+                Birth
+                    .Schema(schema, mem)
+                    .Post(
+                        new
+                        {
+                            Name = "Track",
+                            BestFriends = new[] { tick.Card(), trick.Card() }
+                        }
+                    ).BestFriends[0].ID()
+            );
+        }
+
+        [Fact]
+        public void LinksManyRelationByXemo()
+        {
+            var mem = new Ram();
+            var schema =
+                new
+                {
+                    Name = "",
+                    BestFriends = Link.Many("User")
+                };
+
+            var tick =
+                mem.Allocate("User", schema)
+                    .Cluster("User")
+                    .Create(
+                        new
+                        {
+                            Name = "Tick"
+                        }
+                    );
+
+            var trick =
+                mem.Cluster("User")
+                    .Create(
+                        new
+                        {
+                            Name = "Trick"
+                        }
+                    );
+
+            Assert.Equal(
+                tick.Card().ID(),
+                Birth
+                    .Schema(schema, mem)
+                    .Post(
+                        new
+                        {
+                            Name = "Track",
+                            BestFriends = new[] { tick, trick }
+                        }
+                    ).BestFriends[0].ID()
             );
         }
     }

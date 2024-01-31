@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Xemo.Mutation
+namespace Xemo.Bench
 {
     /// <summary>
     /// Merges two objects of the same type by overwriting the target properties

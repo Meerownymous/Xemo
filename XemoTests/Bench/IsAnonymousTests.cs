@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Xunit;
 
-namespace Xemo.Mutation.Tests
+namespace Xemo.Bench.Tests
 {
     public sealed class IsAnonymousTests
     {
