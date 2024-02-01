@@ -119,7 +119,13 @@ namespace Xemo.Bench.Tests
         {
             Assert.Equal(
                 123,
-                Merge.Target(new Example())
+                Merge.Target(new Example()
+                {
+                    Nesteds = new NestedExample[]
+                    {
+                        new NestedExample() { NestedNumber = 0 }
+                    }
+                })
                     .Post(
                         new Example
                         {
@@ -179,6 +185,10 @@ namespace Xemo.Bench.Tests
         [Fact]
         public void DoesNotChangeConcreteInput()
         {
+            var a = new { Name = "Test" };
+            var b = new { Name = "Test2" };
+
+            var c = a with { };
 
             var example = new Example() { Number = 100 };
 

@@ -66,7 +66,67 @@ namespace Xemo.Tests
         }
 
         [Fact]
-        public void SolvesRelations()
+        public void FillsPrimitiveArray()
+        {
+            var schema =
+                new
+                {
+                    FirstName = "",
+                    LastName = "",
+                    Skills = new string[0]
+                };
+
+            Assert.Equal(
+                "Dive",
+                schema.Allocated("User", new Ram())
+                    .Create(
+                        new
+                        {
+                            FirstName = "Stephano",
+                            LastName = "Memorius",
+                            Skills = new[] { "Dive", "Sail" }
+                        }
+                    )
+                    .Fill(new
+                    {
+                        Skills = new string[0]
+                    })
+                    .Skills[0]
+            );
+        }
+
+        [Fact]
+        public void FillsAnonymousArray()
+        {
+            var schema =
+                new
+                {
+                    FirstName = "",
+                    LastName = "",
+                    Skills = new []{ new { SkillName = "" } }
+                };
+
+            Assert.Equal(
+                "Dive",
+                schema.Allocated("User", new Ram())
+                    .Create(
+                        new
+                        {
+                            FirstName = "Stephano",
+                            LastName = "Memorius",
+                            Skills = new[] { new { SkillName = "Dive" } }
+                        }
+                    )
+                    .Fill(new
+                    {
+                        Skills = new[] { new { SkillName = "" } }
+                    })
+                    .Skills[0].SkillName
+            );
+        }
+
+        [Fact]
+        public void Solves1to1Relation()
         {
             var schema =
                 new
@@ -91,7 +151,7 @@ namespace Xemo.Tests
         }
 
         [Fact]
-        public void MutatesRelations()
+        public void Mutates1to1Relation()
         {
             var schema =
                 new

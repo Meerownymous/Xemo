@@ -1,7 +1,8 @@
-﻿using System.Reflection;
+﻿using System.Collections;
+using System.Diagnostics;
+using System.Reflection;
 using Tonga.Enumerable;
 using Tonga.Scalar;
-using Xemo.IDCard;
 
 namespace Xemo.Bench
 {
@@ -18,13 +19,13 @@ namespace Xemo.Bench
             new Merge<TTarget>(target);
     }
 
-    public sealed class Merge<TTarget> : IBench<TTarget>
+    public sealed class Merge<TResult> : IBench<TResult>
     {
-        private readonly TTarget target;
+        private readonly TResult target;
         private readonly Func<object, IIDCard, object> solve1To1;
         private readonly Func<object, IIDCard[], object> solve1ToMany;
 
-        public Merge(TTarget target) : this(
+        public Merge(TResult target) : this(
             target,
             (left, right) => right,
             (left, right) => right
@@ -32,7 +33,7 @@ namespace Xemo.Bench
         { }
 
         public Merge(
-            TTarget target,
+            TResult target,
             Func<object, IIDCard, object> solve1to1,
             Func<object, IIDCard[], object> solve1toMany
         )
@@ -42,56 +43,91 @@ namespace Xemo.Bench
             this.solve1ToMany = solve1toMany;
         }
 
-        public TTarget Post<TPatch>(TPatch patch)
+        public TResult Post<TSource>(TSource patch)
         {
-            return (TTarget)Merged(this.target.GetType(), this.target, patch);
+            TResult result;
+            if(this.target.GetType().IsArray)
+            {
+                result = (TResult)MergedArray(this.target.GetType(), this.target, patch);
+            }
+            else
+            {
+                result = (TResult)MergedObject(this.target.GetType(), this.target, patch);
+            }
+            return result;
         }
 
-        private object Merged<TInput>(Type outType, object output, TInput input)
+        private object MergedObject<TSource>(Type resultType, object target, TSource source)
         {
             object result = null;
-            if (input != null)
+            if (source != null)
             {
-                if (output == null) output = Instance(outType);
-
-                var isAnonymous = IsAnonymous(outType);
+                if (target == null) target = Instance(resultType);
+                var isAnonymous = IsAnonymous(resultType);
+                var values = Values(source, target);
                 if (isAnonymous)
                 {
-                    result = MakeAnonymous(outType, Values(input, output));
+                    result = MakeAnonymous(resultType, values);
                 }
                 else
                 {
-                    result = MakeConcrete(outType, Values(input, output), output.GetType().GetProperties());
+                    result = MakeConcrete(resultType, values, target.GetType().GetProperties());
                 }
             }
             return result;
         }
 
-        private object[] Values(object input, object output)
+        private object MergedArray<TSource>(Type resultType, object target, TSource source)
         {
-            var outProps = output.GetType().GetProperties();
-            var inType = input.GetType();
-            var values = new object[outProps.Length];
-            int collected = 0;
-            foreach (var outProp in outProps)
+            object result = null;
+            if (target != null)
             {
-                var inProp = inType.GetProperty(outProp.Name);
-                if (inProp != null && inProp.CanRead)
+                var schema = (target as Array).GetValue(0);
+                if (source != null && schema != null)
                 {
-                    if (IsCompatible(outProp, inProp))
+                    var outputArray = Array.CreateInstance(resultType.GetElementType(), (source as Array).Length);
+                    for (var i = 0; i < outputArray.Length; i++)
                     {
-                        if (IsPrimitive(outProp))
+                        outputArray.SetValue(
+                            MergedObject(
+                                resultType.GetElementType(),
+                                schema,
+                                (source as Array).GetValue(i)
+                            ),
+                            i
+                        );
+                    }
+                    result = outputArray;
+                }
+            }
+            return result;
+        }
+
+        private object[] Values(object source, object target)
+        {
+            var targetProps = target.GetType().GetProperties();
+            var sourceType = source.GetType();
+            var mergedValues = new object[targetProps.Length];
+            int collected = 0;
+            foreach (var targetProp in targetProps)
+            {
+                var sourceProp = sourceType.GetProperty(targetProp.Name);
+                if (sourceProp != null && sourceProp.CanRead)
+                {
+                    if (IsCompatible(targetProp, sourceProp))
+                    {
+                        if (IsPrimitive(targetProp))
                         {
-                            values[collected] = inProp.GetValue(input);
+                            mergedValues[collected] = sourceProp.GetValue(source);
                         }
-                        else if (IsSolvableRelation(outProp.PropertyType, inProp.PropertyType))
+                        else if (IsSolvableRelation(targetProp.PropertyType, sourceProp.PropertyType))
                         {
-                            var incoming = inProp.GetValue(input);
+                            var incoming = sourceProp.GetValue(source);
                             if (incoming.GetType().IsArray)
                             {
-                                values[collected] =
+                                mergedValues[collected] =
                                     this.solve1ToMany(
-                                        outProp.GetValue(output),
+                                        targetProp.GetValue(target),
                                         incoming.GetType().GetElementType().IsAssignableTo(typeof(IXemo)) ?
                                         Mapped._(
                                             item => item.Card(),
@@ -102,9 +138,9 @@ namespace Xemo.Bench
                             }
                             else
                             {
-                                values[collected] =
+                                mergedValues[collected] =
                                     this.solve1To1(
-                                        outProp.GetValue(output),
+                                        targetProp.GetValue(target),
                                         incoming.GetType().IsAssignableTo(typeof(IXemo)) ?
                                         (incoming as IXemo).Card() :
                                         (incoming as IIDCard)
@@ -113,23 +149,35 @@ namespace Xemo.Bench
                         }
                         else
                         {
-                            values[collected] =
-                                Merged(
-                                    outProp.PropertyType,
-                                    outProp.GetValue(output),
-                                    inProp.GetValue(input)
-                                );
+                            if (targetProp.PropertyType.IsArray)
+                            {
+                                mergedValues[collected] =
+                                    MergedArray(
+                                        targetProp.PropertyType,
+                                        targetProp.GetValue(target),
+                                        sourceProp.GetValue(source)
+                                    );
+                            }
+                            else
+                            {
+                                mergedValues[collected] =
+                                    MergedObject(
+                                        targetProp.PropertyType,
+                                        targetProp.GetValue(target),
+                                        sourceProp.GetValue(source)
+                                    );
+                            }
                         }
                     }
                 }
                 else
                 {
-                    values[collected] =
-                        outProp.GetValue(output);
+                    mergedValues[collected] =
+                        targetProp.GetValue(target);
                 }
                 collected++;
             }
-            return values;
+            return mergedValues;
         }
 
         private static object MakeAnonymous(Type type, object[] values) =>
@@ -203,17 +251,19 @@ namespace Xemo.Bench
 
         private static bool IsSolvable1ToManyRelation(Type leftPropType, Type rightPropType)
         {
-            
-            return
-                leftPropType.IsArray && rightPropType.IsArray
-                &&
-                leftPropType.GetElementType().IsAssignableTo(typeof(IIDCard))
-                ||
-                (
-                    rightPropType.GetElementType().IsAssignableTo(typeof(IXemo))
+            var result = false;
+            if (leftPropType.IsArray && rightPropType.IsArray)
+            {
+                result =
+                    leftPropType.GetElementType().IsAssignableTo(typeof(IIDCard))
                     ||
-                    rightPropType.GetElementType().IsAssignableTo(typeof(IIDCard))
-                );
+                    (
+                        rightPropType.GetElementType().IsAssignableTo(typeof(IXemo))
+                        ||
+                        rightPropType.GetElementType().IsAssignableTo(typeof(IIDCard))
+                    );
+            }
+            return result;
         }
     }
 }
