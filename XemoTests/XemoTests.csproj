@@ -29,11 +29,15 @@
     <None Remove="Cluster\" />
     <None Remove="Bench\" />
     <None Remove="Cluster\PropertyValueTests.config" />
+    <None Remove="Tonga\" />
+    <None Remove="Tonga\Text\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Xemo\" />
     <Folder Include="Cluster\" />
     <Folder Include="Bench\" />
+    <Folder Include="Tonga\" />
+    <Folder Include="Tonga\Text\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Xemo\Xemo.csproj" />

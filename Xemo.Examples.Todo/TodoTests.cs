@@ -44,7 +44,6 @@ namespace Xemo.Examples.Todo
 
             var todo = new Todo("Succeed in Unittest", mem);
 			todo.Mutate(new { Done = true });
-
             Assert.True(
 				todo.Fill(new { Done = false })
 					.Done

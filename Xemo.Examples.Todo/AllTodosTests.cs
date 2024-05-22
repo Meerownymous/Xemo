@@ -42,7 +42,9 @@ namespace Xemo.Examples.Todo
         [Fact]
         public void RejectsWrongDueDate()
         {
-            Assert.Throws<ArgumentException>(() =>
+            AssertException.MessageContains<InvalidCastException>(
+                "Yada",
+                () =>
                 new AllTodos(new Ram())
                     .Create(
                         new
