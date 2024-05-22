@@ -10,7 +10,7 @@ namespace Xemo.Bench.Tests
         {
             Assert.Equal(
                 "Bob",
-                DeepSlice.Schema(
+                DeepMerge.Schema(
                     new
                     {
                         FirstName = ""
@@ -42,7 +42,7 @@ namespace Xemo.Bench.Tests
             var check = b.GetType() == a.GetType();
 
             var result =
-                DeepSlice.Schema(
+                DeepMerge.Schema(
                     new
                     {
                         Things = new[] { new { Name = "", Age = 0 } }
@@ -68,7 +68,7 @@ namespace Xemo.Bench.Tests
 
             Assert.Equal(
                 "Stanley",
-                DeepSlice.Schema(
+                DeepMerge.Schema(
                     new
                     {
                         Friend = new
@@ -106,7 +106,7 @@ namespace Xemo.Bench.Tests
 
             Assert.Equal(
                 "Stanley",
-                DeepSlice.Schema(
+                DeepMerge.Schema(
                     new
                     {
                         Friends = new[]

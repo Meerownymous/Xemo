@@ -5,6 +5,9 @@
 	/// </summary>
 	public interface IXemoCluster : IEnumerable<IXemo>
 	{
+		/// <summary>
+		/// Single item in this cluster.
+		/// </summary>
         IXemo Xemo(string id);
 
 		/// <summary>

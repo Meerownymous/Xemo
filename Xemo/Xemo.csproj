@@ -14,16 +14,12 @@
   <ItemGroup>
     <None Remove="Cluster\" />
     <None Remove="Xemo\" />
-    <None Remove="Old\" />
-    <None Remove="Relation\" />
     <None Remove="IDCard\" />
     <None Remove="Bench\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Cluster\" />
     <Folder Include="Xemo\" />
-    <Folder Include="Old\" />
-    <Folder Include="Relation\" />
     <Folder Include="IDCard\" />
     <Folder Include="Bench\" />
   </ItemGroup>

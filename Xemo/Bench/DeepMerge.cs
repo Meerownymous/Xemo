@@ -1,14 +1,19 @@
-﻿using System;
-using Tonga.Enumerable;
-
-namespace Xemo.Bench
+﻿namespace Xemo.Bench
 {
-    public sealed class DeepSlice<TSlice> : IBench<TSlice>
+    /// <summary>
+    /// A merge of data by also pulling data inside relations.
+    /// It uses the given memory to solve relations.
+    /// </summary>
+    public sealed class DeepMerge<TSlice> : IBench<TSlice>
     {
         private readonly TSlice target;
         private readonly IMem mem;
 
-        public DeepSlice(TSlice target, IMem mem)
+        /// <summary>
+        /// A merge of data by also pulling data inside relations.
+        /// It uses the given memory to solve relations.
+        /// </summary>
+        public DeepMerge(TSlice target, IMem mem)
         {
             this.target = target;
             this.mem = mem;
@@ -19,12 +24,12 @@ namespace Xemo.Bench
             return
                 Merge.Target(
                     this.target,
-                    (left, rightID) =>
+                    solve1to1: (left, rightID) =>
                     {
                         var result = mem.Xemo(rightID.Kind(), rightID.ID()).Fill(left);
                         return result;
                     },
-                    (left, rightIDs) =>
+                    solve1toMany:(left, rightIDs) =>
                     {
                         var itemSchema = (left as Array).GetValue(0);
                         var targetArray = Array.CreateInstance((left as Array).GetType().GetElementType(), rightIDs.Length);
@@ -35,20 +40,21 @@ namespace Xemo.Bench
                                 index
                             );
                         }
-                        //var result =
-                        //    Mapped._(
-                        //        rightID => mem.Xemo(rightID.Kind(), rightID.ID()).Fill((left as Array).GetValue(0)),
-                        //        rightIDs
-                        //    ).ToArray();
                         return targetArray;
                     }
                 ).Post(patch);
         }
     }
 
-    public static class DeepSlice
+    /// <summary>
+    /// A merge that can merge data from relations in the source into the target.
+    /// </summary>
+    public static class DeepMerge
     {
-        public static DeepSlice<TSlice> Schema<TSlice>(TSlice target, IMem mem) =>
-            new DeepSlice<TSlice>(target, mem);
+        /// <summary>
+        /// A merge that can merge data from relations in the source into the target.
+        /// </summary>
+        public static DeepMerge<TSlice> Schema<TSlice>(TSlice target, IMem mem) =>
+            new DeepMerge<TSlice>(target, mem);
     }
 }

@@ -6,13 +6,8 @@ using Xemo.Bench;
 
 namespace Xemo
 {
-    public sealed class XoRamCluster : ClusterEnvelope
+    public sealed class XoRamCluster
     {
-        public XoRamCluster() : base(
-            new XoRamCluster<object>()
-        )
-        { }
-
         public static XoRamCluster<TSchema> Allocate<TSchema>(string subject, TSchema schema) =>
             new XoRamCluster<TSchema>(new DeadMem("This cluster is isolated."), subject, new ConcurrentDictionary<string, TSchema>(), schema);
 
@@ -23,7 +18,7 @@ namespace Xemo
     public sealed class XoRamCluster<TContent> : IXemoCluster
     {
         private readonly IMem home;
-        private string subject;
+        private readonly string subject;
         private readonly Lazy<List<string>> index;
         private readonly ConcurrentDictionary<string, TContent> storage;
         private readonly TContent schema;
@@ -99,10 +94,8 @@ namespace Xemo
         public IXemo Create<TNew>(TNew input)
         {
             var id =
-                ReflectionFill.Fill(
-                    new Identifier(Guid.NewGuid().ToString())
-                ).From(input)
-                .ID;
+                Merge.Target(new Identifier(Guid.NewGuid().ToString()))
+                    .Post(input).ID;
             this.storage.AddOrUpdate(id,
                 (key) =>
                 {
@@ -118,7 +111,7 @@ namespace Xemo
                 },
                 (key, existing) =>
                 {
-                    throw new ApplicationException($"Expected '{id}' to not exist, but it does: {existing}.");
+                    throw new ApplicationException($"Cannot create item. ID '{id}' is expected to not exist, but it does: {existing}.");
                 }
             );
             return

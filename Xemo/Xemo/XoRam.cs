@@ -1,9 +1,6 @@
 ﻿using System.Collections.Concurrent;
-using Tonga;
-using Tonga.Text;
-using Xemo.IDCard;
-using Xemo.Information;
 using Xemo.Bench;
+using Xemo.IDCard;
 
 namespace Xemo
 {
@@ -152,7 +149,7 @@ namespace Xemo
             if (!this.HasSchema())
                 throw new InvalidOperationException("Define a schema prior to filling.");
             TContent current = storage.GetValueOrDefault(this.passport.ID(), this.schema);
-            return DeepSlice.Schema(wanted, this.mem).Post(current);
+            return DeepMerge.Schema(wanted, this.mem).Post(current);
         }
 
         public IXemo Schema<TSchema>(TSchema schema)
