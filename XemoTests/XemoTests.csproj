@@ -28,6 +28,7 @@
     <None Remove="Xemo\" />
     <None Remove="Cluster\" />
     <None Remove="Bench\" />
+    <None Remove="Cluster\PropertyValueTests.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Xemo\" />

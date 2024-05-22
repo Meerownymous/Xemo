@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Xemo.Bench.Tests
 {
-    public sealed class DeepSliceTests
+    public sealed class DeepMergeTests
     {
         [Fact]
         public void Slices()

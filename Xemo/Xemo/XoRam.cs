@@ -168,7 +168,7 @@ namespace Xemo
                 key =>
                 {
                     var newState = Patch.Target(this.schema, this.mem).Post(mutation);
-                    var newID = Merge.Target(new Identifier()).Post(newState).ID;
+                    var newID = new PropertyValue("ID", newState, string.Empty).AsString();
                     if (newID != string.Empty && newID != this.passport.ID())
                     {
                         throw new InvalidOperationException("ID change is not supported.");
@@ -178,9 +178,9 @@ namespace Xemo
                 (key, existing) =>
                 {
                     var newState = Patch.Target(existing, this.mem).Post(mutation);
-                    var newID = Merge.Target(new Identifier()).Post(newState).ID;
+                    var newID = new PropertyValue("ID", newState, () => string.Empty).AsString();
                     if (newID != string.Empty
-                        && newID != Merge.Target(new Identifier()).Post(existing).ID
+                        && newID != new PropertyValue("ID", existing).AsString()
                     )
                     {
                         throw new InvalidOperationException("ID change is not supported.");

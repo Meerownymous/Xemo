@@ -211,12 +211,13 @@ namespace Xemo.Bench
             return ctor.Invoke(new object[0]);
         }
 
-        private static bool IsCompatible(PropertyInfo left, PropertyInfo right)
+        private static bool IsCompatible(PropertyInfo target, PropertyInfo source)
         {
             return
-                Type.GetTypeCode(left.PropertyType) == Type.GetTypeCode(right.PropertyType)
-                    || IsAnonymous(left.PropertyType) && IsAnonymous(right.PropertyType)
-                    || (IsNumber(left) && IsNumber(right));
+                Type.GetTypeCode(target.PropertyType) == Type.GetTypeCode(source.PropertyType)
+                    || IsAnonymous(target.PropertyType) && IsAnonymous(source.PropertyType)
+                    || (IsNumber(target) && IsNumber(source))
+                    || (IsString(target) && IsPrimitive(source));
         }
 
         private static bool IsNumber(PropertyInfo input)
@@ -230,9 +231,17 @@ namespace Xemo.Bench
                 or TypeCode.UInt16 or TypeCode.UInt32 or TypeCode.UInt64;
         }
 
-        private static bool IsPrimitive(PropertyInfo prop)
+        private static bool IsString(PropertyInfo input)
         {
-            var type = prop.PropertyType;
+            var candidate = input.PropertyType.IsArray
+                ? input.PropertyType.GetElementType()
+                : input.PropertyType;
+            return Type.GetTypeCode(candidate) is TypeCode.String;
+        }
+
+        private static bool IsPrimitive(PropertyInfo input)
+        {
+            var type = input.PropertyType;
             return
                 (type.IsArray ?
                     Type.GetTypeCode(type.GetElementType()) : Type.GetTypeCode(type)

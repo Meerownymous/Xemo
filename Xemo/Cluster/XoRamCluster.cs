@@ -93,10 +93,9 @@ namespace Xemo
 
         public IXemo Create<TNew>(TNew input)
         {
-            var id =
-                Merge.Target(new Identifier(Guid.NewGuid().ToString()))
-                    .Post(input).ID;
-            this.storage.AddOrUpdate(id,
+            var id = new PropertyValue("ID", input, fallBack: () => Guid.NewGuid()).AsString();
+            this.storage.AddOrUpdate(
+                id,
                 (key) =>
                 {
                     var newItem =
@@ -111,7 +110,7 @@ namespace Xemo
                 },
                 (key, existing) =>
                 {
-                    throw new ApplicationException($"Cannot create item. ID '{id}' is expected to not exist, but it does: {existing}.");
+                    throw new ApplicationException($"Cannot create item. ID '{key}' is expected to not exist, but it does: {existing}.");
                 }
             );
             return

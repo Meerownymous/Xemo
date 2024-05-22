@@ -16,6 +16,7 @@
     <None Remove="Xemo\" />
     <None Remove="IDCard\" />
     <None Remove="Bench\" />
+    <None Remove="Cluster\PropertyValue.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Cluster\" />
