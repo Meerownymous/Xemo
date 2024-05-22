@@ -83,7 +83,7 @@ namespace Xemo.Bench
             if (target != null)
             {
                 var schema = (target as Array).GetValue(0);
-                if (source != null && schema != null)
+                if (source != null && schema != null && source is Array)
                 {
                     var outputArray = Array.CreateInstance(resultType.GetElementType(), (source as Array).Length);
                     for (var i = 0; i < outputArray.Length; i++)
@@ -98,6 +98,18 @@ namespace Xemo.Bench
                         );
                     }
                     result = outputArray;
+                }
+                else if(source == null)
+                {
+                    throw new ArgumentException("Cannot merge Array because the source object is null.");
+                }
+                else if(schema == null)
+                {
+                    throw new ArgumentException("Cannot merge Array because the schema is null.");
+                }
+                else if(source is not Array)
+                {
+                    throw new ArgumentException("Cannot merge Array because the source object is not an array.");
                 }
             }
             return result;

@@ -41,15 +41,12 @@ namespace Xemo.Bench.Tests
 
             var check = b.GetType() == a.GetType();
 
-            var schema =
-                new
-                {
-                    Things = new[] { new { Name = "" } }
-                };
-
             var result =
                 DeepSlice.Schema(
-                    schema,
+                    new
+                    {
+                        Things = new[] { new { Name = "", Age = 0 } }
+                    },
                     new DeadMem("No relations in this unittest")
                 ).Post(
                     new
@@ -123,7 +120,7 @@ namespace Xemo.Bench.Tests
                     {
                         FirstName = "Bob",
                         LastName = "Perry",
-                        Friends = new[] { stanley, sylvia }
+                        Friends = new[] { stanley.Card(), sylvia.Card() }
                     }
                 ).Friends[0].FirstName
             );

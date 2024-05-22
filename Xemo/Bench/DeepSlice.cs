@@ -26,12 +26,21 @@ namespace Xemo.Bench
                     },
                     (left, rightIDs) =>
                     {
-                        var result =
-                            Mapped._(
-                                rightID => mem.Xemo(rightID.Kind(), rightID.ID()).Fill(left),
-                                rightIDs
-                            ).ToArray();
-                        return result;
+                        var itemSchema = (left as Array).GetValue(0);
+                        var targetArray = Array.CreateInstance((left as Array).GetType().GetElementType(), rightIDs.Length);
+                        for(int index = 0;index<targetArray.Length;index++)
+                        {
+                            targetArray.SetValue(
+                                mem.Xemo(rightIDs[index].Kind(), rightIDs[index].ID()).Fill(itemSchema),
+                                index
+                            );
+                        }
+                        //var result =
+                        //    Mapped._(
+                        //        rightID => mem.Xemo(rightID.Kind(), rightID.ID()).Fill((left as Array).GetValue(0)),
+                        //        rightIDs
+                        //    ).ToArray();
+                        return targetArray;
                     }
                 ).Post(patch);
         }
@@ -43,4 +52,3 @@ namespace Xemo.Bench
             new DeepSlice<TSlice>(target, mem);
     }
 }
-
