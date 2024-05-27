@@ -2,7 +2,7 @@
 {
 	/// <summary>
 	/// A piece of data which is based on a schema.
-	/// Pass any slice of data - either with with settable properties or an
+	/// Pass any slice of data - either with settable properties or an
 	/// anonymous object - to <see cref="Fill{TSlice}(TSlice)"/> and it
 	/// will be filled with available data.
 	///
@@ -34,6 +34,6 @@
 		/// <summary>
 		/// Mutate contents by property values of the given slice.
 		/// </summary>
-		IXemo Mutate<TSlice>(TSlice mutation);
+		IXemo Mutate<TPatch>(TPatch mutation);
 	}
 }

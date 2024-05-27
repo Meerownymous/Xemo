@@ -1,16 +1,28 @@
 ﻿using System;
 namespace Xemo.IDCard
 {
+    /// <summary>
+    /// Link to another Xemo subject (eg User -> Address) in a schema.
+    /// </summary>
     public static partial class Link
     {
+        /// <summary>
+        /// Link to another Xemo subject (eg User -> Address) in a schema.
+        /// </summary>
         public static IIDCard One(string targetSubject) =>
             new OneToOne(targetSubject);
     }
 
+    /// <summary>
+    /// Link to another Xemo subject (eg User -> Address) in a schema.
+    /// </summary>
     internal sealed class OneToOne : IIDCard
     {
         private readonly string targetSubject;
 
+        /// <summary>
+        /// Link to another Xemo subject (eg User -> Address) in a schema.
+        /// </summary>
         public OneToOne(string targetSubject)
         {
             this.targetSubject = targetSubject;

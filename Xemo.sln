@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xemo", "Xemo\Xemo.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XemoTests", "XemoTests\XemoTests.csproj", "{C96E270F-96F0-42E1-BA3E-89F89BA19F40}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xemo.Azure", "Xemo.Azure\Xemo.Azure.csproj", "{1F44EF20-4130-49F6-9C96-8C545995F62F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xemo.Azure.Tests", "Xemo.Azure.Tests\Xemo.Azure.Tests.csproj", "{7EA3B928-17DC-437A-BD97-71372EFF7746}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{C96E270F-96F0-42E1-BA3E-89F89BA19F40}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C96E270F-96F0-42E1-BA3E-89F89BA19F40}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C96E270F-96F0-42E1-BA3E-89F89BA19F40}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F44EF20-4130-49F6-9C96-8C545995F62F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F44EF20-4130-49F6-9C96-8C545995F62F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F44EF20-4130-49F6-9C96-8C545995F62F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F44EF20-4130-49F6-9C96-8C545995F62F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7EA3B928-17DC-437A-BD97-71372EFF7746}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EA3B928-17DC-437A-BD97-71372EFF7746}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EA3B928-17DC-437A-BD97-71372EFF7746}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EA3B928-17DC-437A-BD97-71372EFF7746}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

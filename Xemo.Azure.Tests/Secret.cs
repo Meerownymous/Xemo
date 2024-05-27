@@ -1,13 +1,22 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Tonga.Text;
 using Xunit;
 
-namespace XemoTests
+namespace Xemo.Azure.Tests
 {
+    /// <summary>
+    /// Fetch secrets either from a local file or from environment variables.
+    /// Environment variables are prioritized over files.
+    /// Handy to prevent secrets from leaking online.
+    /// </summary>
     public sealed class Secret : TextEnvelope
     {
+        /// <summary>
+        /// Fetch secrets either from a local file or from environment variables.
+        /// Environment variables are prioritized over files.
+        /// Handy to prevent secrets from leaking online.
+        /// </summary>
         public Secret(string name) : base(AsText._(() =>
         {
             string result = string.Empty;
