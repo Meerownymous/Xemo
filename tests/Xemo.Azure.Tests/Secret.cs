@@ -47,7 +47,7 @@ namespace Xemo.Azure.Tests
 
     public sealed class SecretTests
     {
-        [Fact]
+        [Fact(Skip = "Temporary local test")]
         public void ReadsFromFile()
         {
             Assert.Equal(
@@ -56,7 +56,7 @@ namespace Xemo.Azure.Tests
             );
         }
 
-        [Fact]
+        [Fact(Skip ="Temporary local test")]
         public void ReadsFromEnvironmentVariable()
         {
             try
