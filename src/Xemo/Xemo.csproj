@@ -9,7 +9,6 @@
   <ItemGroup>
     <PackageReference Include="Tonga" Version="0.7.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="PeanutButter.DuckTyping" Version="3.0.251" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Cluster\" />
