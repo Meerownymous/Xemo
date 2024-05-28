@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Xemo.Bench;
+using Xemo.Cluster;
 using Xemo.IDCard;
 
 namespace Xemo

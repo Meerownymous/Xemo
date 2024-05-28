@@ -42,8 +42,8 @@ namespace Xemo.Examples.Todo
         [Fact]
         public void RejectsWrongDueDate()
         {
-            AssertException.MessageContains<InvalidCastException>(
-                "Yada",
+            AssertException.MessageContains<ArgumentException>(
+                "Due date must be in the future",
                 () =>
                 new AllTodos(new Ram())
                     .Create(

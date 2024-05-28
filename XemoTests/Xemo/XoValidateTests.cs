@@ -2,26 +2,14 @@
 
 namespace Xemo.Tests
 {
-	public sealed class XoVerifiedTests
+	public sealed class XoValidateTests
 	{
-		[Fact]
-		public void RejectsWhenInformationMissing()
-		{
-			Assert.Throws<ArgumentException>(() =>
-				XoSpawn.Schema(
-					new { Name = "", Success = false }
-				).Fill(
-					new { Name = "Fail please" }
-				)
-			);
-		}
-
         [Fact]
         public void PreservesAdditionalInformation()
         {
             Assert.Equal(
                 "Important",
-                XoSpawn.Schema(
+                XoValidate.That(
                     new { Name = "", Success = false }
                 ).Fill(
                     new { Name = "Succeed please", Success = true, SomeThingElse = "Important" }
@@ -33,7 +21,7 @@ namespace Xemo.Tests
         public void PassesWhenInformationSufficient()
         {
             Assert.True(
-                XoSpawn.Schema(
+                XoValidate.That(
                     new { Name = "", Success = false }
                 ).Fill(
                     new { Name = "Succeed please", Success = true }

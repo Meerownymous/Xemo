@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using Xemo.Cluster;
+using Xunit;
 
 public sealed class PropertyValueTests
 {

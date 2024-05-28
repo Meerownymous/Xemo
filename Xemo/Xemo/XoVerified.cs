@@ -8,15 +8,15 @@ namespace Xemo
     /// </summary>
     public sealed class XoVerified<TInvestigate> : IXemo
     {
-        private readonly TInvestigate minimum;
+        private readonly TInvestigate candidate;
         private readonly Func<TInvestigate, (bool, string)>[] validations;
 
         /// <summary>
         /// Information that ensures it is being filled with all necessary data.
         /// </summary>
-        public XoVerified(TInvestigate minimum, params Func<TInvestigate, (bool, string)>[] valid)
+        public XoVerified(TInvestigate candidate, params Func<TInvestigate, (bool, string)>[] valid)
         {
-            this.minimum = minimum;
+            this.candidate = candidate;
             this.validations = valid;
         }
 
@@ -32,7 +32,6 @@ namespace Xemo
 
         public TSlice Fill<TSlice>(TSlice wanted)
         {
-            Investigate(this.minimum, wanted);
             foreach (var isValid in this.validations)
             {
                 var result = isValid(Casted(wanted));
@@ -57,36 +56,8 @@ namespace Xemo
             return
                 JsonConvert.DeserializeAnonymousType(
                     JsonConvert.SerializeObject(candidate).ToString(),
-                    this.minimum
+                    this.candidate
                 );
-        }
-
-        private static void Investigate<TNeeds, TPiece>(TNeeds needs, TPiece piece)
-        {
-            Investigate(
-                JObject.Parse(
-                    JsonConvert.SerializeObject(needs)
-                ),
-                JObject.Parse(
-                    JsonConvert.SerializeObject(piece)
-                )
-            );
-        }
-
-        private static void Investigate(JObject needs, JObject piece)
-        {
-            foreach (var token in needs)
-            {
-                if (!piece.ContainsKey(token.Key))
-                    throw new ArgumentException($"Expected '{token.Key}' in {piece}.");
-                if (token.Value.Type != piece[token.Key].Type)
-                    throw new ArgumentException(
-                        $"Expected '{token.Key}' to be '{token.Value.Type}', "
-                        + $"but it is '{piece[token.Key].Type}'."
-                    );
-                if (token.Value.Type == JTokenType.Object)
-                    Investigate(token.Value, piece[token.Key]);
-            }
         }
     }
 
@@ -98,10 +69,10 @@ namespace Xemo
         /// <summary>
         /// Information that ensures it is being filled with all necessary data.
         /// </summary>
-        public static XoVerified<TMinimum> By<TMinimum>(
-            TMinimum minimum,
-            params Func<TMinimum, (bool, string)>[] isValid
+        public static XoVerified<TInvestigate> _<TInvestigate>(
+            TInvestigate candidate,
+            params Func<TInvestigate, (bool, string)>[] isValid
         ) =>
-            new XoVerified<TMinimum>(minimum, isValid);
+            new XoVerified<TInvestigate>(candidate, isValid);
     }
 }

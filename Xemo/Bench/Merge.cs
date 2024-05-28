@@ -1,11 +1,21 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using Tonga.Enumerable;
 using Tonga.Scalar;
+using Xemo.Tonga;
 
 namespace Xemo.Bench
 {
+    /// <summary>
+    /// Merge data to a target.
+    /// </summary>
     public static class Merge
     {
+        /// <summary>
+        /// Merge data to a target.
+        /// If the data contains relations (it has members of type IDCard), the use the given
+        /// functions to solve them and access their data.
+        /// </summary>
         public static Merge<TTarget> Target<TTarget>(
             TTarget target,
             Func<object, IIDCard, object> solve1to1,
@@ -13,16 +23,26 @@ namespace Xemo.Bench
         ) =>
             new Merge<TTarget>(target, solve1to1, solve1toMany);
 
+        /// <summary>
+        /// Merge data to a target.
+        /// </summary>
         public static Merge<TTarget> Target<TTarget>(TTarget target) =>
             new Merge<TTarget>(target);
     }
 
+    /// <summary>
+    /// Merge data to a target.
+    /// </summary>
     public sealed class Merge<TResult> : IBench<TResult>
     {
+        private static readonly TimeSpan elapsed = new TimeSpan(0);
         private readonly TResult target;
         private readonly Func<object, IIDCard, object> solve1To1;
         private readonly Func<object, IIDCard[], object> solve1ToMany;
 
+        /// <summary>
+        /// Merge data to a target.
+        /// </summary>
         public Merge(TResult target) : this(
             target,
             (left, right) => right,
@@ -30,6 +50,11 @@ namespace Xemo.Bench
         )
         { }
 
+        /// <summary>
+        /// Merge data to a target.
+        /// If the data contains relations (it has members of type IDCard), the use the given
+        /// functions to solve them and access their data.
+        /// </summary>
         public Merge(
             TResult target,
             Func<object, IIDCard, object> solve1to1,
@@ -41,17 +66,27 @@ namespace Xemo.Bench
             this.solve1ToMany = solve1toMany;
         }
 
+        /// <summary>
+        /// The content of the posted data is used to merge it into the encapsulated target
+        /// of this bench.
+        /// </summary>
         public TResult Post<TSource>(TSource patch)
         {
-            TResult result;
-            if(this.target.GetType().IsArray)
-            {
-                result = (TResult)MergedArray(this.target.GetType(), this.target, patch);
-            }
-            else
-            {
-                result = (TResult)MergedObject(this.target.GetType(), this.target, patch);
-            }
+            TResult result = default(TResult);
+            Merge<TResult>.elapsed.Add(
+                new Measured(() =>
+                {
+                    if (this.target.GetType().IsArray)
+                    {
+                        result = (TResult)MergedArray(this.target.GetType(), this.target, patch);
+                    }
+                    else
+                    {
+                        result = (TResult)MergedObject(this.target.GetType(), this.target, patch);
+                    }
+                }).Value());
+
+            //Debug.WriteLine(Merge<TResult>.elapsed.TotalMilliseconds + "ms");
             return result;
         }
 

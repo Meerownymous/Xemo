@@ -3,15 +3,15 @@
     /// <summary>
     /// Information that ensures it is being filled with all necessary data.
     /// </summary>
-    public sealed class XoSpawn<TMinimum> : IXemo
+    public sealed class XoValidate<TCandidate> : IXemo
     {
         private readonly IXemo inner;
         /// <summary>
         /// Information that ensures it is being filled with all necessary data.
         /// </summary>
-        public XoSpawn(TMinimum minimum, params Func<TMinimum, (bool, string)>[] valid)
+        public XoValidate(TCandidate candidate, params Func<TCandidate, (bool, string)>[] valid)
         {
-            this.inner = XoVerified.By(minimum, valid);
+            this.inner = XoVerified._(candidate, valid);
         }
 
         public IIDCard Card() => this.inner.Card();
@@ -33,12 +33,12 @@
     /// <summary>
     /// Information that ensures it is being filled with all necessary data.
     /// </summary>
-    public static class XoSpawn
+    public static class XoValidate
     {
         /// <summary>
         /// Information that ensures it is being filled with all necessary data.
         /// </summary>
-        public static XoSpawn<TMinimum> Schema<TMinimum>(TMinimum minimum, params Func<TMinimum, (bool,string)>[] isValid) =>
-            new XoSpawn<TMinimum>(minimum, isValid);
+        public static XoValidate<TMinimum> That<TMinimum>(TMinimum minimum, params Func<TMinimum, (bool,string)>[] isValid) =>
+            new XoValidate<TMinimum>(minimum, isValid);
     }
 }

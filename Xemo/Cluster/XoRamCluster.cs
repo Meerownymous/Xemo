@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using Xemo.Cluster;
 using Xemo.IDCard;
 using Xemo.Bench;
+using Xemo.Tonga;
+using System.Diagnostics;
 
 namespace Xemo
 {
@@ -17,7 +19,7 @@ namespace Xemo
 
     public sealed class XoRamCluster<TContent> : IXemoCluster
     {
-        private readonly IMem home;
+        private readonly IMem mem;
         private readonly string subject;
         private readonly Lazy<List<string>> index;
         private readonly ConcurrentDictionary<string, TContent> storage;
@@ -33,7 +35,7 @@ namespace Xemo
 
         public XoRamCluster(IMem home, string subject, ConcurrentDictionary<string, TContent> storage, TContent schema)
         {
-            this.home = home;
+            this.mem = home;
             this.subject = subject;
             this.index = new Lazy<List<string>>(() =>
             {
@@ -54,7 +56,7 @@ namespace Xemo
                 yield return new XoRam<TContent>(
                     new AsIDCard(key, this.subject),
                     this.storage,
-                    this.home,
+                    this.mem,
                     this.schema
                 );
         }
@@ -63,11 +65,11 @@ namespace Xemo
         {
             if (!this.storage.ContainsKey(id))
                 throw new ArgumentException($"{this.subject} '{id}' does not exist.");
-            return new XoRam<TContent>(new AsIDCard(id, this.subject), this.storage, this.home, this.schema);
+            return new XoRam<TContent>(new AsIDCard(id, this.subject), this.storage, this.mem, this.schema);
         }
 
         public IXemoCluster Schema<TSchema>(TSchema schema) =>
-            new XoRamCluster<TSchema>(this.home, this.subject, new ConcurrentDictionary<string, TSchema>(), schema);
+            new XoRamCluster<TSchema>(this.mem, this.subject, new ConcurrentDictionary<string, TSchema>(), schema);
 
         public IXemoCluster Reduced<TQuery>(TQuery blueprint, Func<TQuery, bool> matches) =>
             new XoFiltered<TQuery>(this, blueprint, matches);
@@ -99,12 +101,12 @@ namespace Xemo
                 (key) =>
                 {
                     var newItem =
-                        Birth.Schema(this.schema, this.home)
+                        Birth.Schema(this.schema, this.mem)
                             .Post(input);
+
                     lock (this.subject)
                     {
                         this.index.Value.Add(key);
-                        this.index.Value.Sort();
                     }
                     return newItem;
                 },
@@ -117,7 +119,7 @@ namespace Xemo
                 new XoRam<TContent>(
                     new AsIDCard(id, this.subject),
                     this.storage,
-                    this.home,
+                    this.mem,
                     this.schema
                 );
         }

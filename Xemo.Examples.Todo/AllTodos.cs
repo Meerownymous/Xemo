@@ -13,8 +13,14 @@ namespace Xemo.Examples.Todo
         /// </summary>
         public AllTodos(IMem memory) : base(
             new LazyCluster(() =>
-                new XoSpawnCluster(
-                    XoSpawn.Schema(
+                XoSpawnCluster._(
+                    new
+                    {
+                        Done = false,
+                        Due = DateTime.Now,
+                        Subject = ""
+                    },
+                    XoValidate.That(
                         new { Subject = "", Due = DateTime.MinValue },
                         todo => (todo.Due > DateTime.Now, "Due date must be in the future.")
                     ),
