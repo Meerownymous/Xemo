@@ -1,5 +1,4 @@
-﻿using System;
-namespace Xemo.Cluster
+﻿namespace Xemo.Cluster
 {
     /// <summary>
     /// Cluster with the given contents created inside.

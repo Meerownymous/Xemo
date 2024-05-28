@@ -2,11 +2,17 @@
 
 namespace Xemo
 {
+    /// <summary>
+    /// Pure RAM storage.
+    /// </summary>
     public sealed class Ram : IMem
     {
         private readonly ConcurrentDictionary<string, IXemoCluster> clusters;
         private readonly ConcurrentDictionary<string, object> storages;
 
+        /// <summary>
+        /// Pure RAM storage.
+        /// </summary>
         public Ram()
         {
             this.clusters = new ConcurrentDictionary<string, IXemoCluster>();

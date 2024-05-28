@@ -279,7 +279,7 @@ namespace Xemo.Tests
                     FirstName = "Defaultus",
                     LastName = "Memorius"
                 };
-            var storage = RamStorage.Allocated(schema);
+            var storage = ConcurrentDictionary._(schema);
             XoRam
                 .Make(new AsIDCard("1", "User"), storage, schema)
                 .Mutate(new { FirstName = "Ulf", LastName = "Saveman" });
