@@ -80,8 +80,8 @@ $RECYCLE.BIN/
 *.user
 *.userosscache
 *.sln.docstates
-secrets.json
-Xemo.GarFuncL/*
+**/secrets.json
+**/.DS_Store
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

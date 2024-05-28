@@ -23,6 +23,6 @@
     <PackageReference Include="Snapshooter.Xunit" Version="0.13.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Xemo.Azure\Xemo.Azure.csproj" />
+    <ProjectReference Include="..\..\src\Xemo.Azure\Xemo.Azure.csproj" />
   </ItemGroup>
 </Project>

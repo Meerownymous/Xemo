@@ -40,6 +40,6 @@
     <Folder Include="Tonga\Text\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Xemo\Xemo.csproj" />
+    <ProjectReference Include="..\..\src\Xemo\Xemo.csproj" />
   </ItemGroup>
 </Project>

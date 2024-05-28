@@ -7,7 +7,7 @@ namespace Xemo.Azure.Tests;
 
 public sealed class AzureMemTests
 {
-    [Fact]
+    [Fact(Skip ="Temporary local test")]
     public void Connects()
     {
         var serviceClient =

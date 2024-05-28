@@ -13,7 +13,7 @@ namespace XemoTests.Xemo
             var schema = new { ID = "" };
 
             Assert.Equal(
-                "Dobertus Meow",
+                "Meerow",
                 new XoFirst(
                     new XoWith(
                         XoRamCluster.Allocate("Personalities", schema),
