@@ -6,7 +6,7 @@ image: Visual Studio 2022
 configuration: Release
 environment:
   NUGET_TOKEN:
-    secure: jQYJeILk7Tai/83XFtyKVf7GpP7VOg8eE7WdQiI/dyYsnUpQJbGxtB/jXoORV+Yl
+    secure: hA7gNbFhOr/6AilfgIRGHT1A6TzB1+hhxxYmwctD4lDaVgGb+qGeFYV6xJ0wyNTM
 # Do not build feature branch with open Pull Requests
 skip_branch_with_pr: true
 # Automatically register private account and/or project AppVeyor NuGet feeds.
