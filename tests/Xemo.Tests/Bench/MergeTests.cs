@@ -102,6 +102,34 @@ namespace Xemo.Bench.Tests
         }
 
         [Fact]
+        public void InvokesLive()
+        {
+            var i = 0;
+            var patch =
+                new
+                {
+                    Number = Live._(() =>
+                    {
+                        return 10;
+                    })
+                };
+
+            var result = 
+                Merge
+                    .Target(
+                        new
+                        {
+                            Number = 0
+                        },
+                        (left, right) => { return right; },
+                        (left, right) => { return right; }
+                    )
+                    .Post(patch);
+
+            Assert.Equal(10, result.Number);
+        }
+
+        [Fact]
         public void FillsPropertyObjectPrimitiveArrays()
         {
             Assert.Equal(
@@ -244,7 +272,7 @@ namespace Xemo.Bench.Tests
                     Merge
                         .Target(new Example())
                         .Post(
-                            new { Nested = new { NestedNumber = 123 } }
+                            new { Nested = new { NestedNumber = Live._(() => 123) } }
                         )
                         .Nested
                         .NestedNumber
