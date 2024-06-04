@@ -1,7 +1,7 @@
-﻿using System.Diagnostics;
-using System.Reflection;
+﻿using System.Reflection;
 using Tonga.Enumerable;
 using Tonga.Scalar;
+using Xemo.IDCard;
 using Xemo.Tonga;
 
 namespace Xemo.Bench
@@ -85,8 +85,6 @@ namespace Xemo.Bench
                         result = (TResult)MergedObject(this.target.GetType(), this.target, patch);
                     }
                 }).Value());
-
-            //Debug.WriteLine(Merge<TResult>.elapsed.TotalMilliseconds + "ms");
             return result;
         }
 
@@ -161,9 +159,10 @@ namespace Xemo.Bench
                 {
                     if (IsCompatible(targetProp, sourceProp))
                     {
-                        if (IsPrimitive(targetProp))
+                        if (IsPrimitive(targetProp.PropertyType))
                         {
-                            mergedValues[collected] = sourceProp.GetValue(source);
+                            mergedValues[collected] =
+                                SourceValue(sourceProp, source);
                         }
                         else if (IsSolvableRelation(targetProp.PropertyType, sourceProp.PropertyType))
                         {
@@ -217,8 +216,10 @@ namespace Xemo.Bench
                 }
                 else
                 {
-                    mergedValues[collected] =
-                        targetProp.GetValue(target);
+                    var value = targetProp.GetValue(target);
+                    if (value is OneToOne) value = new BlankIDCard();
+                    else if (value is OneToMany) value = new IIDCard[0];
+                    mergedValues[collected] = value;
                 }
                 collected++;
             }
@@ -246,40 +247,82 @@ namespace Xemo.Bench
             return ctor.Invoke(new object[0]);
         }
 
-        private static bool IsCompatible(PropertyInfo target, PropertyInfo source)
+        private static bool IsCompatible(PropertyInfo targetProp, PropertyInfo sourceProp)
         {
+            var source = sourceProp.PropertyType;
+            var target = targetProp.PropertyType;
+            if(IsLive(sourceProp))
+            {
+                source = sourceProp.PropertyType.GenericTypeArguments[0];
+            }
+
             return
-                Type.GetTypeCode(target.PropertyType) == Type.GetTypeCode(source.PropertyType)
-                    || IsAnonymous(target.PropertyType) && IsAnonymous(source.PropertyType)
-                    || (IsNumber(target) && IsNumber(source))
-                    || (IsString(target) && IsPrimitive(source));
+                SameType(target, source)
+                || BothAnonymous(target, source)
+                || BothNumbers(target, source)
+                || (IsString(target) && IsPrimitive(source));
         }
 
-        private static bool IsNumber(PropertyInfo input)
+        private static object SourceValue(PropertyInfo prop, object source)
         {
-            var candidate = input.PropertyType.IsArray
-                ? input.PropertyType.GetElementType()
-                : input.PropertyType;
+            object result;
+            if (IsLive(prop))
+            {
+                var live = prop.GetValue(source);
+                result = live.GetType().GetMethod("Value").Invoke(live, new object[0]);
+            }
+            else
+                result = prop.GetValue(source);
+
+            return result;
+        }
+
+        private static bool IsLive(PropertyInfo source)
+        {
+            return
+                source.PropertyType.IsGenericType &&
+                source.PropertyType.GetGenericTypeDefinition() == typeof(Live<>);
+        }
+
+        private static bool SameType(Type target, Type source)
+        {
+            return Type.GetTypeCode(target) == Type.GetTypeCode(source);
+        }
+
+        private static bool BothAnonymous(Type target, Type source)
+        {
+            return IsAnonymous(target) && IsAnonymous(source);
+        }
+
+        private static bool BothNumbers(Type source, Type target)
+        {
+            return IsNumber(target) && IsNumber(source);
+        }
+
+        private static bool IsNumber(Type input)
+        {
+            var candidate = input.IsArray
+                ? input.GetElementType()
+                : input;
             return Type.GetTypeCode(candidate)
                 is TypeCode.Decimal or TypeCode.Double or TypeCode.Int16
                 or TypeCode.Int32 or TypeCode.Int64 or TypeCode.Single
                 or TypeCode.UInt16 or TypeCode.UInt32 or TypeCode.UInt64;
         }
 
-        private static bool IsString(PropertyInfo input)
+        private static bool IsString(Type input)
         {
-            var candidate = input.PropertyType.IsArray
-                ? input.PropertyType.GetElementType()
-                : input.PropertyType;
+            var candidate = input.IsArray
+                ? input.GetElementType()
+                : input;
             return Type.GetTypeCode(candidate) is TypeCode.String;
         }
 
-        private static bool IsPrimitive(PropertyInfo input)
+        private static bool IsPrimitive(Type input)
         {
-            var type = input.PropertyType;
             return
-                (type.IsArray ?
-                    Type.GetTypeCode(type.GetElementType()) : Type.GetTypeCode(type)
+                (input.IsArray ?
+                    Type.GetTypeCode(input.GetElementType()) : Type.GetTypeCode(input)
                 ) != TypeCode.Object;
         }
 
@@ -294,7 +337,8 @@ namespace Xemo.Bench
 
         private static bool IsSolvable1To1Relation(Type leftPropType, Type rightPropType)
         {
-            return leftPropType.IsAssignableTo(typeof(IIDCard))
+            return
+                leftPropType.IsAssignableTo(typeof(IIDCard))
                 ||
                 (
                     rightPropType.IsAssignableTo(typeof(IXemo))

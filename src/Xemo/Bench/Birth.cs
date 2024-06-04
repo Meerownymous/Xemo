@@ -33,7 +33,11 @@
 
         private IIDCard EnsureLinkable(IIDCard card)
         {
-            return this.mem.Xemo(card.Kind(), card.ID()).Card();
+            return
+                String.IsNullOrEmpty(card.Kind()) && string.IsNullOrEmpty(card.ID()) ?
+                card
+                :
+                this.mem.Xemo(card.Kind(), card.ID()).Card();
         }
 
         private IIDCard[] EnsureLinkable(IIDCard[] cards)

@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Tonga.Scalar;
+using Xemo.Bench;
 
 namespace Xemo
 {
@@ -53,11 +55,29 @@ namespace Xemo
 
         private TInvestigate Casted<TCandidate>(TCandidate candidate)
         {
+            var parameterTypes = typeof(TInvestigate).GetConstructors()[0].GetParameters();
+            var parameters = new object[parameterTypes.Length];
+            for(var i=0;i<parameters.Length;i++)
+            {
+                parameters[i] =
+                    parameterTypes[i].ParameterType.IsValueType
+                    ?
+                    Activator.CreateInstance(parameterTypes[i].ParameterType)
+                    :
+                    null;
+            }
             return
-                JsonConvert.DeserializeAnonymousType(
-                    JsonConvert.SerializeObject(candidate).ToString(),
-                    this.candidate
-                );
+                Merge.Target(
+                    (TInvestigate)First._(typeof(TInvestigate).GetConstructors())
+                    .Value()
+                    .Invoke(parameters)
+                ).Post(candidate);
+
+            //return
+            //    JsonConvert.DeserializeAnonymousType(
+            //        JsonConvert.SerializeObject(candidate).ToString(),
+            //        this.candidate
+            //    );
         }
     }
 

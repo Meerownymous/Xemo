@@ -25,7 +25,6 @@
     <PackageReference Include="Snapshooter.Xunit" Version="0.13.0" />
   </ItemGroup>
   <ItemGroup>
-    <None Remove="Xemo\" />
     <None Remove="Cluster\" />
     <None Remove="Bench\" />
     <None Remove="Cluster\PropertyValueTests.config" />
@@ -33,7 +32,6 @@
     <None Remove="Tonga\Text\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Xemo\" />
     <Folder Include="Cluster\" />
     <Folder Include="Bench\" />
     <Folder Include="Tonga\" />

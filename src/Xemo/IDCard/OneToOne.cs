@@ -31,7 +31,7 @@ namespace Xemo.IDCard
         public string ID()
         {
             throw new InvalidOperationException(
-                "This is a relation. You cannot request an ID from a relation."
+                $"This is a relation definition pointing to '{this.targetSubject}'. You cannot request an ID from a relation definition."
             );
         }
 

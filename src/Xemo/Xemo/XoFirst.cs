@@ -26,6 +26,12 @@ namespace Xemo.Xemo
         /// </summary>
         public static IXemo Find<TSlice>(TSlice slice, Func<TSlice, bool> match, IXemoCluster cluster) =>
             new XoFirst<TSlice>(slice, match, cluster);
+
+        /// <summary>
+        /// First match for a given slice in a cluster.
+        /// </summary>
+        public static IXemo Of<TSlice>(TSlice slice, IXemoCluster cluster) =>
+            new XoFirst<TSlice>(slice, (candidate) => true, cluster);
     }
 
     /// <summary>
