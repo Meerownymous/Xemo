@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using Newtonsoft.Json;
 
 namespace Xemo
 {
@@ -9,6 +10,7 @@ namespace Xemo
     {
         private readonly ConcurrentDictionary<string, IXemoCluster> clusters;
         private readonly ConcurrentDictionary<string, object> storages;
+        private readonly ConcurrentDictionary<string, object> schemata;
 
         /// <summary>
         /// Pure RAM storage.
@@ -17,6 +19,7 @@ namespace Xemo
         {
             this.clusters = new ConcurrentDictionary<string, IXemoCluster>();
             this.storages = new ConcurrentDictionary<string, object>();
+            this.schemata = new ConcurrentDictionary<string, object>();
         }
 
         public IXemoCluster Cluster(string subject)
@@ -37,7 +40,7 @@ namespace Xemo
             return result.Xemo(id);
         }
 
-        public IMem Allocate<TSchema>(string subject, TSchema schema)
+        public IMem Allocate<TSchema>(string subject, TSchema schema, bool errorIfExists = true)
         {
             this.storages.AddOrUpdate(subject,
                 subject =>
@@ -52,14 +55,28 @@ namespace Xemo
                             schema
                         )
                     );
+                    this.schemata.TryAdd(subject, schema);
                     return subjectMemory;
                 },
                 (subject, existing) =>
-                    throw new InvalidOperationException(
-                        $"Memory for '{subject}' has already been allocated."
-                    )
+                {
+                    if(errorIfExists)
+                        throw new InvalidOperationException(
+                            $"Memory for '{subject}' has already been allocated."
+                        );
+                    return existing;
+                }
             );
             return this;
+        }
+
+        public string Schema(string subject)
+        {
+            object schema;
+            if (!this.schemata.TryGetValue(subject, out schema))
+                throw new ArgumentException($"{subject} is an unknown subject. It has not yet been allocated.");
+
+            return JsonConvert.SerializeObject(schema).ToString();
         }
     }
 }

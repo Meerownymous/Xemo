@@ -12,7 +12,7 @@ namespace Xemo
                     $"Cannot {action} a dead memory{(reason.Length > 0 ? $", because {reason}." : ".")}");
         }
 
-        public IMem Allocate<TSchema>(string subject, TSchema schema) =>
+        public IMem Allocate<TSchema>(string subject, TSchema schema, bool errorIfExists = true) =>
             throw this.death("allocate in");
 
         public IXemoCluster Cluster(string subject) =>
@@ -20,6 +20,9 @@ namespace Xemo
 
         public IXemo Xemo(string subject, string id)=>
             throw this.death("deliver xemo from");
+
+        public string Schema(string subject) =>
+            throw this.death("deliver schema from");
     }
 }
 

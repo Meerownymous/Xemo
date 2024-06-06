@@ -18,6 +18,11 @@
         /// <summary>
         /// Allocates space for the given subject and schema.
         /// </summary>
-        IMem Allocate<TSchema>(string subject, TSchema schema);
+        IMem Allocate<TSchema>(string subject, TSchema schema, bool errorIfExists = true);
+
+        /// <summary>
+        /// Get a string description of the schema for a subject.
+        /// </summary>
+        string Schema(string subject);
     }
 }
