@@ -28,7 +28,7 @@ namespace Xemo.Xemo
             new XoFirst<TSlice>(slice, match, cluster);
 
         /// <summary>
-        /// First match for a given slice in a cluster.
+        /// First match for a given slice in a cluster, direct access.
         /// </summary>
         public static TSlice From<TSlice>(TSlice slice, IXemoCluster cluster) =>
             new XoFirst<TSlice>(slice, (candidate) => true, cluster).Fill(slice);
