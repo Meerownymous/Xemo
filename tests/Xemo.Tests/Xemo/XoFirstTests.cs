@@ -23,6 +23,24 @@ namespace XemoTests.Xemo
                 ).Fill(schema).ID
             );
         }
+
+        [Fact]
+        public void FillsByOf()
+        {
+            var schema = new { ID = "" };
+
+            Assert.Equal(
+                "Meerow",
+                XoFirst.From(
+                    schema,
+                    new XoWith(
+                        XoRamCluster.Allocate("Personalities", schema),
+                        new { ID = "Meerow" },
+                        new { ID = "Dobertus Meow" }
+                    )
+                ).ID
+            );
+        }
     }
 }
 

@@ -30,8 +30,8 @@ namespace Xemo.Xemo
         /// <summary>
         /// First match for a given slice in a cluster.
         /// </summary>
-        public static IXemo Of<TSlice>(TSlice slice, IXemoCluster cluster) =>
-            new XoFirst<TSlice>(slice, (candidate) => true, cluster);
+        public static TSlice From<TSlice>(TSlice slice, IXemoCluster cluster) =>
+            new XoFirst<TSlice>(slice, (candidate) => true, cluster).Fill(slice);
     }
 
     /// <summary>
