@@ -1,4 +1,4 @@
-﻿# Xemo is a true object oriented, DTO free data storage library
+# Xemo is a true object oriented, DTO free data storage library
 If you agree to these statements, Xemo may be for you:
 - All data should be encapsulated
 - Objects are for processing data, not for holding data
@@ -52,7 +52,8 @@ todo.Mutate(new { Subject = "Complete Examples", Author = "John Doe", Done = fal
 
 You can now get a slice of data by passing an empty data structure to the Xemo. It will then fill that for you by merging the encapsulated data into the passed slice.
 
-```
+```csharp
+
 var simple =
    todo.Fill(new { Subject = "", Done = false });
 
