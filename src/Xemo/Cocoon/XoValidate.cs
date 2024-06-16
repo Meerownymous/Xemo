@@ -1,4 +1,4 @@
-﻿namespace Xemo
+﻿namespace Xemo.Cocoon
 {
     /// <summary>
     /// Information that ensures it is being filled with all necessary data.

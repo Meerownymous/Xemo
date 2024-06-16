@@ -1,5 +1,5 @@
 ﻿using Tonga.Scalar;
-using Xemo.Xemo;
+using Xemo.Cocoon;
 using Xunit;
 
 namespace Xemo.Cluster.Tests

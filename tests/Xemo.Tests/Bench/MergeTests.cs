@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using Xemo.IDCard;
-using Xemo.Xemo;
+using Xemo.Cocoon;
 using Xunit;
 
 namespace Xemo.Bench.Tests

@@ -1,6 +1,6 @@
 ﻿using Xunit;
 
-namespace Xemo.Tests
+namespace Xemo.Cocoon.Tests
 {
 	public sealed class XoValidateTests
 	{

@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Xemo.Bench;
 
-namespace Xemo.Information
+namespace Xemo.Cocoon
 {
     /// <summary>
     /// Xemo which overrides data in the inner object by using the given function

@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Xemo.Xemo
+namespace Xemo.Cocoon
 {
     /// <summary>
     /// Dead xemo.

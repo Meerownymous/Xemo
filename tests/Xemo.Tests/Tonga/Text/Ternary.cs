@@ -24,4 +24,3 @@ namespace Tonga.Text
             new Ternary(condition, ifTrue, ifFalse);
     }
 }
-

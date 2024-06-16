@@ -3,7 +3,7 @@ using Xemo.Bench;
 using Xemo.Cluster;
 using Xemo.IDCard;
 
-namespace Xemo
+namespace Xemo.Cocoon
 {
     /// <summary>
     /// Information stored in RAM.

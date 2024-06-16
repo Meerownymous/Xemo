@@ -1,8 +1,7 @@
 ﻿using Tonga.Scalar;
 using Xemo.Cluster.Probe;
-using Xemo.Information;
 
-namespace Xemo.Xemo
+namespace Xemo.Cocoon
 {
     /// <summary>
     /// First match for a given slice in a cluster.

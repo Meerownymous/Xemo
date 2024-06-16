@@ -1,10 +1,10 @@
 ﻿using System.Collections.Concurrent;
 using Xemo;
 using Xemo.IDCard;
-using Xemo.Xemo;
+using Xemo.Cocoon;
 using Xunit;
 
-namespace Xemo.Tests
+namespace Xemo.Cocoon.Tests
 {
     public sealed class XoRamTests
     {

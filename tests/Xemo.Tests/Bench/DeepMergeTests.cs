@@ -1,4 +1,4 @@
-﻿using Xemo.Xemo;
+﻿using Xemo.Cocoon;
 using Xunit;
 
 namespace Xemo.Bench.Tests

@@ -1,5 +1,4 @@
-﻿using System;
-namespace Xemo.Xemo
+﻿namespace Xemo.Cocoon
 {
     /// <summary>
     /// Quickly turn any object into a Xemo, stored in a given memory.

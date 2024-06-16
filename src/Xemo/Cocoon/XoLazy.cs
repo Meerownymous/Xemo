@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Xemo.Information
+namespace Xemo.Cocoon
 {
     /// <summary>
     /// Information whic is created on first request.

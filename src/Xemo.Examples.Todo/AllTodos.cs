@@ -1,5 +1,5 @@
 ﻿using Xemo.Cluster;
-using Xemo.Information;
+using Xemo.Cocoon;
 
 namespace Xemo.Examples.Todo
 {

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Newtonsoft.Json;
+using Xemo.Cluster;
 
 namespace Xemo
 {

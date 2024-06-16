@@ -1,5 +1,4 @@
-﻿using Xemo.Information;
-using Xemo.Xemo;
+﻿using Xemo.Cocoon;
 
 namespace Xemo.Examples.Todo
 {

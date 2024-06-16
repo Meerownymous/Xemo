@@ -12,20 +12,20 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Cluster\" />
-    <None Remove="Xemo\" />
     <None Remove="IDCard\" />
     <None Remove="Bench\" />
     <None Remove="Cluster\PropertyValue.config" />
     <None Remove="Tonga\" />
     <None Remove="Cluster\Probe\" />
+    <None Remove="Cocoon\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Cluster\" />
-    <Folder Include="Xemo\" />
     <Folder Include="IDCard\" />
     <Folder Include="Bench\" />
     <Folder Include="Tonga\" />
     <Folder Include="Cluster\Probe\" />
+    <Folder Include="Cocoon\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <NoWarn>CS8604,CS8603,CS8602,CS8601,CS8618</NoWarn>

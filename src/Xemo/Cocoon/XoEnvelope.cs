@@ -1,4 +1,4 @@
-﻿namespace Xemo.Information
+﻿namespace Xemo.Cocoon
 {
     /// <summary>
     /// Envelope for Information.

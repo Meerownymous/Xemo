@@ -4,11 +4,18 @@ using Xemo.Cluster;
 using Xemo.IDCard;
 using Xemo.Bench;
 using Xemo.Cluster.Probe;
+using Xemo.Cocoon;
 
-namespace Xemo
+namespace Xemo.Cluster
 {
+    /// <summary>
+    /// Cluster of information stored in Ram.
+    /// </summary>
     public sealed class XoRamCluster
     {
+        /// <summary>
+        /// Cluster of information stored in Ram.
+        /// </summary>
         public static XoRamCluster<TSchema> Flex<TSchema>(string subject, TSchema schema) =>
             new XoRamCluster<TSchema>(
                 new DeadMem("This cluster is isolated."),
@@ -17,10 +24,16 @@ namespace Xemo
                 schema
             );
 
+        /// <summary>
+        /// Cluster of information stored in Ram.
+        /// </summary>
         public static XoRamCluster<TSchema> Allocate<TSchema>(IMem home, string subject, TSchema schema) =>
             new XoRamCluster<TSchema>(home, subject, new ConcurrentDictionary<string, TSchema>(), schema);
     }
 
+    /// <summary>
+    /// Cluster of information stored in Ram.
+    /// </summary>
     public sealed class XoRamCluster<TContent> : ICluster
     {
         private readonly IMem mem;
@@ -29,6 +42,9 @@ namespace Xemo
         private readonly ConcurrentDictionary<string, TContent> storage;
         private readonly TContent schema;
 
+        /// <summary>
+        /// Cluster of information stored in Ram.
+        /// </summary>
         public XoRamCluster() : this(
             new DeadMem("This cluster is isolated."),
             string.Empty,
@@ -37,6 +53,9 @@ namespace Xemo
         )
         { }
 
+        /// <summary>
+        /// Cluster of information stored in Ram.
+        /// </summary>
         public XoRamCluster(IMem home, string subject, ConcurrentDictionary<string, TContent> storage, TContent schema)
         {
             this.mem = home;
@@ -53,6 +72,7 @@ namespace Xemo
             this.storage = storage;
             this.schema = schema;
         }
+
 
         public IEnumerator<ICocoon> GetEnumerator()
         {

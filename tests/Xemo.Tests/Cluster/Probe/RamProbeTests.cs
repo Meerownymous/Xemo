@@ -1,7 +1,7 @@
 ﻿using System;
 using Tonga.Scalar;
 using Xemo.Cluster.Probe;
-using Xemo.Xemo;
+using Xemo.Cocoon;
 using Xunit;
 
 namespace Xemo.Tests.Cluster.Probe

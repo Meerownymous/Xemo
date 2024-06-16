@@ -1,9 +1,7 @@
-﻿using Xemo;
-using Xemo.Cluster;
-using Xemo.Xemo;
+﻿using Xemo.Cluster;
 using Xunit;
 
-namespace XemoTests.Xemo
+namespace Xemo.Cocoon.Tests
 {
     public sealed class XoFirstTests
     {
