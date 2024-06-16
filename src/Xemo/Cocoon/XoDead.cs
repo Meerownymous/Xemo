@@ -16,7 +16,7 @@ namespace Xemo.Cocoon
             this.death = (action) => new InvalidOperationException($"Cannot {action} a dead xemo.");
         }
 
-        public IIDCard Card() => throw this.death("deliver ID card from");
+        public IGrip Card() => throw this.death("deliver ID card from");
 
         public TSlice Fill<TSlice>(TSlice wanted) => throw this.death("fill from");
 

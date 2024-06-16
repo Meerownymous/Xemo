@@ -21,7 +21,7 @@ namespace Xemo.Cocoon
             this.inner = inner;
         }
 
-        public IIDCard Card() => this.inner.Card();
+        public IGrip Card() => this.inner.Card();
 
         public TSlice Fill<TSlice>(TSlice wanted)
         {

@@ -1,14 +1,14 @@
-﻿namespace Xemo.IDCard
+﻿namespace Xemo.Grip
 {
     /// <summary>
-    /// An emmpty ID card.
+    /// An emmpty Grip.
     /// </summary>
-    public sealed class BlankIDCard : IIDCard
+    public sealed class BlankGrip : IGrip
     {
         /// <summary>
-        /// An emmpty ID card.
+        /// An emmpty Grip.
         /// </summary>
-        public BlankIDCard()
+        public BlankGrip()
         { }
 
         public string ID() => string.Empty;

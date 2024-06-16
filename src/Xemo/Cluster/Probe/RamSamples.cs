@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using Xemo.Bench;
 using Xemo.Cocoon;
-using Xemo.IDCard;
+using Xemo.Grip;
 
 namespace Xemo.Cluster.Probe
 {
@@ -62,7 +62,7 @@ namespace Xemo.Cluster.Probe
                         yield return
                             AsSample._(
                                 new XoRam<TContent>(
-                                    new AsIDCard(seed, this.subject),
+                                    new AsGrip(seed, this.subject),
                                     this.mem,
                                     this.originSchema
                                 ),
@@ -100,7 +100,7 @@ namespace Xemo.Cluster.Probe
                     yield return
                         new AsSample<TSample>(
                             XoRam.Make(
-                                new AsIDCard(this.subject, seed),
+                                new AsGrip(this.subject, seed),
                                 this.mem,
                                 this.originSchema
                             ),

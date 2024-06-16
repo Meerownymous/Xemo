@@ -16,7 +16,7 @@ namespace Xemo.Cocoon
             this.core = new Lazy<ICocoon>(origin);
         }
 
-        public IIDCard Card() => this.core.Value.Card();
+        public IGrip Card() => this.core.Value.Card();
 
         public TSlice Fill<TSlice>(TSlice wanted) =>
             this.core.Value.Fill(wanted);

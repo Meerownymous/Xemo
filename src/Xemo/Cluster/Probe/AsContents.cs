@@ -14,7 +14,7 @@ namespace Xemo.Cluster.Probe
         public AsCocoons(IEnumerable<ISample<TSample>> samples) : base(
             AsEnumerable._(() =>
                 Mapped._(
-                    sample => sample.Origin(),
+                    sample => sample.Cocoon(),
                     samples
                 )
             )

@@ -31,7 +31,7 @@
             return newItem;
         }
 
-        private IIDCard EnsureLinkable(IIDCard card)
+        private IGrip EnsureLinkable(IGrip card)
         {
             return
                 String.IsNullOrEmpty(card.Kind()) && string.IsNullOrEmpty(card.ID()) ?
@@ -40,7 +40,7 @@
                 this.mem.Xemo(card.Kind(), card.ID()).Card();
         }
 
-        private IIDCard[] EnsureLinkable(IIDCard[] cards)
+        private IGrip[] EnsureLinkable(IGrip[] cards)
         {
             foreach(var card in cards)
             {

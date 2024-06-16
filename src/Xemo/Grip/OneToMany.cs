@@ -1,7 +1,7 @@
 ﻿using System;
 using Tonga.Map;
 
-namespace Xemo.IDCard
+namespace Xemo.Grip
 {
     /// <summary>
     /// Link to other Xemo subjects (eg User -> Friends) in a schema.
@@ -11,14 +11,14 @@ namespace Xemo.IDCard
         /// <summary>
         /// Link to other Xemo subjects (eg User -> Friends) in a schema.
         /// </summary>
-        public static IIDCard[] Many(string targetSubject) =>
+        public static IGrip[] Many(string targetSubject) =>
             new OneToMany[] { new OneToMany(targetSubject) };
     }
 
     /// <summary>
     /// Link to other Xemo subjects (eg User -> Friends) in a schema.
     /// </summary>
-    internal sealed class OneToMany : IIDCard
+    internal sealed class OneToMany : IGrip
     {
         private readonly string targetSubject;
 

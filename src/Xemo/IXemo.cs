@@ -16,7 +16,7 @@
 		/// Typically, there is a subject assigned to a xemo, which is
 		/// part of the IDCard, as well as a unique ID.
 		/// </summary>
-		IIDCard Card();
+		IGrip Card();
 
 		/// <summary>
 		/// Fill properties of the given slice with data available inside this

@@ -6,7 +6,7 @@ namespace Xemo.Cocoon
     /// <summary>
     /// First match for a given slice in a cluster.
     /// </summary>
-    public sealed class XoFirst : XoEnvelope
+    public sealed class XoFirst : CocoonEnvelope
     {
         /// <summary>
         /// First element in an enumerable of xemos.
@@ -49,19 +49,19 @@ namespace Xemo.Cocoon
         /// <summary>
         /// First match for a given slice in a cluster, direct access.
         /// </summary>
-        public static TSlice Content<TSlice>(IEnumerable<ISample<TSlice>> samples) =>
+        public static TSlice Sampled<TSlice>(IEnumerable<ISample<TSlice>> samples) =>
             First._(samples).Value().Content();
 
         /// <summary>
         /// First match for a given slice in a cluster, direct access.
         /// </summary>
-        public static TSlice Content<TSlice>(TSlice slice, ICluster cluster) =>
-            Content<TSlice>(slice, slice => true, cluster);
+        public static TSlice Sampled<TSlice>(TSlice slice, ICluster cluster) =>
+            Sampled<TSlice>(slice, slice => true, cluster);
 
         /// <summary>
         /// First match for a given slice in a cluster, direct access.
         /// </summary>
-        public static TSlice Content<TSlice>(TSlice slice, Func<TSlice, bool> match, ICluster cluster) =>
+        public static TSlice Sampled<TSlice>(TSlice slice, Func<TSlice, bool> match, ICluster cluster) =>
             First._(
                 AsContents._(
                     cluster
@@ -74,7 +74,7 @@ namespace Xemo.Cocoon
     /// <summary>
     /// First match for a given slice in a cluster.
     /// </summary>
-    public sealed class XoFirst<TSlice> : XoEnvelope
+    public sealed class XoFirst<TSlice> : CocoonEnvelope
     {
         /// <summary>
         /// First match for a given slice in a cluster.
@@ -96,7 +96,7 @@ namespace Xemo.Cocoon
         ) : base(() =>
             First._(samples)
                 .Value()
-                .Origin()
+                .Cocoon()
         )
         { }
 

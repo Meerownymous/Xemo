@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Xemo.Bench;
 using Xemo.Cluster;
-using Xemo.IDCard;
+using Xemo.Grip;
 
 namespace Xemo.Cocoon
 {
@@ -10,7 +10,7 @@ namespace Xemo.Cocoon
     /// </summary>
     public sealed class XoRam : ICocoon
     {
-        private readonly IIDCard passport;
+        private readonly IGrip passport;
 
         /// <summary>
         /// Information stored in RAM.
@@ -18,7 +18,7 @@ namespace Xemo.Cocoon
         /// Schema(propertyObject).
         /// </summary>
         public XoRam(string subject) : this(
-            new LazyIDCard(() => Guid.NewGuid().ToString(), () => subject)
+            new LazyGrip(() => Guid.NewGuid().ToString(), () => subject)
         )
         { }
 
@@ -27,7 +27,7 @@ namespace Xemo.Cocoon
         /// Before using, you need to define a schema, calling
         /// Schema(propertyObject).
         /// </summary>
-        public XoRam(string subject, string id) : this(new AsIDCard(subject, id))
+        public XoRam(string subject, string id) : this(new AsGrip(subject, id))
         { }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace Xemo.Cocoon
         /// Before using, you need to define a schema, calling
         /// Schema(propertyObject).
         /// </summary>
-        public XoRam(IIDCard id)
+        public XoRam(IGrip id)
         {
             this.passport = id;
         }
@@ -43,7 +43,7 @@ namespace Xemo.Cocoon
         public TSlice Fill<TSlice>(TSlice wanted) =>
             throw new InvalidOperationException("Define a schema first.");
 
-        public IIDCard Card() => this.passport;
+        public IGrip Card() => this.passport;
 
         public ICocoon Mutate<TSlice>(TSlice mutation) =>
             throw new InvalidOperationException("Define a schema first.");
@@ -52,7 +52,7 @@ namespace Xemo.Cocoon
             new XoRam<TSchema>(this.passport, new ConcurrentDictionary<string, TSchema>(), schema);
 
         public static XoRam<TSchema> Make<TSchema>(
-            IIDCard id, ConcurrentDictionary<string, TSchema> storage, TSchema schema
+            IGrip id, ConcurrentDictionary<string, TSchema> storage, TSchema schema
         ) =>
             new XoRam<TSchema>(id, storage, schema);
     }
@@ -62,7 +62,7 @@ namespace Xemo.Cocoon
     /// </summary>
     public sealed class XoRam<TContent> : ICocoon
     {
-        private readonly IIDCard passport;
+        private readonly IGrip passport;
 
         /// <summary>
         /// Storage of Xemos addressable by unique strings.
@@ -74,13 +74,13 @@ namespace Xemo.Cocoon
         /// <summary>
         /// Information stored in RAM.
         /// </summary>
-        public XoRam() : this(new BlankIDCard())
+        public XoRam() : this(new BlankGrip())
         { }
 
         /// <summary>
         /// Information stored in RAM.
         /// </summary>
-        public XoRam(IIDCard id) : this(
+        public XoRam(IGrip id) : this(
             id,
             new ConcurrentDictionary<string, TContent>()
         )
@@ -90,7 +90,7 @@ namespace Xemo.Cocoon
         /// Information stored in RAM.
         /// </summary>
         public XoRam(
-            IIDCard id,
+            IGrip id,
             ConcurrentDictionary<string, TContent> storage,
             TContent schema
         ) : this(
@@ -105,7 +105,7 @@ namespace Xemo.Cocoon
         /// Information stored in RAM.
         /// </summary>
         public XoRam(
-            IIDCard id,
+            IGrip id,
             ConcurrentDictionary<string, TContent> storage
         ) : this(
             id,
@@ -119,7 +119,7 @@ namespace Xemo.Cocoon
         /// Information stored in RAM.
         /// </summary>
         public XoRam(
-            IIDCard id,
+            IGrip id,
             ConcurrentDictionary<string, TContent> storage,
             IMem mem
         ) : this(
@@ -131,7 +131,7 @@ namespace Xemo.Cocoon
         /// Information stored in RAM.
         /// </summary>
         public XoRam(
-            IIDCard id,
+            IGrip id,
             ConcurrentDictionary<string, TContent> storage,
             IMem mem,
             TContent schema
@@ -143,7 +143,7 @@ namespace Xemo.Cocoon
             this.schema = schema;
         }
 
-        public IIDCard Card() => this.passport;
+        public IGrip Card() => this.passport;
 
         public TSlice Fill<TSlice>(TSlice wanted)
         {

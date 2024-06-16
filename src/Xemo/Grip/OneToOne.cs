@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Xemo.IDCard
+namespace Xemo.Grip
 {
     /// <summary>
     /// Link to another Xemo subject (eg User -> Address) in a schema.
@@ -9,14 +9,14 @@ namespace Xemo.IDCard
         /// <summary>
         /// Link to another Xemo subject (eg User -> Address) in a schema.
         /// </summary>
-        public static IIDCard One(string targetSubject) =>
+        public static IGrip One(string targetSubject) =>
             new OneToOne(targetSubject);
     }
 
     /// <summary>
     /// Link to another Xemo subject (eg User -> Address) in a schema.
     /// </summary>
-    internal sealed class OneToOne : IIDCard
+    internal sealed class OneToOne : IGrip
     {
         private readonly string targetSubject;
 

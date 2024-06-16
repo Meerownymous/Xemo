@@ -23,12 +23,12 @@ namespace Xemo.Bench
                     ).Post(patch);
         }
 
-        private IIDCard AssertExists(IIDCard card)
+        private IGrip AssertExists(IGrip card)
         {
             return this.mem.Xemo(card.Kind(), card.ID()).Card();
         }
 
-        private IIDCard[] AssertExists(IIDCard[] cards)
+        private IGrip[] AssertExists(IGrip[] cards)
         {
             foreach(var card in cards)
             {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Xemo;
-using Xemo.IDCard;
+using Xemo.Grip;
 using Xemo.Cocoon;
 using Xunit;
 
@@ -281,7 +281,7 @@ namespace Xemo.Cocoon.Tests
                 };
             var storage = ConcurrentDictionary._(schema);
             XoRam
-                .Make(new AsIDCard("1", "User"), storage, schema)
+                .Make(new AsGrip("1", "User"), storage, schema)
                 .Mutate(new { FirstName = "Ulf", LastName = "Saveman" });
 
             Assert.Equal(
@@ -299,7 +299,7 @@ namespace Xemo.Cocoon.Tests
         {
             var users = new ConcurrentDictionary<string, object>();
             var xemo =
-                XoRam.Make(new AsIDCard("1", "User"), users,
+                XoRam.Make(new AsGrip("1", "User"), users,
                     new
                     {
                         FirstName = "Ramirez",

@@ -4,7 +4,7 @@ namespace Xemo
     /// <summary>
     /// Identifies by Kind and ID. Used to identify Xemos in a cluster and relations.
     /// </summary>
-    public interface IIDCard
+    public interface IGrip
     {
         /// <summary>
         /// Unique ID of something.

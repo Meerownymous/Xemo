@@ -14,7 +14,7 @@ namespace Xemo.Cocoon.Tests
                 "Meerow",
                 new XoFirst(
                     new XoWith(
-                        XoRamCluster.Flex("Personalities", schema),
+                        XoRamCluster.Allocate("Personalities", schema),
                         new { ID = "Meerow" },
                         new { ID = "Dobertus Meow" }
                     )
@@ -29,10 +29,10 @@ namespace Xemo.Cocoon.Tests
 
             Assert.Equal(
                 "Dobertus Meow",
-                XoFirst.Content(
+                XoFirst.Sampled(
                     schema,
                     new XoWith(
-                        XoRamCluster.Flex("Personalities", schema),
+                        XoRamCluster.Allocate("Personalities", schema),
                         new { ID = "Meerow" },
                         new { ID = "Dobertus Meow" }
                     )

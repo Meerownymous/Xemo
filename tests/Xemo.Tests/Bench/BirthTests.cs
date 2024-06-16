@@ -1,5 +1,5 @@
 ﻿using System;
-using Xemo.IDCard;
+using Xemo.Grip;
 using Xunit;
 
 namespace Xemo.Bench.Tests
@@ -116,7 +116,7 @@ namespace Xemo.Bench.Tests
                         {
                             ID = "1",
                             Name = "Timon",
-                            BestFriend = new AsIDCard(pumba.Card().ID(), "User")
+                            BestFriend = new AsGrip(pumba.Card().ID(), "User")
                         }
                     ).BestFriend.ID()
             );
@@ -142,7 +142,7 @@ namespace Xemo.Bench.Tests
                         {
                             ID = "1",
                             Name = "Timon",
-                            BestFriend = new AsIDCard("19", "User")
+                            BestFriend = new AsGrip("19", "User")
                         }
                     )
             );

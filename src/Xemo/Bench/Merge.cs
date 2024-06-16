@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Tonga.Enumerable;
 using Tonga.Scalar;
-using Xemo.IDCard;
+using Xemo.Grip;
 using Xemo.Tonga;
 
 namespace Xemo.Bench
@@ -18,8 +18,8 @@ namespace Xemo.Bench
         /// </summary>
         public static Merge<TTarget> Target<TTarget>(
             TTarget target,
-            Func<object, IIDCard, object> solve1to1,
-            Func<object, IIDCard[], object> solve1toMany
+            Func<object, IGrip, object> solve1to1,
+            Func<object, IGrip[], object> solve1toMany
         ) =>
             new Merge<TTarget>(target, solve1to1, solve1toMany);
 
@@ -37,8 +37,8 @@ namespace Xemo.Bench
     {
         private static readonly TimeSpan elapsed = new TimeSpan(0);
         private readonly TResult target;
-        private readonly Func<object, IIDCard, object> solve1To1;
-        private readonly Func<object, IIDCard[], object> solve1ToMany;
+        private readonly Func<object, IGrip, object> solve1To1;
+        private readonly Func<object, IGrip[], object> solve1ToMany;
 
         /// <summary>
         /// Merge data to a target.
@@ -57,8 +57,8 @@ namespace Xemo.Bench
         /// </summary>
         public Merge(
             TResult target,
-            Func<object, IIDCard, object> solve1to1,
-            Func<object, IIDCard[], object> solve1toMany
+            Func<object, IGrip, object> solve1to1,
+            Func<object, IGrip[], object> solve1toMany
         )
         {
             this.target = target;
@@ -177,7 +177,7 @@ namespace Xemo.Bench
                                             item => item.Card(),
                                             incoming as ICocoon[]
                                         ).ToArray() :
-                                        (incoming as IIDCard[])
+                                        (incoming as IGrip[])
                                     );
                             }
                             else
@@ -187,7 +187,7 @@ namespace Xemo.Bench
                                         targetProp.GetValue(target),
                                         incoming.GetType().IsAssignableTo(typeof(ICocoon)) ?
                                         (incoming as ICocoon).Card() :
-                                        (incoming as IIDCard)
+                                        (incoming as IGrip)
                                     );
                             }
                         }
@@ -217,8 +217,8 @@ namespace Xemo.Bench
                 else
                 {
                     var value = targetProp.GetValue(target);
-                    if (value is OneToOne) value = new BlankIDCard();
-                    else if (value is OneToMany) value = new IIDCard[0];
+                    if (value is OneToOne) value = new BlankGrip();
+                    else if (value is OneToMany) value = new IGrip[0];
                     mergedValues[collected] = value;
                 }
                 collected++;
@@ -338,12 +338,12 @@ namespace Xemo.Bench
         private static bool IsSolvable1To1Relation(Type leftPropType, Type rightPropType)
         {
             return
-                leftPropType.IsAssignableTo(typeof(IIDCard))
+                leftPropType.IsAssignableTo(typeof(IGrip))
                 ||
                 (
                     rightPropType.IsAssignableTo(typeof(ICocoon))
                     ||
-                    rightPropType.IsAssignableTo(typeof(IIDCard))
+                    rightPropType.IsAssignableTo(typeof(IGrip))
                 );
         }
 
@@ -353,12 +353,12 @@ namespace Xemo.Bench
             if (leftPropType.IsArray && rightPropType.IsArray)
             {
                 result =
-                    leftPropType.GetElementType().IsAssignableTo(typeof(IIDCard))
+                    leftPropType.GetElementType().IsAssignableTo(typeof(IGrip))
                     ||
                     (
                         rightPropType.GetElementType().IsAssignableTo(typeof(ICocoon))
                         ||
-                        rightPropType.GetElementType().IsAssignableTo(typeof(IIDCard))
+                        rightPropType.GetElementType().IsAssignableTo(typeof(IGrip))
                     );
             }
             return result;

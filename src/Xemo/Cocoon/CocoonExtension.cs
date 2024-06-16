@@ -3,7 +3,7 @@
     /// <summary>
     /// Quickly turn any object into a Xemo, stored in a given memory.
     /// </summary>
-    public static class XemoExtension
+    public static class CocoonExtension
     {
         /// <summary>
         /// A given object will be stored in the given memory.

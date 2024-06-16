@@ -1,5 +1,5 @@
 ﻿using System;
-using Xemo.IDCard;
+using Xemo.Grip;
 using Xunit;
 
 namespace Xemo.Tests

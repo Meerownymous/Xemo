@@ -1,17 +1,17 @@
-﻿namespace Xemo.IDCard
+﻿namespace Xemo.Grip
 {
     /// <summary>
-    /// ID card from inputs.
+    /// Grip from inputs.
     /// </summary>
-    public sealed class AsIDCard : IIDCard
+    public sealed class AsGrip : IGrip
     {
         private readonly string id;
         private readonly string kind;
 
         /// <summary>
-        /// ID card from inputs.
+        /// Grip from inputs.
         /// </summary>
-        public AsIDCard(string id, string kind)
+        public AsGrip(string id, string kind)
         {
             this.id = id;
             this.kind = kind;

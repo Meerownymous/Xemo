@@ -3,14 +3,14 @@
     /// <summary>
     /// Envelope for Information.
     /// </summary>
-    public abstract class XoEnvelope : ICocoon
+    public abstract class CocoonEnvelope : ICocoon
 	{
         private readonly ICocoon core;
 
         /// <summary>
         /// Envelope for Information.
         /// </summary>
-        public XoEnvelope(Func<ICocoon> core) : this(
+        public CocoonEnvelope(Func<ICocoon> core) : this(
             new XoLazy(core)
         )
         { }
@@ -18,12 +18,12 @@
         /// <summary>
         /// Envelope for Information.
         /// </summary>
-        public XoEnvelope(ICocoon core)
+        public CocoonEnvelope(ICocoon core)
 		{
             this.core = core;
         }
 
-        public IIDCard Card() =>
+        public IGrip Card() =>
             this.core.Card();
 
         public TSlice Fill<TSlice>(TSlice wanted) =>

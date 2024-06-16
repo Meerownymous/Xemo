@@ -52,8 +52,14 @@ namespace Xemo.Cluster
             this.GetEnumerator();
     }
 
+    /// <summary>
+    /// Cluster which is filtered by a given mask + match.
+    /// </summary>
     public static class XoFiltered
     {
+        /// <summary>
+        /// Cluster which is filtered by a given mask + match.
+        /// </summary>
         public static XoFiltered<TSlice> _<TSlice>(ICluster origin, TSlice schema, Func<TSlice, bool> matches) =>
             new XoFiltered<TSlice>(origin, schema, item => matches(item));
     }

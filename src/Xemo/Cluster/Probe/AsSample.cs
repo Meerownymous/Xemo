@@ -19,7 +19,7 @@ namespace Xemo.Cluster
         }
 
         public TSample Content() => this.sample;
-        public ICocoon Origin() => this.cocoon;
+        public ICocoon Cocoon() => this.cocoon;
 
         public static implicit operator TSample(AsSample<TSample> s) => s.sample;
     }

@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Concurrent;
-using Xemo.Cluster;
-using Xemo.IDCard;
+using Xemo.Grip;
 using Xemo.Bench;
 using Xemo.Cluster.Probe;
 using Xemo.Cocoon;
@@ -16,9 +15,9 @@ namespace Xemo.Cluster
         /// <summary>
         /// Cluster of information stored in Ram.
         /// </summary>
-        public static XoRamCluster<TSchema> Flex<TSchema>(string subject, TSchema schema) =>
+        public static XoRamCluster<TSchema> Allocate<TSchema>(string subject, TSchema schema) =>
             new XoRamCluster<TSchema>(
-                new DeadMem("This cluster is isolated."),
+                new DeadMem("This cluster is isolated and has its own memory."),
                 subject,
                 new ConcurrentDictionary<string, TSchema>(),
                 schema
@@ -78,7 +77,7 @@ namespace Xemo.Cluster
         {
             foreach (var key in this.index.Value)
                 yield return new XoRam<TContent>(
-                    new AsIDCard(key, this.subject),
+                    new AsGrip(key, this.subject),
                     this.storage,
                     this.mem,
                     this.schema
@@ -89,7 +88,7 @@ namespace Xemo.Cluster
         {
             if (!this.storage.ContainsKey(id))
                 throw new ArgumentException($"{this.subject} '{id}' does not exist.");
-            return new XoRam<TContent>(new AsIDCard(id, this.subject), this.storage, this.mem, this.schema);
+            return new XoRam<TContent>(new AsGrip(id, this.subject), this.storage, this.mem, this.schema);
         }
 
         public ISamples<TShape> Samples<TShape>(TShape blueprint) =>
@@ -138,7 +137,7 @@ namespace Xemo.Cluster
             );
             return
                 new XoRam<TContent>(
-                    new AsIDCard(id, this.subject),
+                    new AsGrip(id, this.subject),
                     this.storage,
                     this.mem,
                     this.schema

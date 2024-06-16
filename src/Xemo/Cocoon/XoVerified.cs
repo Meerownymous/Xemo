@@ -20,12 +20,12 @@ namespace Xemo.Cocoon
             this.validations = valid;
         }
 
-        public IIDCard Card() =>
+        public IGrip Card() =>
             throw new InvalidOperationException(
                 "This is a verify object, it does not have an ID."
             );
 
-        public IIDCard IID() =>
+        public IGrip IID() =>
             throw new InvalidOperationException(
                 "This is a verify object, it does not have an ID."
             );

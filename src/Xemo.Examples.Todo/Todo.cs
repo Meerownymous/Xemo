@@ -5,7 +5,7 @@ namespace Xemo.Examples.Todo
 	/// <summary>
 	/// 
 	/// </summary>
-	public sealed class Todo : XoEnvelope
+	public sealed class Todo : CocoonEnvelope
 	{
         public Todo(string subject, IMem memory) : base(() =>
 			new

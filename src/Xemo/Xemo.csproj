@@ -7,25 +7,25 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Tonga" Version="0.7.0" />
+    <PackageReference Include="Tonga" Version="0.9.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Cluster\" />
-    <None Remove="IDCard\" />
     <None Remove="Bench\" />
     <None Remove="Cluster\PropertyValue.config" />
     <None Remove="Tonga\" />
     <None Remove="Cluster\Probe\" />
     <None Remove="Cocoon\" />
+    <None Remove="Grip\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Cluster\" />
-    <Folder Include="IDCard\" />
     <Folder Include="Bench\" />
     <Folder Include="Tonga\" />
     <Folder Include="Cluster\Probe\" />
     <Folder Include="Cocoon\" />
+    <Folder Include="Grip\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <NoWarn>CS8604,CS8603,CS8602,CS8601,CS8618</NoWarn>

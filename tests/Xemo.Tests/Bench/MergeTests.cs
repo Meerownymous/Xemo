@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
-using Xemo.IDCard;
+using Xemo.Grip;
 using Xemo.Cocoon;
 using Xunit;
 
@@ -52,7 +52,7 @@ namespace Xemo.Bench.Tests
                     (left, right) => throw new Exception("one to many is not tested here.")
                 )
                 .Post(
-                    new { Author = new AsIDCard("1", "User") }
+                    new { Author = new AsGrip("1", "User") }
                 );
 
             Assert.True(solved);
@@ -82,7 +82,7 @@ namespace Xemo.Bench.Tests
         [Fact]
         public void PutsSourceIDIntoSolve()
         {
-            IIDCard result = default;
+            IGrip result = default;
 
             var patch = new { Author = new XoRam("User", "1") };
 
