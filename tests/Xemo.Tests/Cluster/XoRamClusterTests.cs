@@ -16,9 +16,7 @@ namespace Xemo.Cluster.Tests
             Assert.Equal(
                 13,
                 XoFirst.Content(
-                    users
-                        .Probe()
-                        .Samples(new { Name = "", Age = 0 })
+                    users.Samples(new { Name = "", Age = 0 })
                         .Filtered(info => info.Name == "Jay")
                 ).Age
 			);
@@ -32,9 +30,7 @@ namespace Xemo.Cluster.Tests
             Assert.Equal(
                 1,
                 XoFirst.Content(
-                    users
-                        .Probe()
-                        .Samples(new { Name = "", Age = 0 })
+                    users.Samples(new { Name = "", Age = 0 })
                         .Filtered(u => u.Name == "Dobert")
                 ).Age
             );

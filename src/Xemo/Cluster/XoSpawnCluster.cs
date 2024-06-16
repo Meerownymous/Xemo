@@ -41,7 +41,8 @@ namespace Xemo.Cluster
         public IEnumerator<ICocoon> GetEnumerator() =>
             this.origin.GetEnumerator();
 
-        public IProbe Probe() => this.origin.Probe();
+        public ISamples<TShape> Samples<TShape>(TShape blueprint) =>
+            this.origin.Samples(blueprint);
 
         public ICluster Removed(params ICocoon[] gone) =>
             this.origin.Removed(gone);

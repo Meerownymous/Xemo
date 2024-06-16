@@ -32,8 +32,7 @@ namespace Xemo.Tests.Cluster.Probe
             Assert.Equal(
                 "Valiant40",
                 XoFirst.Cocoon(
-                    RamProbe._(mem, "sailboat", originSchema)
-                        .Samples(new { Rigging = "" })
+                    RamSamples._(mem, "sailboat", originSchema, new { Rigging = "" })
                         .Filtered(boat => boat.Rigging == "Cutter")
                 )
                 .Card()

@@ -32,7 +32,8 @@ namespace Xemo.Cluster
         public IEnumerator<ICocoon> GetEnumerator() =>
             this.core.GetEnumerator();
 
-        public IProbe Probe() => this.core.Probe();
+        public ISamples<TSample> Samples<TSample>(TSample sample) =>
+            this.core.Samples(sample);
 
         public ICocoon Create<TNew>(TNew input) =>
             this.core.Create(input);

@@ -35,12 +35,12 @@ namespace Xemo.Cluster
 
         public IEnumerator<ICocoon> GetEnumerator() =>
             AsCocoons._(
-                this.Probe()
-                    .Samples(this.filterSlice)
+                this.Samples(this.filterSlice)
                     .Filtered(this.match)
             ).GetEnumerator();
 
-        public IProbe Probe() => this.origin.Probe();
+        public ISamples<TSample> Samples<TSample>(TSample sample) =>
+            this.origin.Samples(sample);
 
         public ICluster Removed(params ICocoon[] gone)
         {

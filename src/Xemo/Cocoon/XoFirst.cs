@@ -65,7 +65,6 @@ namespace Xemo.Cocoon
             First._(
                 AsContents._(
                     cluster
-                        .Probe()
                         .Samples(slice)
                         .Filtered(match)
                 )
@@ -112,7 +111,6 @@ namespace Xemo.Cocoon
             First._(
                 AsCocoons._(
                     cluster
-                        .Probe()
                         .Samples(slice)
                         .Filtered(match)
                     )

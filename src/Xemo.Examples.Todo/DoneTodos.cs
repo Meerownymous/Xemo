@@ -15,8 +15,7 @@ namespace Xemo.Examples.Todo
         /// </summary>
         public DoneTodos(ICluster all) : base(AsEnumerable._(() =>
 			AsCocoons._(
-				all.Probe()
-					.Samples(new { Done = false })
+				all.Samples(new { Done = false })
 					.Filtered(todo => todo.Done)
 				)
 			)

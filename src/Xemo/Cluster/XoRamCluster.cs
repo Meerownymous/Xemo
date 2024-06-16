@@ -92,7 +92,8 @@ namespace Xemo.Cluster
             return new XoRam<TContent>(new AsIDCard(id, this.subject), this.storage, this.mem, this.schema);
         }
 
-        public IProbe Probe() => new RamProbe<TContent>(this.storage, this.subject, this.schema);
+        public ISamples<TShape> Samples<TShape>(TShape blueprint) =>
+            new RamSamples<TContent, TShape>(this.storage, this.subject, this.schema, blueprint);
 
         public ICluster Removed(params ICocoon[] gone)
         {
