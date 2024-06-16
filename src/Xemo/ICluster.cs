@@ -3,28 +3,64 @@
 	/// <summary>
 	/// A cluster which groups information.
 	/// </summary>
-	public interface IXemoCluster : IEnumerable<IXemo>
+	public interface ICluster : IEnumerable<ICocoon>
 	{
 		/// <summary>
 		/// Single item in this cluster.
 		/// </summary>
-        IXemo Xemo(string id);
+        ICocoon Xemo(string id);
 
-		/// <summary>
-		/// Reduce this cluster by the given filter. The filter is applied against
-		/// the given blueprint after filling it with information.
-		/// </summary>
-		IXemoCluster Reduced<TQuery>(TQuery slice, Func<TQuery, bool> matches);
+		IProbe Probe();
 
         /// <summary>
         /// Create new information in this cluster from the given plan.
         /// </summary>
-        IXemo Create<TNew>(TNew plan);
+        ICocoon Create<TNew>(TNew plan);
 
         /// <summary>
         /// Remove information from this cluster which matches the given filter
 		/// after filling the blueprint.
         /// </summary>
-        IXemoCluster Without(params IXemo[] gone);
+        ICluster Removed(params ICocoon[] gone);
 	}
+
+	public interface IProbe
+	{
+		IProbe<TShape> Samples<TShape>(TShape shape);
+	}
+
+    public sealed class FkProbe : IProbe
+    {
+        public IProbe<TShape> Samples<TShape>(TShape shape)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public interface IProbe<TShape>
+    {
+		IEnumerable<ISample<TShape>> Filtered(Func<TShape, bool> match);
+
+        int Count(Func<TShape, bool> match);
+
+        int Count();
+    }
+
+    public class FkProbe<TShape> : IProbe<TShape>
+    {
+        public IEnumerable<ISample<TShape>> Filtered(Func<TShape, bool> match)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int Count(Func<TShape, bool> match)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int Count()
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

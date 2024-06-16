@@ -9,12 +9,12 @@ namespace Xemo.Xemo
     /// for example when you want to define a cluster and have a minimum
     /// set of data when creating an entry.
     /// </summary>
-    public sealed class XoBlueprint<Blueprint> : IXemo
+    public sealed class XoBlueprint<Blueprint> : ICocoon
     {
         private readonly Blueprint blueprint;
-        private readonly IXemo inner;
+        private readonly ICocoon inner;
 
-        public XoBlueprint(Blueprint blueprint, IXemo inner)
+        public XoBlueprint(Blueprint blueprint, ICocoon inner)
         {
             this.blueprint = blueprint;
             this.inner = inner;
@@ -28,12 +28,12 @@ namespace Xemo.Xemo
             return wanted; 
         }
 
-        public IXemo Mutate<TPatch>(TPatch mutation)
+        public ICocoon Mutate<TPatch>(TPatch mutation)
         {
             throw new NotImplementedException();
         }
 
-        public IXemo Schema<TSchema>(TSchema schema)
+        public ICocoon Schema<TSchema>(TSchema schema)
         {
             throw new NotImplementedException();
         }
@@ -41,7 +41,7 @@ namespace Xemo.Xemo
 
     public static class XoBlueprint
     {
-        public static XoBlueprint<TBlueprint> _<TBlueprint>(TBlueprint blueprint, IXemo inner) =>
+        public static XoBlueprint<TBlueprint> _<TBlueprint>(TBlueprint blueprint, ICocoon inner) =>
             new XoBlueprint<TBlueprint>(blueprint, inner);
     }
 }

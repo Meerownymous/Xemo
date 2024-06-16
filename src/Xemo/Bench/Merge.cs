@@ -172,10 +172,10 @@ namespace Xemo.Bench
                                 mergedValues[collected] =
                                     this.solve1ToMany(
                                         targetProp.GetValue(target),
-                                        incoming.GetType().GetElementType().IsAssignableTo(typeof(IXemo)) ?
+                                        incoming.GetType().GetElementType().IsAssignableTo(typeof(ICocoon)) ?
                                         Mapped._(
                                             item => item.Card(),
-                                            incoming as IXemo[]
+                                            incoming as ICocoon[]
                                         ).ToArray() :
                                         (incoming as IIDCard[])
                                     );
@@ -185,8 +185,8 @@ namespace Xemo.Bench
                                 mergedValues[collected] =
                                     this.solve1To1(
                                         targetProp.GetValue(target),
-                                        incoming.GetType().IsAssignableTo(typeof(IXemo)) ?
-                                        (incoming as IXemo).Card() :
+                                        incoming.GetType().IsAssignableTo(typeof(ICocoon)) ?
+                                        (incoming as ICocoon).Card() :
                                         (incoming as IIDCard)
                                     );
                             }
@@ -341,7 +341,7 @@ namespace Xemo.Bench
                 leftPropType.IsAssignableTo(typeof(IIDCard))
                 ||
                 (
-                    rightPropType.IsAssignableTo(typeof(IXemo))
+                    rightPropType.IsAssignableTo(typeof(ICocoon))
                     ||
                     rightPropType.IsAssignableTo(typeof(IIDCard))
                 );
@@ -356,7 +356,7 @@ namespace Xemo.Bench
                     leftPropType.GetElementType().IsAssignableTo(typeof(IIDCard))
                     ||
                     (
-                        rightPropType.GetElementType().IsAssignableTo(typeof(IXemo))
+                        rightPropType.GetElementType().IsAssignableTo(typeof(ICocoon))
                         ||
                         rightPropType.GetElementType().IsAssignableTo(typeof(IIDCard))
                     );

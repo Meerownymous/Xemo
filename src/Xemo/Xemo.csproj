@@ -17,6 +17,7 @@
     <None Remove="Bench\" />
     <None Remove="Cluster\PropertyValue.config" />
     <None Remove="Tonga\" />
+    <None Remove="Cluster\Probe\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Cluster\" />
@@ -24,6 +25,7 @@
     <Folder Include="IDCard\" />
     <Folder Include="Bench\" />
     <Folder Include="Tonga\" />
+    <Folder Include="Cluster\Probe\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <NoWarn>CS8604,CS8603,CS8602,CS8601,CS8618</NoWarn>

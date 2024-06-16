@@ -7,15 +7,15 @@ namespace Xemo.Information
     /// Xemo which overrides data in the inner object by using the given function
     /// to generate the override.
     /// </summary>
-    public sealed class XoOverride<TOverride> : IXemo
+    public sealed class XoOverride<TOverride> : ICocoon
     {
         private readonly Func<TOverride> overrides;
-        private readonly IXemo inner;
+        private readonly ICocoon inner;
 
         /// <summary>
         /// Xemo which overrides data in the inner object by using the given function.
         /// </summary>
-        public XoOverride(Func<TOverride> overrides, IXemo inner)
+        public XoOverride(Func<TOverride> overrides, ICocoon inner)
         {
             this.overrides = overrides;
             this.inner = inner;
@@ -31,18 +31,18 @@ namespace Xemo.Information
                 ).Post(this.overrides());
         }
 
-        public IXemo Mutate<TDefaults>(TDefaults mutation)
+        public ICocoon Mutate<TDefaults>(TDefaults mutation)
         {
             return this.inner.Mutate(mutation);
         }
 
-        public IXemo Schema<TMask>(TMask mask) =>
+        public ICocoon Schema<TMask>(TMask mask) =>
             this.inner.Schema(mask);
     }
 
     public static class XoOverride
     {
-        public static XoOverride<TOverride> _<TOverride>(Func<TOverride> overrides, IXemo inner) =>
+        public static XoOverride<TOverride> _<TOverride>(Func<TOverride> overrides, ICocoon inner) =>
             new XoOverride<TOverride>(overrides, inner);
     }
 }

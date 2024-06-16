@@ -6,38 +6,31 @@ namespace Xemo.Cluster
     /// <summary>
     /// Cluster which is lazyliy initialized.
     /// </summary>
-	public sealed class LazyCluster : IXemoCluster
+	public sealed class LazyCluster : ICluster
 	{
-        private readonly Lazy<IXemoCluster> origin;
+        private readonly Lazy<ICluster> origin;
 
         /// <summary>
         /// Cluster which is lazyliy initialized.
         /// </summary>
-        public LazyCluster(Func<IXemoCluster> origin)
+        public LazyCluster(Func<ICluster> origin)
 		{
-            this.origin = new Lazy<IXemoCluster>(origin);
+            this.origin = new Lazy<ICluster>(origin);
 		}
 
-        public IXemo Xemo(string id) =>
+        public ICocoon Xemo(string id) =>
             this.origin.Value.Xemo(id);
 
-        //public IXemoCluster Schema<TSchema>(TSchema schema) =>
-        //    new LazyCluster(() => this.origin.Value.Schema(schema));
-
-        public IEnumerator<IXemo> GetEnumerator() =>
+        public IEnumerator<ICocoon> GetEnumerator() =>
             this.origin.Value.GetEnumerator();
 
-        public IXemoCluster Reduced<TQuery>(TQuery blueprint, Func<TQuery, bool> matches) =>
-            this.origin.Value.Reduced(blueprint, matches);
+        public IProbe Probe() => this.origin.Value.Probe();
 
-        //public IXemoCluster With<TNew>(TNew input) =>
-        //    this.origin.Value.With(input);
-
-        public IXemo Create<TNew>(TNew input) =>
+        public ICocoon Create<TNew>(TNew input) =>
             this.origin.Value.Create(input);
 
-        public IXemoCluster Without(params IXemo[] gone) =>
-            this.origin.Value.Without(gone);
+        public ICluster Removed(params ICocoon[] gone) =>
+            this.origin.Value.Removed(gone);
 
         IEnumerator IEnumerable.GetEnumerator() =>
             this.origin.Value.GetEnumerator();

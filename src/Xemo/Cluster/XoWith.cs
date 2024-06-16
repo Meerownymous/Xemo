@@ -8,7 +8,7 @@
         /// <summary>
         /// Cluster with the given contents created inside.
         /// </summary>
-        public XoWith(IXemoCluster origin, params object[] with) : base(
+        public XoWith(ICluster origin, params object[] with) : base(
             new LazyCluster(() =>
             {
                 foreach (var content in with)
@@ -27,7 +27,7 @@
         /// <summary>
         /// Cluster with the given contents created inside.
         /// </summary>
-        public XoWith(IXemoCluster origin, params TContent[] with) : base(
+        public XoWith(ICluster origin, params TContent[] with) : base(
             new LazyCluster(() =>
             {
                 foreach (var content in with)

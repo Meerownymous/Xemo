@@ -8,7 +8,7 @@ namespace Xemo
     /// <summary>
     /// Information stored in RAM.
     /// </summary>
-    public sealed class XoRam : IXemo
+    public sealed class XoRam : ICocoon
     {
         private readonly IIDCard passport;
 
@@ -45,10 +45,10 @@ namespace Xemo
 
         public IIDCard Card() => this.passport;
 
-        public IXemo Mutate<TSlice>(TSlice mutation) =>
+        public ICocoon Mutate<TSlice>(TSlice mutation) =>
             throw new InvalidOperationException("Define a schema first.");
 
-        public IXemo Schema<TSchema>(TSchema schema) =>
+        public ICocoon Schema<TSchema>(TSchema schema) =>
             new XoRam<TSchema>(this.passport, new ConcurrentDictionary<string, TSchema>(), schema);
 
         public static XoRam<TSchema> Make<TSchema>(
@@ -60,7 +60,7 @@ namespace Xemo
     /// <summary>
     /// Information stored in RAM.
     /// </summary>
-    public sealed class XoRam<TContent> : IXemo
+    public sealed class XoRam<TContent> : ICocoon
     {
         private readonly IIDCard passport;
 
@@ -153,14 +153,14 @@ namespace Xemo
             return DeepMerge.Schema(wanted, this.mem).Post(current);
         }
 
-        public IXemo Schema<TSchema>(TSchema schema)
+        public ICocoon Schema<TSchema>(TSchema schema)
         {
             //if (this.HasSchema())
             throw new InvalidOperationException("Schema has already been defined.");
             //return new XoRam<TSchema>(this.id.Value, this.storage, schema);
         }
 
-        public IXemo Mutate<TSlice>(TSlice mutation)
+        public ICocoon Mutate<TSlice>(TSlice mutation)
         {
             if (!this.HasSchema())
                 throw new InvalidOperationException("Define a schema prior to mutation.");

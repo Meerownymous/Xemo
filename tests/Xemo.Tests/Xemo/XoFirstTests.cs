@@ -16,7 +16,7 @@ namespace XemoTests.Xemo
                 "Meerow",
                 new XoFirst(
                     new XoWith(
-                        XoRamCluster.Allocate("Personalities", schema),
+                        XoRamCluster.Flex("Personalities", schema),
                         new { ID = "Meerow" },
                         new { ID = "Dobertus Meow" }
                     )
@@ -30,11 +30,11 @@ namespace XemoTests.Xemo
             var schema = new { ID = "" };
 
             Assert.Equal(
-                "Meerow",
-                XoFirst.From(
+                "Dobertus Meow",
+                XoFirst.Content(
                     schema,
                     new XoWith(
-                        XoRamCluster.Allocate("Personalities", schema),
+                        XoRamCluster.Flex("Personalities", schema),
                         new { ID = "Meerow" },
                         new { ID = "Dobertus Meow" }
                     )

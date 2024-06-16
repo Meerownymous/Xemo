@@ -9,7 +9,7 @@
 	/// The same way you can mutate this by using
 	/// <see cref="Mutate{TSlice}(TSlice)"/>.
 	/// </summary>
-	public interface IXemo
+	public interface ICocoon
 	{
 		/// <summary>
 		/// ID Card which uniquely identifies this Xemo.
@@ -20,20 +20,20 @@
 
 		/// <summary>
 		/// Fill properties of the given slice with data available inside this
-		/// <see cref="IXemo"/>.
+		/// <see cref="ICocoon"/>.
 		/// </summary>
 		TSlice Fill<TSlice>(TSlice wanted);
 
 		/// <summary>
-		/// Set the schema for this <see cref="IXemo"/>. Properties of this schema
+		/// Set the schema for this <see cref="ICocoon"/>. Properties of this schema
 		/// define the properties that can be obtained via
 		/// <see cref="Fill{TSlice}(TSlice)"/> or modified via <see cref="Mutate{TSlice}(TSlice)"/>
 		/// </summary>
-        IXemo Schema<TSchema>(TSchema schema);
+        ICocoon Schema<TSchema>(TSchema schema);
 
 		/// <summary>
 		/// Mutate contents by property values of the given slice.
 		/// </summary>
-		IXemo Mutate<TPatch>(TPatch mutation);
+		ICocoon Mutate<TPatch>(TPatch mutation);
 	}
 }

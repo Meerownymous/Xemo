@@ -4,7 +4,7 @@ namespace Xemo.Xemo
     /// <summary>
     /// Dead xemo.
     /// </summary>
-    public sealed class XoDead : IXemo
+    public sealed class XoDead : ICocoon
     {
         private readonly Func<string, InvalidOperationException> death;
 
@@ -20,9 +20,9 @@ namespace Xemo.Xemo
 
         public TSlice Fill<TSlice>(TSlice wanted) => throw this.death("fill from");
 
-        public IXemo Mutate<TSlice>(TSlice mutation) => throw this.death("mutate");
+        public ICocoon Mutate<TSlice>(TSlice mutation) => throw this.death("mutate");
 
-        public IXemo Schema<TSchema>(TSchema schema) => throw this.death("set schema for");
+        public ICocoon Schema<TSchema>(TSchema schema) => throw this.death("set schema for");
     }
 }
 

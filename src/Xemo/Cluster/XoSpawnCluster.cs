@@ -8,28 +8,28 @@ namespace Xemo.Cluster
     /// spawn guard. That guard ensures that the minimum data for a xemo is
     /// declared when creating an object.
     /// </summary>
-    public sealed class XoSpawnCluster<TSchema> : IXemoCluster
+    public sealed class XoSpawnCluster<TSchema> : ICluster
     {
         private readonly TSchema schema;
-        private readonly IXemo spawnGuard;
-        private readonly IXemoCluster origin;
+        private readonly ICocoon spawnGuard;
+        private readonly ICluster origin;
 
         /// <summary>
         /// A cluster that spawns new objects through the given
         /// spawn guard. That guard ensures that the minimum data for a xemo is
         /// declared when creating an object.
         /// </summary>
-        public XoSpawnCluster(TSchema schema, IXemo spawnGuard, IXemoCluster origin)
+        public XoSpawnCluster(TSchema schema, ICocoon spawnGuard, ICluster origin)
         {
             this.schema = schema;
             this.spawnGuard = spawnGuard;
             this.origin = origin;
         }
 
-        public IXemo Xemo(string id) =>
+        public ICocoon Xemo(string id) =>
             this.origin.Xemo(id);
 
-        public IXemo Create<TNew>(TNew plan) =>
+        public ICocoon Create<TNew>(TNew plan) =>
             this.origin
                 .Create(
                     this.spawnGuard.Fill(
@@ -38,18 +38,13 @@ namespace Xemo.Cluster
                     )
                 );
 
-        public IEnumerator<IXemo> GetEnumerator() =>
+        public IEnumerator<ICocoon> GetEnumerator() =>
             this.origin.GetEnumerator();
 
-        public IXemoCluster Reduced<TQuery>(TQuery blueprint, Func<TQuery, bool> matches) =>
-            new XoSpawnCluster<TSchema>(
-                this.schema,
-                this.spawnGuard,
-                this.origin.Reduced(blueprint, matches)
-            );
+        public IProbe Probe() => this.origin.Probe();
 
-        public IXemoCluster Without(params IXemo[] gone) =>
-            this.origin.Without(gone);
+        public ICluster Removed(params ICocoon[] gone) =>
+            this.origin.Removed(gone);
 
         IEnumerator IEnumerable.GetEnumerator() =>
             this.origin.GetEnumerator();
@@ -67,7 +62,7 @@ namespace Xemo.Cluster
         /// spawn guard. That guard ensures that the minimum data for a xemo is
         /// declared when creating an object.
         /// </summary>
-        public static XoSpawnCluster<TSchema> _<TSchema>(TSchema schema, IXemo spawnGuard, IXemoCluster origin) =>
+        public static XoSpawnCluster<TSchema> _<TSchema>(TSchema schema, ICocoon spawnGuard, ICluster origin) =>
             new XoSpawnCluster<TSchema>(schema, spawnGuard, origin);
     }
 }

@@ -3,9 +3,9 @@
     /// <summary>
     /// Information that ensures it is being filled with all necessary data.
     /// </summary>
-    public sealed class XoValidate<TCandidate> : IXemo
+    public sealed class XoValidate<TCandidate> : ICocoon
     {
-        private readonly IXemo inner;
+        private readonly ICocoon inner;
         /// <summary>
         /// Information that ensures it is being filled with all necessary data.
         /// </summary>
@@ -21,12 +21,12 @@
             return this.inner.Fill(wanted);
         }
 
-        public IXemo Mutate<TSlice>(TSlice mutation)
+        public ICocoon Mutate<TSlice>(TSlice mutation)
         {
             throw new InvalidOperationException("Spawning cannot be modified.");
         }
 
-        public IXemo Schema<TMask>(TMask mask) =>
+        public ICocoon Schema<TMask>(TMask mask) =>
             this.inner.Schema(mask);
     }
 

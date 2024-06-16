@@ -3,21 +3,25 @@ using System.Collections.Concurrent;
 using Xemo.Cluster;
 using Xemo.IDCard;
 using Xemo.Bench;
-using Xemo.Tonga;
-using System.Diagnostics;
+using Xemo.Cluster.Probe;
 
 namespace Xemo
 {
     public sealed class XoRamCluster
     {
-        public static XoRamCluster<TSchema> Allocate<TSchema>(string subject, TSchema schema) =>
-            new XoRamCluster<TSchema>(new DeadMem("This cluster is isolated."), subject, new ConcurrentDictionary<string, TSchema>(), schema);
+        public static XoRamCluster<TSchema> Flex<TSchema>(string subject, TSchema schema) =>
+            new XoRamCluster<TSchema>(
+                new DeadMem("This cluster is isolated."),
+                subject,
+                new ConcurrentDictionary<string, TSchema>(),
+                schema
+            );
 
         public static XoRamCluster<TSchema> Allocate<TSchema>(IMem home, string subject, TSchema schema) =>
-            new XoRamCluster<TSchema>(home, subject, new ConcurrentDictionary<string,TSchema>(), schema);
+            new XoRamCluster<TSchema>(home, subject, new ConcurrentDictionary<string, TSchema>(), schema);
     }
 
-    public sealed class XoRamCluster<TContent> : IXemoCluster
+    public sealed class XoRamCluster<TContent> : ICluster
     {
         private readonly IMem mem;
         private readonly string subject;
@@ -50,7 +54,7 @@ namespace Xemo
             this.schema = schema;
         }
 
-        public IEnumerator<IXemo> GetEnumerator()
+        public IEnumerator<ICocoon> GetEnumerator()
         {
             foreach (var key in this.index.Value)
                 yield return new XoRam<TContent>(
@@ -61,20 +65,16 @@ namespace Xemo
                 );
         }
 
-        public IXemo Xemo(string id)
+        public ICocoon Xemo(string id)
         {
             if (!this.storage.ContainsKey(id))
                 throw new ArgumentException($"{this.subject} '{id}' does not exist.");
             return new XoRam<TContent>(new AsIDCard(id, this.subject), this.storage, this.mem, this.schema);
         }
 
-        public IXemoCluster Schema<TSchema>(TSchema schema) =>
-            new XoRamCluster<TSchema>(this.mem, this.subject, new ConcurrentDictionary<string, TSchema>(), schema);
+        public IProbe Probe() => new RamProbe<TContent>(this.storage, this.subject, this.schema);
 
-        public IXemoCluster Reduced<TQuery>(TQuery blueprint, Func<TQuery, bool> matches) =>
-            new XoFiltered<TQuery>(this, blueprint, matches);
-
-        public IXemoCluster Without(params IXemo[] gone)
+        public ICluster Removed(params ICocoon[] gone)
         {
             foreach (var xemo in gone)
             {
@@ -87,13 +87,13 @@ namespace Xemo
             return this;
         }
 
-        public IXemoCluster With<TNew>(TNew input)
+        public ICluster With<TNew>(TNew input)
         {
             this.Create(input);
             return this;
         }
 
-        public IXemo Create<TNew>(TNew input)
+        public ICocoon Create<TNew>(TNew input)
         {
             var id = new PropertyValue("ID", input, fallBack: () => Guid.NewGuid()).AsString();
             this.storage.AddOrUpdate(

@@ -3,14 +3,14 @@
     /// <summary>
     /// Envelope for Information.
     /// </summary>
-    public abstract class XoEnvelope : IXemo
+    public abstract class XoEnvelope : ICocoon
 	{
-        private readonly IXemo core;
+        private readonly ICocoon core;
 
         /// <summary>
         /// Envelope for Information.
         /// </summary>
-        public XoEnvelope(Func<IXemo> core) : this(
+        public XoEnvelope(Func<ICocoon> core) : this(
             new XoLazy(core)
         )
         { }
@@ -18,7 +18,7 @@
         /// <summary>
         /// Envelope for Information.
         /// </summary>
-        public XoEnvelope(IXemo core)
+        public XoEnvelope(ICocoon core)
 		{
             this.core = core;
         }
@@ -29,10 +29,10 @@
         public TSlice Fill<TSlice>(TSlice wanted) =>
             this.core.Fill(wanted);
 
-        public IXemo Mutate<TSlice>(TSlice mutation) =>
+        public ICocoon Mutate<TSlice>(TSlice mutation) =>
             this.core.Mutate(mutation);
 
-        public IXemo Schema<TMask>(TMask mask) =>
+        public ICocoon Schema<TMask>(TMask mask) =>
             this.core.Schema(mask);
     }
 }

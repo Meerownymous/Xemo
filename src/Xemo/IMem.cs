@@ -8,12 +8,12 @@
         /// <summary>
         /// State of a single item of a specific type.
         /// </summary>
-        IXemo Xemo(string subject, string id);
+        ICocoon Xemo(string subject, string id);
 
         /// <summary>
         /// Cluster for a given subject.
         /// </summary>
-        IXemoCluster Cluster(string subject);
+        ICluster Cluster(string subject);
 
         /// <summary>
         /// Allocates space for the given subject and schema.

@@ -4,16 +4,16 @@ namespace Xemo.Information
     /// <summary>
     /// Information whic is created on first request.
     /// </summary>
-    public sealed class XoLazy : IXemo
+    public sealed class XoLazy : ICocoon
     {
-        private readonly Lazy<IXemo> core;
+        private readonly Lazy<ICocoon> core;
 
         /// <summary>
         /// Information which is created on first request.
         /// </summary>
-        public XoLazy(Func<IXemo> origin)
+        public XoLazy(Func<ICocoon> origin)
         {
-            this.core = new Lazy<IXemo>(origin);
+            this.core = new Lazy<ICocoon>(origin);
         }
 
         public IIDCard Card() => this.core.Value.Card();
@@ -21,10 +21,10 @@ namespace Xemo.Information
         public TSlice Fill<TSlice>(TSlice wanted) =>
             this.core.Value.Fill(wanted);
 
-        public IXemo Mutate<TSlice>(TSlice mutation) =>
+        public ICocoon Mutate<TSlice>(TSlice mutation) =>
             this.core.Value.Mutate(mutation);
 
-        public IXemo Schema<TMask>(TMask mask) =>
+        public ICocoon Schema<TMask>(TMask mask) =>
             this.core.Value.Schema(mask);
     }
 }

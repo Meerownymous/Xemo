@@ -12,14 +12,14 @@ namespace Xemo.Xemo
         /// It is assumed that a schema for this kind of object has already been created in the memory.
         /// If not, use <see cref="AllocatedXemo{TContent}(TContent, string, IMem)" to allocate it in one go. />
         /// </summary>
-        public static IXemo AsXemo<TContent>(this TContent content, string kind, IMem mem) =>
+        public static ICocoon AsXemo<TContent>(this TContent content, string kind, IMem mem) =>
             mem.Cluster(kind).Create(content);
 
         /// <summary>
         /// A given object will be stored in the given memory.
         /// Note that only properties are stored, while functions are omited.
         /// </summary>
-        public static IXemo AllocatedXemo<TContent>(
+        public static ICocoon AllocatedXemo<TContent>(
             this TContent schemaAndContent, string kind, IMem mem
         ) =>
             mem.Allocate(kind, schemaAndContent)
@@ -29,7 +29,7 @@ namespace Xemo.Xemo
         /// <summary>
         /// A cluster which is allocated using the given object as schema.
         /// </summary>
-        public static IXemoCluster Allocated<TSchema>(
+        public static ICluster Allocated<TSchema>(
             this TSchema schema, string kind, IMem mem
         ) =>
             mem.Allocate(kind, schema)

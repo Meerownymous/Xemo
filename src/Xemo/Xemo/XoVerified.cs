@@ -8,7 +8,7 @@ namespace Xemo
     /// <summary>
     /// Information that ensures it is being filled with all necessary data.
     /// </summary>
-    public sealed class XoVerified<TInvestigate> : IXemo
+    public sealed class XoVerified<TInvestigate> : ICocoon
     {
         private readonly TInvestigate candidate;
         private readonly Func<TInvestigate, (bool, string)>[] validations;
@@ -43,12 +43,12 @@ namespace Xemo
             return wanted;
         }
 
-        public IXemo Mutate<TSlice>(TSlice mutation)
+        public ICocoon Mutate<TSlice>(TSlice mutation)
         {
             throw new InvalidOperationException("Verifying xemo cannot be modified.");
         }
 
-        public IXemo Schema<TSlice>(TSlice mutation)
+        public ICocoon Schema<TSlice>(TSlice mutation)
         {
             throw new InvalidOperationException("Verifying xemo does not accept a schema.");
         }
