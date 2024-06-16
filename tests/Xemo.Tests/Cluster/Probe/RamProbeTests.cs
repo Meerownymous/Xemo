@@ -1,12 +1,10 @@
-﻿using System;
-using Tonga.Scalar;
-using Xemo.Cluster.Probe;
+﻿using Xemo.Cluster.Probe;
 using Xemo.Cocoon;
 using Xunit;
 
 namespace Xemo.Tests.Cluster.Probe
 {
-    public sealed class RamProbeTests
+    public sealed class RamSamplesTests
     {
         [Fact]
         public void AnalysesItemsInMemory()
