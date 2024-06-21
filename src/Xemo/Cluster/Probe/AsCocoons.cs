@@ -1,19 +1,20 @@
-﻿using Tonga.Enumerable;
+﻿using System;
+using Tonga.Enumerable;
 
 namespace Xemo.Cluster.Probe
 {
     /// <summary>
-    /// Enumerable of samples as their contents.
+    /// Enumerable of samples as their cocoons.
     /// </summary>
-    public sealed class AsContents<TSample> : EnumerableEnvelope<TSample>
+    public sealed class AsCocoons<TSample> : EnumerableEnvelope<ICocoon>
     {
         /// <summary>
         /// Enumerable of samples as their cocoons.
         /// </summary>
-        public AsContents(IEnumerable<ISample<TSample>> samples) : base(
+        public AsCocoons(IEnumerable<ISample<TSample>> samples) : base(
             AsEnumerable._(() =>
                 Mapped._(
-                    sample => sample.Content(),
+                    sample => sample.Cocoon(),
                     samples
                 )
             )
@@ -24,13 +25,14 @@ namespace Xemo.Cluster.Probe
     /// <summary>
     /// Enumerable of samples as their cocoons.
     /// </summary>
-    public static class AsContents
+    public static class AsCocoons
     {
         /// <summary>
         /// Enumerable of samples as their cocoons.
         /// </summary>
-        public static AsContents<TSample> _<TSample>(IEnumerable<ISample<TSample>> samples) =>
-            new AsContents<TSample>(samples);
+        public static AsCocoons<TSample> _<TSample>(IEnumerable<ISample<TSample>> samples) =>
+            new AsCocoons<TSample>(samples);
+
     }
 }
 
