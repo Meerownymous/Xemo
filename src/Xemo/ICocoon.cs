@@ -3,7 +3,7 @@
 	/// <summary>
 	/// A piece of data which is based on a schema.
 	/// Pass any slice of data - either with settable properties or an
-	/// anonymous object - to <see cref="Fill{TSlice}(TSlice)"/> and it
+	/// anonymous object - to <see cref="Sample{TSlice}(TSlice)"/> and it
 	/// will be filled with available data.
 	///
 	/// The same way you can mutate this by using
@@ -22,12 +22,12 @@
 		/// Fill properties of the given slice with data available inside this
 		/// <see cref="ICocoon"/>.
 		/// </summary>
-		TSlice Fill<TSlice>(TSlice wanted);
+		TSample Sample<TSample>(TSample wanted);
 
 		/// <summary>
 		/// Set the schema for this <see cref="ICocoon"/>. Properties of this schema
 		/// define the properties that can be obtained via
-		/// <see cref="Fill{TSlice}(TSlice)"/> or modified via <see cref="Mutate{TSlice}(TSlice)"/>
+		/// <see cref="Sample{TSlice}(TSlice)"/> or modified via <see cref="Mutate{TSlice}(TSlice)"/>
 		/// </summary>
         ICocoon Schema<TSchema>(TSchema schema);
 

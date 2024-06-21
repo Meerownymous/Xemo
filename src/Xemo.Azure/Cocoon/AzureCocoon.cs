@@ -22,7 +22,7 @@ namespace Xemo.Azure.Cocoon
                 this.azureEntity.RowKey
             );
 
-        public TSlice Fill<TSlice>(TSlice wanted)
+        public TSlice Sample<TSlice>(TSlice wanted)
         {
             throw new NotImplementedException();
         }

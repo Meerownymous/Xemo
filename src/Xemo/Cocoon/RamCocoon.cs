@@ -40,7 +40,7 @@ namespace Xemo.Cocoon
             this.passport = id;
         }
 
-        public TSlice Fill<TSlice>(TSlice wanted) =>
+        public TSlice Sample<TSlice>(TSlice wanted) =>
             throw new InvalidOperationException("Define a schema first.");
 
         public IGrip Grip() => this.passport;
@@ -145,7 +145,7 @@ namespace Xemo.Cocoon
 
         public IGrip Grip() => this.passport;
 
-        public TSlice Fill<TSlice>(TSlice wanted)
+        public TSlice Sample<TSlice>(TSlice wanted)
         {
             if (!this.HasSchema())
                 throw new InvalidOperationException("Define a schema prior to filling.");

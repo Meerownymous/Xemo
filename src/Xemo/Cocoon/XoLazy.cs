@@ -18,8 +18,8 @@ namespace Xemo.Cocoon
 
         public IGrip Grip() => this.core.Value.Grip();
 
-        public TSlice Fill<TSlice>(TSlice wanted) =>
-            this.core.Value.Fill(wanted);
+        public TSlice Sample<TSlice>(TSlice wanted) =>
+            this.core.Value.Sample(wanted);
 
         public ICocoon Mutate<TSlice>(TSlice mutation) =>
             this.core.Value.Mutate(mutation);

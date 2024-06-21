@@ -18,7 +18,7 @@ namespace Xemo.Cocoon
 
         public IGrip Grip() => throw this.death("deliver ID card from");
 
-        public TSlice Fill<TSlice>(TSlice wanted) => throw this.death("fill from");
+        public TSlice Sample<TSlice>(TSlice wanted) => throw this.death("fill from");
 
         public ICocoon Mutate<TSlice>(TSlice mutation) => throw this.death("mutate");
 

@@ -49,7 +49,7 @@ namespace Xemo.Examples.Todo
                 new XoFirst(
                     new DoneTodos(cluster)
                 )
-                .Fill(
+                .Sample(
                     new { Subject = "", Due = DateTime.MinValue }
                 ).Subject
             );

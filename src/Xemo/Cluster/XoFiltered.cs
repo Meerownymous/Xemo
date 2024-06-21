@@ -25,7 +25,7 @@ namespace Xemo.Cluster
         public ICocoon Xemo(string id)
         {
             var xemo = this.origin.Xemo(id);
-            if (!this.match(xemo.Fill(filterSlice)))
+            if (!this.match(xemo.Sample(filterSlice)))
                 throw new ArgumentException($"'{id}' does not match the filter critera.");
             return xemo;
         }

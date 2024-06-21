@@ -60,7 +60,7 @@ namespace Xemo.Cocoon.Tests
                         }
                     )
                     .Mutate(new { FirstName = "Ramirez" })
-                    .Fill(schema)
+                    .Sample(schema)
                     .FirstName
             );
         }
@@ -87,7 +87,7 @@ namespace Xemo.Cocoon.Tests
                             Skills = new[] { "Dive", "Sail" }
                         }
                     )
-                    .Fill(new
+                    .Sample(new
                     {
                         Skills = new string[0]
                     })
@@ -117,7 +117,7 @@ namespace Xemo.Cocoon.Tests
                             Skills = new[] { new { SkillName = "Dive" } }
                         }
                     )
-                    .Fill(new
+                    .Sample(new
                     {
                         Skills = new[] { new { SkillName = "" } }
                     })
@@ -141,7 +141,7 @@ namespace Xemo.Cocoon.Tests
 
             Assert.Equal(
                 "Donald",
-                daisy.Fill(
+                daisy.Sample(
                     new
                     {
                         Friend = new { Name = "" }
@@ -182,7 +182,7 @@ namespace Xemo.Cocoon.Tests
                             Friend = gustav
                         }
                     )
-                    .Fill(
+                    .Sample(
                         new
                         {
                             Friend = new { Name = "" }
@@ -227,7 +227,7 @@ namespace Xemo.Cocoon.Tests
 
             Assert.Equal(
                 "Saveman",
-                info.Fill(new { LastName = "" }).LastName
+                info.Sample(new { LastName = "" }).LastName
             );
         }
 
@@ -246,7 +246,7 @@ namespace Xemo.Cocoon.Tests
 
             Assert.Equal(
                 "Ramirez",
-                info.Fill(new { FirstName = "" }).FirstName
+                info.Sample(new { FirstName = "" }).FirstName
             );
         }
 
@@ -266,7 +266,7 @@ namespace Xemo.Cocoon.Tests
 
             Assert.Equal(
                 "Saveman",
-                info.Fill(new { LastName = "" }).LastName
+                info.Sample(new { LastName = "" }).LastName
             );
         }
 

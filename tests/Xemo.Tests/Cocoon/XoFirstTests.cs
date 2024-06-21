@@ -18,7 +18,7 @@ namespace Xemo.Cocoon.Tests
                         new { ID = "Meerow" },
                         new { ID = "Dobertus Meow" }
                     )
-                ).Fill(schema).ID
+                ).Sample(schema).ID
             );
         }
 

@@ -32,7 +32,7 @@ namespace Xemo.Cluster
         public ICocoon Create<TNew>(TNew plan) =>
             this.origin
                 .Create(
-                    this.spawnGuard.Fill(
+                    this.spawnGuard.Sample(
                         Merge.Target(this.schema)
                             .Post(plan)
                     )

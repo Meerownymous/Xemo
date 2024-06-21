@@ -16,9 +16,9 @@
 
         public IGrip Grip() => this.inner.Grip();
 
-        public TSlice Fill<TSlice>(TSlice wanted)
+        public TSlice Sample<TSlice>(TSlice wanted)
         {
-            return this.inner.Fill(wanted);
+            return this.inner.Sample(wanted);
         }
 
         public ICocoon Mutate<TSlice>(TSlice mutation)

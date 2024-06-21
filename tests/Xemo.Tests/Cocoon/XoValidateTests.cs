@@ -11,7 +11,7 @@ namespace Xemo.Cocoon.Tests
                 "Important",
                 XoValidate.That(
                     new { Name = "", Success = false }
-                ).Fill(
+                ).Sample(
                     new { Name = "Succeed please", Success = true, SomeThingElse = "Important" }
                 ).SomeThingElse
             );
@@ -23,7 +23,7 @@ namespace Xemo.Cocoon.Tests
             Assert.True(
                 XoValidate.That(
                     new { Name = "", Success = false }
-                ).Fill(
+                ).Sample(
                     new { Name = "Succeed please", Success = true }
                 ).Success
             );

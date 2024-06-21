@@ -23,11 +23,11 @@ namespace Xemo.Cocoon
 
         public IGrip Grip() => this.inner.Grip();
 
-        public TSlice Fill<TSlice>(TSlice wanted)
+        public TSlice Sample<TSlice>(TSlice wanted)
         {
             return
                 Merge.Target(
-                    this.inner.Fill(wanted)
+                    this.inner.Sample(wanted)
                 ).Post(this.overrides());
         }
 

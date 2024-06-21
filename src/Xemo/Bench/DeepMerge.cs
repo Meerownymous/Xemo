@@ -26,7 +26,7 @@
                     this.target,
                     solve1to1: (left, rightID) =>
                     {
-                        var result = mem.Xemo(rightID.Kind(), rightID.ID()).Fill(left);
+                        var result = mem.Xemo(rightID.Kind(), rightID.ID()).Sample(left);
                         return result;
                     },
                     solve1toMany:(left, rightIDs) =>
@@ -36,7 +36,7 @@
                         for(int index = 0;index<targetArray.Length;index++)
                         {
                             targetArray.SetValue(
-                                mem.Xemo(rightIDs[index].Kind(), rightIDs[index].ID()).Fill(itemSchema),
+                                mem.Xemo(rightIDs[index].Kind(), rightIDs[index].ID()).Sample(itemSchema),
                                 index
                             );
                         }

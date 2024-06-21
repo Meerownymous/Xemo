@@ -19,7 +19,7 @@ namespace Xemo.Cocoon.Tests
                             new { Title = "Back to the future" }
                         )
                     )
-                    .Fill(schema)
+                    .Sample(schema)
                     .Watched
             );
         }

@@ -30,7 +30,7 @@ namespace Xemo.Cocoon
                 "This is a verify object, it does not have an ID."
             );
 
-        public TSlice Fill<TSlice>(TSlice wanted)
+        public TSlice Sample<TSlice>(TSlice wanted)
         {
             foreach (var isValid in this.validations)
             {

@@ -26,8 +26,8 @@
         public IGrip Grip() =>
             this.core.Grip();
 
-        public TSlice Fill<TSlice>(TSlice wanted) =>
-            this.core.Fill(wanted);
+        public TSlice Sample<TSlice>(TSlice wanted) =>
+            this.core.Sample(wanted);
 
         public ICocoon Mutate<TSlice>(TSlice mutation) =>
             this.core.Mutate(mutation);

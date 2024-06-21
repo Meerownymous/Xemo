@@ -26,7 +26,7 @@ namespace Xemo.Cluster.Tests
                     )
                 )
                 .Value()
-                .Fill(new { Name = ""})
+                .Sample(new { Name = ""})
                 .Name
             );
         }

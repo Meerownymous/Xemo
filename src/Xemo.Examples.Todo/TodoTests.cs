@@ -22,7 +22,7 @@ namespace Xemo.Examples.Todo
             Assert.Equal(
 				"Succeed in Unittest",
 				new Todo("Succeed in Unittest", mem)
-					.Fill(new { Subject = "" })
+					.Sample(new { Subject = "" })
 					.Subject
 			);
 		}
@@ -45,7 +45,7 @@ namespace Xemo.Examples.Todo
             var todo = new Todo("Succeed in Unittest", mem);
 			todo.Mutate(new { Done = true });
             Assert.True(
-				todo.Fill(new { Done = false })
+				todo.Sample(new { Done = false })
 					.Done
 			);
         }

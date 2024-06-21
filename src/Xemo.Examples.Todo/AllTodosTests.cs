@@ -15,7 +15,7 @@ namespace Xemo.Examples.Todo
             Assert.Equal(
                 "List me",
                 First._(todos).Value()
-                    .Fill(new { Subject = "" })
+                    .Sample(new { Subject = "" })
                     .Subject
             );
         }
@@ -34,7 +34,7 @@ namespace Xemo.Examples.Todo
             Assert.Equal(
                 "Complete me",
                 First._(todos).Value()
-                    .Fill(new { Subject = "", Due = DateTime.MinValue })
+                    .Sample(new { Subject = "", Due = DateTime.MinValue })
                     .Subject
             );
         }
