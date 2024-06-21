@@ -43,7 +43,7 @@ namespace Xemo.Cocoon
         public TSlice Fill<TSlice>(TSlice wanted) =>
             throw new InvalidOperationException("Define a schema first.");
 
-        public IGrip Card() => this.passport;
+        public IGrip Grip() => this.passport;
 
         public ICocoon Mutate<TSlice>(TSlice mutation) =>
             throw new InvalidOperationException("Define a schema first.");
@@ -143,7 +143,7 @@ namespace Xemo.Cocoon
             this.schema = schema;
         }
 
-        public IGrip Card() => this.passport;
+        public IGrip Grip() => this.passport;
 
         public TSlice Fill<TSlice>(TSlice wanted)
         {

@@ -100,8 +100,8 @@ namespace Xemo.Cluster
             {
                 lock (this.index)
                 {
-                    if (this.storage.TryRemove(xemo.Card().ID(), out _))
-                        this.index.Value.Remove(xemo.Card().ID());
+                    if (this.storage.TryRemove(xemo.Grip().ID(), out _))
+                        this.index.Value.Remove(xemo.Grip().ID());
                 }
             }
             return this;

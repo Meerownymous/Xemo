@@ -43,7 +43,7 @@ namespace Xemo.Cluster.Tests
                 XoRamCluster
                     .Allocate("Person", new { Name = "" })
                     .Create(new { Name = "Dobert" })
-                    .Card()
+                    .Grip()
                     .ID()
             );
         }
@@ -56,7 +56,7 @@ namespace Xemo.Cluster.Tests
                 XoRamCluster
                     .Allocate("Person", new { ID = 0, Name = ""})
                     .Create(new { ID = "1", Name = "Dobert" })
-                .Card().ID()
+                .Grip().ID()
             );
         }
 

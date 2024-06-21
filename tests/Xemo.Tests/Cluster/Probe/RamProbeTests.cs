@@ -33,7 +33,7 @@ namespace Xemo.Tests.Cluster.Probe
                     RamSamples._(mem, "sailboat", originSchema, new { Rigging = "" })
                         .Filtered(boat => boat.Rigging == "Cutter")
                 )
-                .Card()
+                .Grip()
                 .ID()
             );
         }

@@ -72,7 +72,7 @@ namespace Xemo.Bench.Tests
                     );
 
             Assert.Equal(
-                pumba.Card().ID(),
+                pumba.Grip().ID(),
                 Birth
                     .Schema(schema, mem)
                     .Post(
@@ -108,7 +108,7 @@ namespace Xemo.Bench.Tests
                     );
 
             Assert.Equal(
-                pumba.Card().ID(),
+                pumba.Grip().ID(),
                 Birth
                     .Schema(schema, mem)
                     .Post(
@@ -116,7 +116,7 @@ namespace Xemo.Bench.Tests
                         {
                             ID = "1",
                             Name = "Timon",
-                            BestFriend = new AsGrip(pumba.Card().ID(), "User")
+                            BestFriend = new AsGrip(pumba.Grip().ID(), "User")
                         }
                     ).BestFriend.ID()
             );
@@ -179,14 +179,14 @@ namespace Xemo.Bench.Tests
                     );
 
             Assert.Equal(
-                tick.Card().ID(),
+                tick.Grip().ID(),
                 Birth
                     .Schema(schema, mem)
                     .Post(
                         new
                         {
                             Name = "Track",
-                            BestFriends = new[] { tick.Card(), trick.Card() }
+                            BestFriends = new[] { tick.Grip(), trick.Grip() }
                         }
                     ).BestFriends[0].ID()
             );
@@ -223,7 +223,7 @@ namespace Xemo.Bench.Tests
                     );
 
             Assert.Equal(
-                tick.Card().ID(),
+                tick.Grip().ID(),
                 Birth
                     .Schema(schema, mem)
                     .Post(

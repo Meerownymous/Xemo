@@ -35,7 +35,6 @@ namespace Xemo.Bench
     /// </summary>
     public sealed class Merge<TResult> : IBench<TResult>
     {
-        private static readonly TimeSpan elapsed = new TimeSpan(0);
         private readonly TResult target;
         private readonly Func<object, IGrip, object> solve1To1;
         private readonly Func<object, IGrip[], object> solve1ToMany;
@@ -73,18 +72,10 @@ namespace Xemo.Bench
         public TResult Post<TSource>(TSource patch)
         {
             TResult result = default(TResult);
-            Merge<TResult>.elapsed.Add(
-                new Measured(() =>
-                {
-                    if (this.target.GetType().IsArray)
-                    {
-                        result = (TResult)MergedArray(this.target.GetType(), this.target, patch);
-                    }
-                    else
-                    {
-                        result = (TResult)MergedObject(this.target.GetType(), this.target, patch);
-                    }
-                }).Value());
+            if (this.target.GetType().IsArray)
+                result = (TResult)MergedArray(this.target.GetType(), this.target, patch);
+            else
+                result = (TResult)MergedObject(this.target.GetType(), this.target, patch);
             return result;
         }
 
@@ -174,7 +165,7 @@ namespace Xemo.Bench
                                         targetProp.GetValue(target),
                                         incoming.GetType().GetElementType().IsAssignableTo(typeof(ICocoon)) ?
                                         Mapped._(
-                                            item => item.Card(),
+                                            item => item.Grip(),
                                             incoming as ICocoon[]
                                         ).ToArray() :
                                         (incoming as IGrip[])
@@ -186,7 +177,7 @@ namespace Xemo.Bench
                                     this.solve1To1(
                                         targetProp.GetValue(target),
                                         incoming.GetType().IsAssignableTo(typeof(ICocoon)) ?
-                                        (incoming as ICocoon).Card() :
+                                        (incoming as ICocoon).Grip() :
                                         (incoming as IGrip)
                                     );
                             }

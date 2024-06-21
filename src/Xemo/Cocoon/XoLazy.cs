@@ -16,7 +16,7 @@ namespace Xemo.Cocoon
             this.core = new Lazy<ICocoon>(origin);
         }
 
-        public IGrip Card() => this.core.Value.Card();
+        public IGrip Grip() => this.core.Value.Grip();
 
         public TSlice Fill<TSlice>(TSlice wanted) =>
             this.core.Value.Fill(wanted);
@@ -28,4 +28,3 @@ namespace Xemo.Cocoon
             this.core.Value.Schema(mask);
     }
 }
-

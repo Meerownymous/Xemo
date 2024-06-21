@@ -98,7 +98,7 @@ namespace Xemo.Bench.Tests
                 )
                 .Post(patch);
 
-            Assert.Equal(patch.Author.Card(), result);
+            Assert.Equal(patch.Author.Grip(), result);
         }
 
         [Fact]

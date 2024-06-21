@@ -18,7 +18,7 @@ namespace Xemo.Cocoon.Tests
                     ID = "1",
                     FirstName = "Ramirez",
                     LastName = "Memorius"
-                }.AllocatedXemo("User", new Ram()).Card().ID()
+                }.AllocatedXemo("User", new Ram()).Grip().ID()
             );
         }
 
@@ -32,7 +32,7 @@ namespace Xemo.Cocoon.Tests
                         FirstName = "Ramirez",
                         LastName = "Memorius"
                     }.AllocatedXemo("User", new Ram())
-                    .Card()
+                    .Grip()
                     .ID(),
                     out _
                 )

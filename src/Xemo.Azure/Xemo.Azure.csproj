@@ -12,4 +12,12 @@
   <ItemGroup>
     <ProjectReference Include="..\Xemo\Xemo.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="Cocoon\" />
+    <None Remove="Bench\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Cocoon\" />
+    <Folder Include="Bench\" />
+  </ItemGroup>
 </Project>

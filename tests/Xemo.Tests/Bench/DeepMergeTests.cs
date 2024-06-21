@@ -82,7 +82,7 @@ namespace Xemo.Bench.Tests
                     {
                         FirstName = "Bob",
                         LastName = "Perry",
-                        Friend = stanley.Card()
+                        Friend = stanley.Grip()
                     }
                 ).Friend.FirstName
             );
@@ -120,7 +120,7 @@ namespace Xemo.Bench.Tests
                     {
                         FirstName = "Bob",
                         LastName = "Perry",
-                        Friends = new[] { stanley.Card(), sylvia.Card() }
+                        Friends = new[] { stanley.Grip(), sylvia.Grip() }
                     }
                 ).Friends[0].FirstName
             );

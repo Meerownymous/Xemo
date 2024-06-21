@@ -14,7 +14,7 @@
             this.inner = XoVerified._(candidate, valid);
         }
 
-        public IGrip Card() => this.inner.Card();
+        public IGrip Grip() => this.inner.Grip();
 
         public TSlice Fill<TSlice>(TSlice wanted)
         {

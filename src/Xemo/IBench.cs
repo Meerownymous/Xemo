@@ -1,4 +1,4 @@
-﻿namespace Xemo.Bench
+﻿namespace Xemo
 {
     /// <summary>
     /// A workbench on which data is put together..
@@ -11,4 +11,3 @@
         TTarget Post<TPatch>(TPatch patch);
     }
 }
-

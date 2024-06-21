@@ -23,8 +23,8 @@
             this.core = core;
         }
 
-        public IGrip Card() =>
-            this.core.Card();
+        public IGrip Grip() =>
+            this.core.Grip();
 
         public TSlice Fill<TSlice>(TSlice wanted) =>
             this.core.Fill(wanted);

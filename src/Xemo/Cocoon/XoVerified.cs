@@ -20,7 +20,7 @@ namespace Xemo.Cocoon
             this.validations = valid;
         }
 
-        public IGrip Card() =>
+        public IGrip Grip() =>
             throw new InvalidOperationException(
                 "This is a verify object, it does not have an ID."
             );
