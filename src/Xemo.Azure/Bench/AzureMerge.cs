@@ -16,9 +16,9 @@
 //        public TableEntity Post(TTarget patch)
 //        {
 //            var entity = new TableEntity(this.grip.Kind(), this.grip.ID());
-//            foreach(var prop in patch.GetType().GetProperties())
+//            foreach (var prop in patch.GetType().GetProperties())
 //            {
-//                if(prop.PropertyType.IsArray)
+//                if (prop.PropertyType.IsArray)
 //                {
 
 //                }

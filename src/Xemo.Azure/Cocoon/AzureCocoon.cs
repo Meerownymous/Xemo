@@ -1,6 +1,4 @@
-﻿using System;
-using Azure.Data.Tables;
-using Azure.Data.Tables.Models;
+﻿using Azure.Data.Tables;
 using Xemo.Grip;
 
 namespace Xemo.Azure.Cocoon
