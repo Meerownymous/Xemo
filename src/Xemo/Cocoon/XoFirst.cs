@@ -22,9 +22,7 @@ namespace Xemo.Cocoon
         public XoFirst(
             ICluster cluster
         ) : base(() =>
-            First._(
-                cluster
-            ).Value()
+            First._(cluster).Value()
         )
         { }
 
@@ -49,7 +47,7 @@ namespace Xemo.Cocoon
         /// <summary>
         /// First match for a given slice in a cluster, direct access.
         /// </summary>
-        public static TSlice Sampled<TSlice>(IEnumerable<ISample<TSlice>> samples) =>
+        public static TSlice Sample<TSlice>(IEnumerable<ISample<TSlice>> samples) =>
             First._(samples).Value().Content();
 
         /// <summary>
@@ -79,21 +77,15 @@ namespace Xemo.Cocoon
         /// <summary>
         /// First match for a given slice in a cluster.
         /// </summary>
-        public XoFirst(
-            ICluster cluster
-        ) : base(() =>
-            First._(
-                cluster
-            ).Value()
+        public XoFirst(ICluster cluster) : base(() =>
+            First._(cluster).Value()
         )
         { }
 
         /// <summary>
         /// First match for a given slice in a cluster.
         /// </summary>
-        public XoFirst(
-            IEnumerable<ISample<TSlice>> samples
-        ) : base(() =>
+        public XoFirst(IEnumerable<ISample<TSlice>> samples) : base(() =>
             First._(samples)
                 .Value()
                 .Cocoon()

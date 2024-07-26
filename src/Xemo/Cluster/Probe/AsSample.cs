@@ -1,26 +1,14 @@
-﻿using System;
-namespace Xemo.Cluster
+﻿namespace Xemo.Cluster.Probe
 {
     /// <summary>
     /// Simple sample.
     /// </summary>
-    public sealed class AsSample<TSample> : ISample<TSample>
+    public sealed class AsSample<TSample>(ICocoon cocoon, TSample sample) : ISample<TSample>
     {
-        private readonly ICocoon cocoon;
-        private readonly TSample sample;
+        private readonly TSample sample = sample;
 
-        /// <summary>
-        /// Simple sample.
-        /// </summary>
-        public AsSample(ICocoon cocoon, TSample sample)
-        {
-            this.cocoon = cocoon;
-            this.sample = sample;
-        }
-
-        public TSample Content() => this.sample;
-        public ICocoon Cocoon() => this.cocoon;
-
+        public TSample Content() => sample;
+        public ICocoon Cocoon() => cocoon;
         public static implicit operator TSample(AsSample<TSample> s) => s.sample;
     }
 
@@ -33,7 +21,7 @@ namespace Xemo.Cluster
         /// Simple sample.
         /// </summary>
         public static AsSample<TSample> _<TSample>(ICocoon origin, TSample sample) =>
-            new AsSample<TSample>(origin, sample);
+            new(origin, sample);
     }
 }
 

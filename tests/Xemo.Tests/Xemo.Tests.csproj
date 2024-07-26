@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <NoWarn>CS8604,CS8602</NoWarn>
@@ -23,6 +23,7 @@
 <PrivateAssets>all</PrivateAssets>
 </PackageReference>
     <PackageReference Include="Snapshooter.Xunit" Version="0.14.1" />
+    <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.22.7" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Cluster\" />
@@ -31,6 +32,8 @@
     <None Remove="Tonga\" />
     <None Remove="Tonga\Text\" />
     <None Remove="Cluster\Probe\" />
+    <None Remove="Debug\" />
+    <None Remove="Samples\OnMessageActivity.json" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Cluster\" />
@@ -41,5 +44,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Xemo\Xemo.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Samples\OnMessageActivity.json" />
   </ItemGroup>
 </Project>

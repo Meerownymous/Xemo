@@ -279,9 +279,9 @@ namespace Xemo.Cocoon.Tests
                     FirstName = "Defaultus",
                     LastName = "Memorius"
                 };
-            var storage = ConcurrentDictionary._(schema);
+            var storage = AnonymousTypeDictionary._(schema);
             XoRam
-                .Make(new AsGrip("1", "User"), storage, schema)
+                .Make(new AsGrip("User", "1"), storage, schema)
                 .Mutate(new { FirstName = "Ulf", LastName = "Saveman" });
 
             Assert.Equal(
@@ -299,7 +299,7 @@ namespace Xemo.Cocoon.Tests
         {
             var users = new ConcurrentDictionary<string, object>();
             var xemo =
-                XoRam.Make(new AsGrip("1", "User"), users,
+                XoRam.Make(new AsGrip("User", "1"), users,
                     new
                     {
                         FirstName = "Ramirez",

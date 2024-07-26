@@ -8,7 +8,7 @@
         /// <summary>
         /// State of a single item of a specific type.
         /// </summary>
-        ICocoon Xemo(string subject, string id);
+        ICocoon Cocoon(string subject, string id);
 
         /// <summary>
         /// Cluster for a given subject.

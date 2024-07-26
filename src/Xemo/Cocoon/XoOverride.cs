@@ -23,18 +23,13 @@ namespace Xemo.Cocoon
 
         public IGrip Grip() => this.inner.Grip();
 
-        public TSlice Sample<TSlice>(TSlice wanted)
-        {
-            return
+        public TSlice Sample<TSlice>(TSlice wanted) =>
                 Merge.Target(
                     this.inner.Sample(wanted)
                 ).Post(this.overrides());
-        }
 
-        public ICocoon Mutate<TDefaults>(TDefaults mutation)
-        {
-            return this.inner.Mutate(mutation);
-        }
+        public ICocoon Mutate<TDefaults>(TDefaults mutation) =>
+            this.inner.Mutate(mutation);
 
         public ICocoon Schema<TMask>(TMask mask) =>
             this.inner.Schema(mask);

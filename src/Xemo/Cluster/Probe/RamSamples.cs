@@ -20,7 +20,7 @@ namespace Xemo.Cluster.Probe
             TContent originSchema,
             TSample sampleSchema
         ) =>
-            new RamSamples<TContent, TSample>(mem, subject, originSchema, sampleSchema);
+            new(mem, subject, originSchema, sampleSchema);
     }
 
     /// <summary>
@@ -62,7 +62,7 @@ namespace Xemo.Cluster.Probe
                         yield return
                             AsSample._(
                                 new XoRam<TContent>(
-                                    new AsGrip(seed, this.subject),
+                                    new AsGrip(this.subject, seed),
                                     this.mem,
                                     this.originSchema
                                 ),

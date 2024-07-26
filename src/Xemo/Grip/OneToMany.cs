@@ -18,29 +18,18 @@ namespace Xemo.Grip
     /// <summary>
     /// Link to other Xemo subjects (eg User -> Friends) in a schema.
     /// </summary>
-    internal sealed class OneToMany : IGrip
+    internal sealed class OneToMany(string targetSubject) : IGrip
     {
-        private readonly string targetSubject;
-
-        /// <summary>
-        /// Link to other Xemo subjects (eg User -> Friends) in a schema.
-        /// </summary>
-        public OneToMany(string targetSubject)
-        {
-            this.targetSubject = targetSubject;
-        }
-
-        public string ID()
-        {
+        public string ID() =>
             throw new InvalidOperationException(
                 "This is a relation. You cannot request an ID from a relation."
             );
-        }
 
-        public string Kind()
-        {
-            return this.targetSubject;
-        }
+        public string Kind() => targetSubject;
+        public string Combined() =>
+            throw new InvalidOperationException(
+                "This is a relation. You cannot request a combined identifier from a relation."
+            );
     }
 }
 

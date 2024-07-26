@@ -3,22 +3,14 @@
     /// <summary>
     /// ID card which is filled when calling a method.
     /// </summary>
-    public sealed class LazyGrip : IGrip
+    public sealed class LazyGrip(Func<string> id, Func<string> kind) : IGrip
     {
-        private readonly Lazy<string> id;
-        private readonly Lazy<string> kind;
-
-        /// <summary>
-        /// ID card which is filled when calling a method.
-        /// </summary>
-        public LazyGrip(Func<string> id, Func<string> kind)
-        {
-            this.id = new Lazy<string>(id);
-            this.kind = new Lazy<string>(kind);
-        }
+        private readonly Lazy<string> id = new(id); 
+        private readonly Lazy<string> kind = new(kind);
 
         public string ID() => this.id.Value;
         public string Kind() => this.kind.Value;
+        public string Combined() => $"{this.kind.Value}.{this.id.Value}";
     }
 }
 

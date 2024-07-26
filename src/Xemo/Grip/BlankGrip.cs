@@ -13,6 +13,7 @@
 
         public string ID() => string.Empty;
         public string Kind() => string.Empty;
+        public string Combined() => string.Empty;
     }
 }
 

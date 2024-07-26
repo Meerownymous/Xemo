@@ -116,7 +116,7 @@ namespace Xemo.Bench.Tests
                         {
                             ID = "1",
                             Name = "Timon",
-                            BestFriend = new AsGrip(pumba.Grip().ID(), "User")
+                            BestFriend = new AsGrip("User", pumba.Grip().ID())
                         }
                     ).BestFriend.ID()
             );
@@ -142,7 +142,7 @@ namespace Xemo.Bench.Tests
                         {
                             ID = "1",
                             Name = "Timon",
-                            BestFriend = new AsGrip("19", "User")
+                            BestFriend = new AsGrip("User", "19")
                         }
                     )
             );

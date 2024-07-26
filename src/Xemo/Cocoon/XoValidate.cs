@@ -16,18 +16,12 @@
 
         public IGrip Grip() => this.inner.Grip();
 
-        public TSlice Sample<TSlice>(TSlice wanted)
-        {
-            return this.inner.Sample(wanted);
-        }
+        public TSlice Sample<TSlice>(TSlice wanted) => this.inner.Sample(wanted);
 
-        public ICocoon Mutate<TSlice>(TSlice mutation)
-        {
+        public ICocoon Mutate<TSlice>(TSlice mutation) =>
             throw new InvalidOperationException("Spawning cannot be modified.");
-        }
 
-        public ICocoon Schema<TMask>(TMask mask) =>
-            this.inner.Schema(mask);
+        public ICocoon Schema<TMask>(TMask mask) => this.inner.Schema(mask);
     }
 
     /// <summary>

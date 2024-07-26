@@ -153,12 +153,8 @@ namespace Xemo.Cocoon
             return DeepMerge.Schema(wanted, this.mem).Post(current);
         }
 
-        public ICocoon Schema<TSchema>(TSchema schema)
-        {
-            //if (this.HasSchema())
+        public ICocoon Schema<TSchema>(TSchema schema) =>
             throw new InvalidOperationException("Schema has already been defined.");
-            //return new XoRam<TSchema>(this.id.Value, this.storage, schema);
-        }
 
         public ICocoon Mutate<TSlice>(TSlice mutation)
         {
