@@ -10,13 +10,13 @@ namespace Xemo.Cluster
     /// <summary>
     /// Cluster of information stored in Ram.
     /// </summary>
-    public sealed class XoRamCluster
+    public sealed class RamCluster
     {
         /// <summary>
         /// Cluster of information stored in Ram.
         /// </summary>
-        public static XoRamCluster<TSchema> Allocate<TSchema>(string subject, TSchema schema) =>
-            new XoRamCluster<TSchema>(
+        public static RamCluster<TSchema> Allocate<TSchema>(string subject, TSchema schema) =>
+            new(
                 new DeadMem("This cluster is isolated and has its own memory."),
                 subject,
                 new ConcurrentDictionary<string, TSchema>(),
@@ -26,14 +26,14 @@ namespace Xemo.Cluster
         /// <summary>
         /// Cluster of information stored in Ram.
         /// </summary>
-        public static XoRamCluster<TSchema> Allocate<TSchema>(IMem home, string subject, TSchema schema) =>
-            new XoRamCluster<TSchema>(home, subject, new ConcurrentDictionary<string, TSchema>(), schema);
+        public static RamCluster<TSchema> Allocate<TSchema>(IMem home, string subject, TSchema schema) =>
+            new(home, subject, new ConcurrentDictionary<string, TSchema>(), schema);
     }
 
     /// <summary>
     /// Cluster of information stored in Ram.
     /// </summary>
-    public sealed class XoRamCluster<TContent> : ICluster
+    public sealed class RamCluster<TContent> : ICluster
     {
         private readonly IMem mem;
         private readonly string subject;
@@ -44,7 +44,7 @@ namespace Xemo.Cluster
         /// <summary>
         /// Cluster of information stored in Ram.
         /// </summary>
-        public XoRamCluster() : this(
+        public RamCluster() : this(
             new DeadMem("This cluster is isolated."),
             string.Empty,
             new ConcurrentDictionary<string, TContent>(),
@@ -55,7 +55,7 @@ namespace Xemo.Cluster
         /// <summary>
         /// Cluster of information stored in Ram.
         /// </summary>
-        public XoRamCluster(IMem home, string subject, ConcurrentDictionary<string, TContent> storage, TContent schema)
+        public RamCluster(IMem home, string subject, ConcurrentDictionary<string, TContent> storage, TContent schema)
         {
             this.mem = home;
             this.subject = subject;
@@ -77,7 +77,7 @@ namespace Xemo.Cluster
         {
             foreach (var key in this.index.Value)
                 yield return new XoRam<TContent>(
-                    new AsGrip(key, this.subject),
+                    new AsGrip(this.subject, key),
                     this.storage,
                     this.mem,
                     this.schema
@@ -88,7 +88,7 @@ namespace Xemo.Cluster
         {
             if (!this.storage.ContainsKey(id))
                 throw new ArgumentException($"{this.subject} '{id}' does not exist.");
-            return new XoRam<TContent>(new AsGrip(id, this.subject), this.storage, this.mem, this.schema);
+            return new XoRam<TContent>(new AsGrip(this.subject, id), this.storage, this.mem, this.schema);
         }
 
         public ISamples<TShape> Samples<TShape>(TShape blueprint) =>
@@ -104,12 +104,6 @@ namespace Xemo.Cluster
                         this.index.Value.Remove(xemo.Grip().ID());
                 }
             }
-            return this;
-        }
-
-        public ICluster With<TNew>(TNew input)
-        {
-            this.Create(input);
             return this;
         }
 
@@ -137,7 +131,7 @@ namespace Xemo.Cluster
             );
             return
                 new XoRam<TContent>(
-                    new AsGrip(id, this.subject),
+                    new AsGrip(this.subject, id),
                     this.storage,
                     this.mem,
                     this.schema

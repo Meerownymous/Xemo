@@ -33,7 +33,7 @@ namespace Xemo
             return result;
         }
 
-        public ICocoon Xemo(string subject, string id)
+        public ICocoon Cocoon(string subject, string id)
         {
             ICluster result;
             if (!this.clusters.TryGetValue(subject, out result))
@@ -49,7 +49,7 @@ namespace Xemo
                     var subjectMemory = new ConcurrentDictionary<string, TSchema>();
                     this.clusters.TryAdd(
                         subject,
-                        new XoRamCluster<TSchema>(
+                        new RamCluster<TSchema>(
                             this,
                             subject,
                             subjectMemory,

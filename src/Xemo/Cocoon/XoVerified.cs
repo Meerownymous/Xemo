@@ -25,12 +25,7 @@ namespace Xemo.Cocoon
                 "This is a verify object, it does not have an ID."
             );
 
-        public IGrip IID() =>
-            throw new InvalidOperationException(
-                "This is a verify object, it does not have an ID."
-            );
-
-        public TSlice Sample<TSlice>(TSlice wanted)
+        public TSample Sample<TSample>(TSample wanted)
         {
             foreach (var isValid in this.validations)
             {

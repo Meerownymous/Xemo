@@ -9,10 +9,7 @@
             this.func = func;
         }
 
-        public TResult Value()
-        {
-            return this.func();
-        }
+        public TResult Value() => this.func();
 
         public static implicit operator TResult(Live<TResult> live) => live.Value();
     }

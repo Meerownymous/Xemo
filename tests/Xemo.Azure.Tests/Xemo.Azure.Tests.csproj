@@ -28,7 +28,4 @@
   <ItemGroup>
     <None Remove="Bench\" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Bench\" />
-  </ItemGroup>
 </Project>

@@ -12,7 +12,7 @@ namespace Xemo.Cluster.Tests
         [Fact]
         public void Reduces()
         {
-            var cluster = XoRamCluster.Allocate("user", new { ID = "", Name = "" });
+            var cluster = RamCluster.Allocate("user", new { ID = "", Name = "" });
             cluster.Create(new { ID = "12", Name = "Twelve" });
             cluster.Create(new { ID = "20", Name = "Twenty" });
 

@@ -16,6 +16,8 @@ namespace Xemo
         /// Kind of something, always the same along a cluster.
         /// </summary>
         public string Kind();
+
+        public string Combined();
     }
 }
 

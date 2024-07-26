@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,7 +23,6 @@
     <Folder Include="Cluster\" />
     <Folder Include="Bench\" />
     <Folder Include="Tonga\" />
-    <Folder Include="Cluster\Probe\" />
     <Folder Include="Cocoon\" />
     <Folder Include="Grip\" />
   </ItemGroup>

@@ -16,29 +16,18 @@ namespace Xemo.Grip
     /// <summary>
     /// Link to another Xemo subject (eg User -> Address) in a schema.
     /// </summary>
-    internal sealed class OneToOne : IGrip
+    internal sealed class OneToOne(string targetSubject) : IGrip
     {
-        private readonly string targetSubject;
-
-        /// <summary>
-        /// Link to another Xemo subject (eg User -> Address) in a schema.
-        /// </summary>
-        public OneToOne(string targetSubject)
-        {
-            this.targetSubject = targetSubject;
-        }
-
-        public string ID()
-        {
+        public string ID() =>
             throw new InvalidOperationException(
-                $"This is a relation definition pointing to '{this.targetSubject}'. You cannot request an ID from a relation definition."
+                $"This is a relation definition pointing to '{targetSubject}'. You cannot request an ID from a relation definition."
             );
-        }
 
-        public string Kind()
-        {
-            return this.targetSubject;
-        }
+        public string Kind() => targetSubject;
+        public string Combined() =>
+            throw new InvalidOperationException(
+                $"This is a relation definition pointing to '{targetSubject}'. You cannot request a combined identifier from a relation definition."
+            );
     }
 }
 

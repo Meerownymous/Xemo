@@ -18,7 +18,7 @@ namespace Xemo
         public ICluster Cluster(string subject) =>
             throw this.death("deliver cluster from");
 
-        public ICocoon Xemo(string subject, string id)=>
+        public ICocoon Cocoon(string subject, string id)=>
             throw this.death("deliver xemo from");
 
         public string Schema(string subject) =>

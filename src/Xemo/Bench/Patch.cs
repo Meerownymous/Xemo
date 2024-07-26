@@ -25,14 +25,14 @@ namespace Xemo.Bench
 
         private IGrip AssertExists(IGrip card)
         {
-            return this.mem.Xemo(card.Kind(), card.ID()).Grip();
+            return this.mem.Cocoon(card.Kind(), card.ID()).Grip();
         }
 
         private IGrip[] AssertExists(IGrip[] cards)
         {
             foreach(var card in cards)
             {
-                this.mem.Xemo(card.Kind(), card.ID()).Grip();
+                this.mem.Cocoon(card.Kind(), card.ID()).Grip();
             }
             return cards;
         }

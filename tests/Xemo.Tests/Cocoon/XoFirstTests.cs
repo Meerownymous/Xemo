@@ -14,7 +14,7 @@ namespace Xemo.Cocoon.Tests
                 "Meerow",
                 new XoFirst(
                     new XoWith(
-                        XoRamCluster.Allocate("Personalities", schema),
+                        RamCluster.Allocate("Personalities", schema),
                         new { ID = "Meerow" },
                         new { ID = "Dobertus Meow" }
                     )
@@ -32,7 +32,7 @@ namespace Xemo.Cocoon.Tests
                 XoFirst.Sampled(
                     schema,
                     new XoWith(
-                        XoRamCluster.Allocate("Personalities", schema),
+                        RamCluster.Allocate("Personalities", schema),
                         new { ID = "Meerow" },
                         new { ID = "Dobertus Meow" }
                     )

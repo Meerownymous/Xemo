@@ -37,14 +37,14 @@
                 String.IsNullOrEmpty(card.Kind()) && string.IsNullOrEmpty(card.ID()) ?
                 card
                 :
-                this.mem.Xemo(card.Kind(), card.ID()).Grip();
+                this.mem.Cocoon(card.Kind(), card.ID()).Grip();
         }
 
         private IGrip[] EnsureLinkable(IGrip[] cards)
         {
             foreach(var card in cards)
             {
-                this.mem.Xemo(card.Kind(), card.ID()).Grip();
+                this.mem.Cocoon(card.Kind(), card.ID()).Grip();
             }
             return cards;
         }

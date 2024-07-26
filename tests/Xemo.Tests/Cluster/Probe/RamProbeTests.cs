@@ -10,7 +10,7 @@ namespace Xemo.Tests.Cluster.Probe
         public void AnalysesItemsInMemory()
         {
             var originSchema = new { Rigging = "", Length = 0 };
-            var mem = ConcurrentDictionary._(originSchema);
+            var mem = AnonymousTypeDictionary._(originSchema);
             mem.TryAdd(
                 "Valiant40",
                 new

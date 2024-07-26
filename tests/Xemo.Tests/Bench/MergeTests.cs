@@ -48,11 +48,11 @@ namespace Xemo.Bench.Tests
                         Todo = "Succeed",
                         Author = Link.One("User")
                     },
-                    (leftID, rightID) => { solved = true; return rightID; },
-                    (left, right) => throw new Exception("one to many is not tested here.")
+                    (_, rightID) => { solved = true; return rightID; },
+                    (_, _) => throw new Exception("one to many is not tested here.")
                 )
                 .Post(
-                    new { Author = new AsGrip("1", "User") }
+                    new { Author = new AsGrip("User", "1") }
                 );
 
             Assert.True(solved);
@@ -104,7 +104,6 @@ namespace Xemo.Bench.Tests
         [Fact]
         public void InvokesLive()
         {
-            var i = 0;
             var patch =
                 new
                 {
@@ -121,8 +120,8 @@ namespace Xemo.Bench.Tests
                         {
                             Number = 0
                         },
-                        (left, right) => { return right; },
-                        (left, right) => { return right; }
+                        (_, right) => right,
+                        (_, right) => right
                     )
                     .Post(patch);
 
