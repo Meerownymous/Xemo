@@ -33,7 +33,6 @@
     <None Remove="Tonga\Text\" />
     <None Remove="Cluster\Probe\" />
     <None Remove="Debug\" />
-    <None Remove="Samples\OnMessageActivity.json" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Cluster\" />
@@ -44,8 +43,5 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Xemo\Xemo.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Samples\OnMessageActivity.json" />
   </ItemGroup>
 </Project>
