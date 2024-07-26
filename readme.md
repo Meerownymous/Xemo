@@ -120,6 +120,10 @@ public interface IXemo
    /// Mutate contents by property values of the given patch.
    IXemo Mutate<TPatch>(TPatch patch);
 }
-
 ```
+------
 
+## Not yet documented but available
+    - Cluster (multiple Xemo)
+    - Relations
+    - Data Sampling
