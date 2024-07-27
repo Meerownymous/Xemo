@@ -33,13 +33,15 @@ namespace Xemo.Cluster
     /// <summary>
     /// Cluster of information stored in Ram.
     /// </summary>
-    public sealed class RamCluster<TContent> : ICluster
+    public sealed class RamCluster<TContent>(IMem mem, string subject, ConcurrentDictionary<string, TContent> storage, TContent schema) : ICluster
     {
-        private readonly IMem mem;
-        private readonly string subject;
-        private readonly Lazy<List<string>> index;
-        private readonly ConcurrentDictionary<string, TContent> storage;
-        private readonly TContent schema;
+        private readonly Lazy<List<string>> index =
+            new(() =>
+            {
+                var index = new List<string>(storage.Keys);
+                index.Sort();
+                return index;
+            });
 
         /// <summary>
         /// Cluster of information stored in Ram.
@@ -48,51 +50,30 @@ namespace Xemo.Cluster
             new DeadMem("This cluster is isolated."),
             string.Empty,
             new ConcurrentDictionary<string, TContent>(),
-            default(TContent)
+            default
         )
         { }
 
-        /// <summary>
-        /// Cluster of information stored in Ram.
-        /// </summary>
-        public RamCluster(IMem home, string subject, ConcurrentDictionary<string, TContent> storage, TContent schema)
-        {
-            this.mem = home;
-            this.subject = subject;
-            this.index = new Lazy<List<string>>(() =>
-            {
-                lock (this.subject)
-                {
-                    var index = new List<string>(storage.Keys);
-                    index.Sort();
-                    return index;
-                }
-            });
-            this.storage = storage;
-            this.schema = schema;
-        }
-
-
         public IEnumerator<ICocoon> GetEnumerator()
         {
-            foreach (var key in this.index.Value)
+            foreach (var key in index.Value)
                 yield return new XoRam<TContent>(
-                    new AsGrip(this.subject, key),
-                    this.storage,
-                    this.mem,
-                    this.schema
+                    new AsGrip(subject, key),
+                    storage,
+                    mem,
+                    schema
                 );
         }
 
         public ICocoon Xemo(string id)
         {
-            if (!this.storage.ContainsKey(id))
-                throw new ArgumentException($"{this.subject} '{id}' does not exist.");
-            return new XoRam<TContent>(new AsGrip(this.subject, id), this.storage, this.mem, this.schema);
+            if (!storage.ContainsKey(id))
+                throw new ArgumentException($"{subject} '{id}' does not exist.");
+            return new XoRam<TContent>(new AsGrip(subject, id), storage, mem, schema);
         }
 
         public ISamples<TShape> Samples<TShape>(TShape blueprint) =>
-            new RamSamples<TContent, TShape>(this.storage, this.subject, this.schema, blueprint);
+            new RamSamples<TContent, TShape>(storage, subject, schema, blueprint);
 
         public ICluster Removed(params ICocoon[] gone)
         {
@@ -100,7 +81,7 @@ namespace Xemo.Cluster
             {
                 lock (this.index)
                 {
-                    if (this.storage.TryRemove(xemo.Grip().ID(), out _))
+                    if (storage.TryRemove(xemo.Grip().ID(), out _))
                         this.index.Value.Remove(xemo.Grip().ID());
                 }
             }
@@ -110,18 +91,15 @@ namespace Xemo.Cluster
         public ICocoon Create<TNew>(TNew input)
         {
             var id = new PropertyValue("ID", input, fallBack: () => Guid.NewGuid()).AsString();
-            this.storage.AddOrUpdate(
+            storage.AddOrUpdate(
                 id,
                 (key) =>
                 {
                     var newItem =
-                        Birth.Schema(this.schema, this.mem)
+                        Birth.Schema(schema, mem)
                             .Post(input);
-
-                    lock (this.subject)
-                    {
-                        this.index.Value.Add(key);
-                    }
+                    
+                    this.index.Value.Add(key);
                     return newItem;
                 },
                 (key, existing) =>
@@ -131,17 +109,14 @@ namespace Xemo.Cluster
             );
             return
                 new XoRam<TContent>(
-                    new AsGrip(this.subject, id),
-                    this.storage,
-                    this.mem,
-                    this.schema
+                    new AsGrip(subject, id),
+                    storage,
+                    mem,
+                    schema
                 );
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
     }
 }
 

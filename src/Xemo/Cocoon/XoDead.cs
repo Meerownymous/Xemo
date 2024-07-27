@@ -6,15 +6,8 @@ namespace Xemo.Cocoon
     /// </summary>
     public sealed class XoDead : ICocoon
     {
-        private readonly Func<string, InvalidOperationException> death;
-
-        /// <summary>
-        /// Dead xemo.
-        /// </summary>
-        public XoDead()
-        {
-            this.death = (action) => new InvalidOperationException($"Cannot {action} a dead xemo.");
-        }
+        private readonly Func<string, InvalidOperationException> death =
+            (action) => new InvalidOperationException($"Cannot {action} a dead xemo.");
 
         public IGrip Grip() => throw this.death("deliver ID card from");
 

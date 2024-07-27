@@ -6,29 +6,18 @@
     public static class CocoonExtension
     {
         /// <summary>
-        /// A given object will be stored in the given memory.
-        /// Note that only properties are stored, while functions are omited.
-        /// It is assumed that a schema for this kind of object has already been created in the memory.
-        /// If not, use <see cref="AllocatedXemo{TContent}(TContent, string, IMem)" to allocate it in one go. />
-        /// </summary>
-        public static ICocoon AsXemo<TContent>(this TContent content, string kind, IMem mem) =>
-            mem.Cluster(kind).Create(content);
-
-        /// <summary>
-        /// A given object will be stored in the given memory.
+        /// The object will be stored in the given memory.
         /// Note that only properties are stored, while functions are omited.
         /// </summary>
-        public static ICocoon AllocatedXemo<TContent>(
-            this TContent schemaAndContent, string kind, IMem mem
-        ) =>
-            mem.Allocate(kind, schemaAndContent)
-                .Cluster(kind)
-                .Create(schemaAndContent);
+        public static ICocoon AsCocoon<TContent>(this TContent content, string subject, IMem mem) =>
+            mem.Allocate(subject, content, errorIfExists: false)
+                .Cluster(subject)
+                .Create(content);
 
         /// <summary>
         /// A cluster which is allocated using the given object as schema.
         /// </summary>
-        public static ICluster Allocated<TSchema>(
+        public static ICluster AsCluster<TSchema>(
             this TSchema schema, string kind, IMem mem
         ) =>
             mem.Allocate(kind, schema)

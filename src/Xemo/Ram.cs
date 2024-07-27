@@ -9,19 +9,9 @@ namespace Xemo
     /// </summary>
     public sealed class Ram : IMem
     {
-        private readonly ConcurrentDictionary<string, ICluster> clusters;
-        private readonly ConcurrentDictionary<string, object> storages;
-        private readonly ConcurrentDictionary<string, object> schemata;
-
-        /// <summary>
-        /// Pure RAM storage.
-        /// </summary>
-        public Ram()
-        {
-            this.clusters = new ConcurrentDictionary<string, ICluster>();
-            this.storages = new ConcurrentDictionary<string, object>();
-            this.schemata = new ConcurrentDictionary<string, object>();
-        }
+        private readonly ConcurrentDictionary<string, ICluster> clusters = new();
+        private readonly ConcurrentDictionary<string, object> storages = new();
+        private readonly ConcurrentDictionary<string, object> schemata = new();
 
         public ICluster Cluster(string subject)
         {

@@ -6,35 +6,27 @@ namespace Xemo.Cluster
     /// <summary>
     /// Cluster which is lazyliy initialized.
     /// </summary>
-	public sealed class LazyCluster : ICluster
+	public sealed class LazyCluster(Func<ICluster> origin) : ICluster
 	{
-        private readonly Lazy<ICluster> origin;
-
-        /// <summary>
-        /// Cluster which is lazyliy initialized.
-        /// </summary>
-        public LazyCluster(Func<ICluster> origin)
-		{
-            this.origin = new Lazy<ICluster>(origin);
-		}
+        private readonly Lazy<ICluster> origin = new(origin);
 
         public ICocoon Xemo(string id) =>
-            this.origin.Value.Xemo(id);
+            origin.Value.Xemo(id);
 
         public IEnumerator<ICocoon> GetEnumerator() =>
-            this.origin.Value.GetEnumerator();
+            origin.Value.GetEnumerator();
 
         public ISamples<TSample> Samples<TSample>(TSample sample) =>
-            this.origin.Value.Samples(sample);
+            origin.Value.Samples(sample);
 
         public ICocoon Create<TNew>(TNew input) =>
-            this.origin.Value.Create(input);
+            origin.Value.Create(input);
 
         public ICluster Removed(params ICocoon[] gone) =>
-            this.origin.Value.Removed(gone);
+            origin.Value.Removed(gone);
 
         IEnumerator IEnumerable.GetEnumerator() =>
-            this.origin.Value.GetEnumerator();
+            origin.Value.GetEnumerator();
     }
 }
 

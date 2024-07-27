@@ -8,47 +8,29 @@ namespace Xemo.Cluster
     /// spawn guard. That guard ensures that the minimum data for a xemo is
     /// declared when creating an object.
     /// </summary>
-    public sealed class XoSpawnCluster<TSchema> : ICluster
+    public sealed class XoSpawnCluster<TSchema>(TSchema schema, ICocoon spawnGuard, ICluster origin) : ICluster
     {
-        private readonly TSchema schema;
-        private readonly ICocoon spawnGuard;
-        private readonly ICluster origin;
-
-        /// <summary>
-        /// A cluster that spawns new objects through the given
-        /// spawn guard. That guard ensures that the minimum data for a xemo is
-        /// declared when creating an object.
-        /// </summary>
-        public XoSpawnCluster(TSchema schema, ICocoon spawnGuard, ICluster origin)
-        {
-            this.schema = schema;
-            this.spawnGuard = spawnGuard;
-            this.origin = origin;
-        }
-
-        public ICocoon Xemo(string id) =>
-            this.origin.Xemo(id);
+        public ICocoon Xemo(string id) => origin.Xemo(id);
 
         public ICocoon Create<TNew>(TNew plan) =>
-            this.origin
+            origin
                 .Create(
-                    this.spawnGuard.Sample(
-                        Merge.Target(this.schema)
-                            .Post(plan)
+                    spawnGuard.Sample(
+                        Merge.Target(schema).Post(plan)
                     )
                 );
 
         public IEnumerator<ICocoon> GetEnumerator() =>
-            this.origin.GetEnumerator();
+            origin.GetEnumerator();
 
         public ISamples<TShape> Samples<TShape>(TShape blueprint) =>
-            this.origin.Samples(blueprint);
+            origin.Samples(blueprint);
 
         public ICluster Removed(params ICocoon[] gone) =>
-            this.origin.Removed(gone);
+            origin.Removed(gone);
 
         IEnumerator IEnumerable.GetEnumerator() =>
-            this.origin.GetEnumerator();
+            origin.GetEnumerator();
     }
 
     /// <summary>
@@ -64,7 +46,7 @@ namespace Xemo.Cluster
         /// declared when creating an object.
         /// </summary>
         public static XoSpawnCluster<TSchema> _<TSchema>(TSchema schema, ICocoon spawnGuard, ICluster origin) =>
-            new XoSpawnCluster<TSchema>(schema, spawnGuard, origin);
+            new(schema, spawnGuard, origin);
     }
 }
 

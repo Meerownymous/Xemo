@@ -3,8 +3,8 @@ using Xemo.Bench;
 using Xemo.Cluster;
 using Xemo.Grip;
 
-namespace Xemo.Cocoon
-{
+namespace Xemo.Cocoon;
+
     /// <summary>
     /// Information stored in RAM.
     /// </summary>
@@ -20,7 +20,8 @@ namespace Xemo.Cocoon
         public XoRam(string subject) : this(
             new LazyGrip(() => Guid.NewGuid().ToString(), () => subject)
         )
-        { }
+        {
+        }
 
         /// <summary>
         /// Information stored in RAM.
@@ -28,7 +29,8 @@ namespace Xemo.Cocoon
         /// Schema(propertyObject).
         /// </summary>
         public XoRam(string subject, string id) : this(new AsGrip(subject, id))
-        { }
+        {
+        }
 
         /// <summary>
         /// Information stored in RAM.
@@ -60,22 +62,19 @@ namespace Xemo.Cocoon
     /// <summary>
     /// Information stored in RAM.
     /// </summary>
-    public sealed class XoRam<TContent> : ICocoon
+    public sealed class XoRam<TContent>(
+        IGrip grip,
+        ConcurrentDictionary<string, TContent> storage,
+        IMem mem,
+        TContent schema
+    ) : ICocoon
     {
-        private readonly IGrip passport;
-
-        /// <summary>
-        /// Storage of Xemos addressable by unique strings.
-        /// </summary>
-        private readonly ConcurrentDictionary<string, TContent> storage;
-        private readonly IMem mem;
-        private readonly TContent schema;
-
         /// <summary>
         /// Information stored in RAM.
         /// </summary>
         public XoRam() : this(new BlankGrip())
-        { }
+        {
+        }
 
         /// <summary>
         /// Information stored in RAM.
@@ -84,7 +83,8 @@ namespace Xemo.Cocoon
             id,
             new ConcurrentDictionary<string, TContent>()
         )
-        { }
+        {
+        }
 
         /// <summary>
         /// Information stored in RAM.
@@ -99,7 +99,8 @@ namespace Xemo.Cocoon
             new DeadMem("This Xemo has not been setup to support relations."),
             schema
         )
-        { }
+        {
+        }
 
         /// <summary>
         /// Information stored in RAM.
@@ -113,7 +114,8 @@ namespace Xemo.Cocoon
             new DeadMem("This Xemo has not been setup to support relations."),
             default(TContent)
         )
-        { }
+        {
+        }
 
         /// <summary>
         /// Information stored in RAM.
@@ -125,32 +127,17 @@ namespace Xemo.Cocoon
         ) : this(
             id, storage, mem, default(TContent)
         )
-        { }
-
-        /// <summary>
-        /// Information stored in RAM.
-        /// </summary>
-        public XoRam(
-            IGrip id,
-            ConcurrentDictionary<string, TContent> storage,
-            IMem mem,
-            TContent schema
-        )
         {
-            this.passport = id;
-            this.storage = storage;
-            this.mem = mem;
-            this.schema = schema;
         }
 
-        public IGrip Grip() => this.passport;
+        public IGrip Grip() => grip;
 
         public TSlice Sample<TSlice>(TSlice wanted)
         {
             if (!this.HasSchema())
                 throw new InvalidOperationException("Define a schema prior to filling.");
-            TContent current = storage.GetValueOrDefault(this.passport.ID(), this.schema);
-            return DeepMerge.Schema(wanted, this.mem).Post(current);
+            TContent current = storage.GetValueOrDefault(grip.ID(), schema);
+            return DeepMerge.Schema(wanted, mem).Post(current);
         }
 
         public ICocoon Schema<TSchema>(TSchema schema) =>
@@ -160,37 +147,30 @@ namespace Xemo.Cocoon
         {
             if (!this.HasSchema())
                 throw new InvalidOperationException("Define a schema prior to mutation.");
-            this.storage.AddOrUpdate(
-                this.passport.ID(),
-                key =>
+            storage.AddOrUpdate(
+                grip.ID(),
+                _ =>
                 {
-                    var newState = Patch.Target(this.schema, this.mem).Post(mutation);
+                    var newState = Patch.Target(schema, mem).Post(mutation);
                     var newID = new PropertyValue("ID", newState, string.Empty).AsString();
-                    if (newID != string.Empty && newID != this.passport.ID())
-                    {
+                    if (newID != string.Empty && newID != grip.ID())
                         throw new InvalidOperationException("ID change is not supported.");
-                    }
                     return newState;
                 },
-                (key, existing) =>
+                (_, existing) =>
                 {
-                    var newState = Patch.Target(existing, this.mem).Post(mutation);
+                    var newState = Patch.Target(existing, mem).Post(mutation);
                     var newID = new PropertyValue("ID", newState, () => string.Empty).AsString();
                     if (newID != string.Empty
                         && newID != new PropertyValue("ID", existing).AsString()
-                    )
-                    {
+                       )
                         throw new InvalidOperationException("ID change is not supported.");
-                    }
                     return newState;
                 }
             );
             return this;
         }
 
-        private bool HasSchema()
-        {
-            return this.schema != null && !this.schema.Equals(default(TContent));
-        }
+        private bool HasSchema() =>
+            schema != null && !schema.Equals(default(TContent));
     }
-}

@@ -4,17 +4,9 @@ namespace Xemo.Cocoon
     /// <summary>
     /// Information whic is created on first request.
     /// </summary>
-    public sealed class XoLazy : ICocoon
+    public sealed class XoLazy(Func<ICocoon> origin) : ICocoon
     {
-        private readonly Lazy<ICocoon> core;
-
-        /// <summary>
-        /// Information which is created on first request.
-        /// </summary>
-        public XoLazy(Func<ICocoon> origin)
-        {
-            this.core = new Lazy<ICocoon>(origin);
-        }
+        private readonly Lazy<ICocoon> core = new(origin);
 
         public IGrip Grip() => this.core.Value.Grip();
 

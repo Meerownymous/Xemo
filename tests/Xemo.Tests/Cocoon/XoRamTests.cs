@@ -1,10 +1,9 @@
 ﻿using System.Collections.Concurrent;
-using Xemo;
-using Xemo.Grip;
 using Xemo.Cocoon;
+using Xemo.Grip;
 using Xunit;
 
-namespace Xemo.Cocoon.Tests
+namespace Xemo.Tests.Cocoon
 {
     public sealed class XoRamTests
     {
@@ -18,7 +17,7 @@ namespace Xemo.Cocoon.Tests
                     ID = "1",
                     FirstName = "Ramirez",
                     LastName = "Memorius"
-                }.AllocatedXemo("User", new Ram()).Grip().ID()
+                }.AsCocoon("User", new Ram()).Grip().ID()
             );
         }
 
@@ -31,7 +30,7 @@ namespace Xemo.Cocoon.Tests
                     {
                         FirstName = "Ramirez",
                         LastName = "Memorius"
-                    }.AllocatedXemo("User", new Ram())
+                    }.AsCocoon("User", new Ram())
                     .Grip()
                     .ID(),
                     out _
@@ -51,7 +50,7 @@ namespace Xemo.Cocoon.Tests
 
             Assert.Equal(
                 "Ramirez",
-                schema.Allocated("User", new Ram())
+                schema.AsCluster("User", new Ram())
                     .Create(
                         new
                         {
@@ -78,7 +77,7 @@ namespace Xemo.Cocoon.Tests
 
             Assert.Equal(
                 "Dive",
-                schema.Allocated("User", new Ram())
+                schema.AsCluster("User", new Ram())
                     .Create(
                         new
                         {
@@ -108,7 +107,7 @@ namespace Xemo.Cocoon.Tests
 
             Assert.Equal(
                 "Dive",
-                schema.Allocated("User", new Ram())
+                schema.AsCluster("User", new Ram())
                     .Create(
                         new
                         {

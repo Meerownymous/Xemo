@@ -40,7 +40,8 @@ This is how you define a todo with xemo.
 
 First, you design a schema which is the blueprint for every todo. Provide default values and the resulting type is clear. ```Done = false``` results in a boolean named "Done", for example.
 
-```
+```csharp
+new
 {
     Done = false,
     Created = DateTime.Now,
@@ -49,7 +50,7 @@ First, you design a schema which is the blueprint for every todo. Provide defaul
 }
 ```
 
-Turn this into a Xemo like this:
+Turn this into a Cocoon like this:
 
 ```csharp
 var todo =
@@ -101,7 +102,7 @@ Assert.Equal(
 
 
 
-**A "Xemo" which holds data for an individual thing:**
+**A "Cocoon" which holds data for an individual thing:**
 
 ```csharp
 /// A piece of data which is based on a schema.

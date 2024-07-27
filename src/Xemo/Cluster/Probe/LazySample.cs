@@ -4,23 +4,11 @@ namespace Xemo.Cluster
     /// <summary>
     /// Simple sample.
     /// </summary>
-    public sealed class LazySample<TSample> : ISample<TSample>
+    public sealed class LazySample<TSample>(ICocoon cocoon, Func<TSample> sample) : ISample<TSample>
     {
-        private readonly ICocoon cocoon;
-        private readonly Lazy<TSample> sample;
-
-        /// <summary>
-        /// Simple sample.
-        /// </summary>
-        public LazySample(ICocoon cocoon, Func<TSample> sample)
-        {
-            this.cocoon = cocoon;
-            this.sample = new(sample);
-        }
-
+        private readonly Lazy<TSample> sample = new(sample);
         public TSample Content() => this.sample.Value;
-        public ICocoon Cocoon() => this.cocoon;
-
+        public ICocoon Cocoon() => cocoon;
         public static implicit operator TSample(LazySample<TSample> s) => s.sample.Value;
     }
 

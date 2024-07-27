@@ -1,16 +1,12 @@
 ﻿using System;
 namespace Xemo
 {
-    public sealed class DeadMem : IMem
+    public sealed class DeadMem(string reason) : IMem
     {
-        private readonly Func<string, InvalidOperationException> death;
-
-        public DeadMem(string reason)
-        {
-            this.death = action =>
+        private readonly Func<string, InvalidOperationException> death =
+            action =>
                 new InvalidOperationException(
                     $"Cannot {action} a dead memory{(reason.Length > 0 ? $", because {reason}." : ".")}");
-        }
 
         public IMem Allocate<TSchema>(string subject, TSchema schema, bool errorIfExists = true) =>
             throw this.death("allocate in");

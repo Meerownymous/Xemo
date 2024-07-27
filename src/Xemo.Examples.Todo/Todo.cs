@@ -14,7 +14,7 @@ namespace Xemo.Examples.Todo
 				Created = DateTime.Now,
 				Subject = subject,
 				Author = ""
-			}.AsXemo("todo", memory)
+			}.AsCocoon("todo", memory)
 		)
         { }
 
@@ -24,7 +24,7 @@ namespace Xemo.Examples.Todo
 				Done = false,
 				Created = DateTime.Now,
 				Subject = ""
-			}.AsXemo("todo", memory)
+			}.AsCocoon("todo", memory)
 		)
 		{ }
 	}

@@ -3,10 +3,8 @@
     /// <summary>
     /// Envelope for Information.
     /// </summary>
-    public abstract class CocoonEnvelope : ICocoon
+    public abstract class CocoonEnvelope(ICocoon core) : ICocoon
 	{
-        private readonly ICocoon core;
-
         /// <summary>
         /// Envelope for Information.
         /// </summary>
@@ -15,25 +13,13 @@
         )
         { }
 
-        /// <summary>
-        /// Envelope for Information.
-        /// </summary>
-        public CocoonEnvelope(ICocoon core)
-		{
-            this.core = core;
-        }
+        public IGrip Grip() => core.Grip();
 
-        public IGrip Grip() =>
-            this.core.Grip();
+        public TSlice Sample<TSlice>(TSlice wanted) => core.Sample(wanted);
 
-        public TSlice Sample<TSlice>(TSlice wanted) =>
-            this.core.Sample(wanted);
+        public ICocoon Mutate<TSlice>(TSlice mutation) => core.Mutate(mutation);
 
-        public ICocoon Mutate<TSlice>(TSlice mutation) =>
-            this.core.Mutate(mutation);
-
-        public ICocoon Schema<TMask>(TMask mask) =>
-            this.core.Schema(mask);
+        public ICocoon Schema<TMask>(TMask mask) => core.Schema(mask);
     }
 }
 

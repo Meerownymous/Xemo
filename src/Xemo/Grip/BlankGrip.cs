@@ -5,12 +5,6 @@
     /// </summary>
     public sealed class BlankGrip : IGrip
     {
-        /// <summary>
-        /// An emmpty Grip.
-        /// </summary>
-        public BlankGrip()
-        { }
-
         public string ID() => string.Empty;
         public string Kind() => string.Empty;
         public string Combined() => string.Empty;

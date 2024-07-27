@@ -8,7 +8,6 @@ namespace Xemo.Cocoon
     /// </summary>
     public sealed class XoVerified<TInvestigate> : ICocoon
     {
-        private readonly TInvestigate candidate;
         private readonly Func<TInvestigate, (bool, string)>[] validations;
 
         /// <summary>
@@ -16,7 +15,6 @@ namespace Xemo.Cocoon
         /// </summary>
         public XoVerified(TInvestigate candidate, params Func<TInvestigate, (bool, string)>[] valid)
         {
-            this.candidate = candidate;
             this.validations = valid;
         }
 
@@ -65,12 +63,6 @@ namespace Xemo.Cocoon
                     .Value()
                     .Invoke(parameters)
                 ).Post(candidate);
-
-            //return
-            //    JsonConvert.DeserializeAnonymousType(
-            //        JsonConvert.SerializeObject(candidate).ToString(),
-            //        this.candidate
-            //    );
         }
     }
 
@@ -86,6 +78,6 @@ namespace Xemo.Cocoon
             TInvestigate candidate,
             params Func<TInvestigate, (bool, string)>[] isValid
         ) =>
-            new XoVerified<TInvestigate>(candidate, isValid);
+            new(candidate, isValid);
     }
 }

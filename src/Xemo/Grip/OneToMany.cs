@@ -11,8 +11,7 @@ namespace Xemo.Grip
         /// <summary>
         /// Link to other Xemo subjects (eg User -> Friends) in a schema.
         /// </summary>
-        public static IGrip[] Many(string targetSubject) =>
-            new OneToMany[] { new OneToMany(targetSubject) };
+        public static IGrip[] Many(string targetSubject) => [new OneToMany(targetSubject)];
     }
 
     /// <summary>

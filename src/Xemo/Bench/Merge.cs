@@ -21,63 +21,41 @@ namespace Xemo.Bench
             Func<object, IGrip, object> solve1to1,
             Func<object, IGrip[], object> solve1toMany
         ) =>
-            new Merge<TTarget>(target, solve1to1, solve1toMany);
+            new(target, solve1to1, solve1toMany);
 
         /// <summary>
         /// Merge data to a target.
         /// </summary>
-        public static Merge<TTarget> Target<TTarget>(TTarget target) =>
-            new Merge<TTarget>(target);
+        public static Merge<TTarget> Target<TTarget>(TTarget target) => new(target);
     }
 
     /// <summary>
     /// Merge data to a target.
     /// </summary>
-    public sealed class Merge<TResult> : IBench<TResult>
+    public sealed class Merge<TResult>(
+        TResult target,
+        Func<object, IGrip, object> solve1to1,
+        Func<object, IGrip[], object> solve1toMany
+    ) : IBench<TResult>
     {
-        private readonly TResult target;
-        private readonly Func<object, IGrip, object> solve1To1;
-        private readonly Func<object, IGrip[], object> solve1ToMany;
-
         /// <summary>
         /// Merge data to a target.
         /// </summary>
         public Merge(TResult target) : this(
             target,
-            (left, right) => right,
-            (left, right) => right
+            (_, right) => right,
+            (_, right) => right
         )
         { }
-
-        /// <summary>
-        /// Merge data to a target.
-        /// If the data contains relations (it has members of type IDCard), the use the given
-        /// functions to solve them and access their data.
-        /// </summary>
-        public Merge(
-            TResult target,
-            Func<object, IGrip, object> solve1to1,
-            Func<object, IGrip[], object> solve1toMany
-        )
-        {
-            this.target = target;
-            this.solve1To1 = solve1to1;
-            this.solve1ToMany = solve1toMany;
-        }
 
         /// <summary>
         /// The content of the posted data is used to merge it into the encapsulated target
         /// of this bench.
         /// </summary>
-        public TResult Post<TSource>(TSource patch)
-        {
-            TResult result = default(TResult);
-            if (this.target.GetType().IsArray)
-                result = (TResult)MergedArray(this.target.GetType(), this.target, patch);
-            else
-                result = (TResult)MergedObject(this.target.GetType(), this.target, patch);
-            return result;
-        }
+        public TResult Post<TSource>(TSource patch) =>
+            target.GetType().IsArray
+                ? (TResult)MergedArray(target.GetType(), target, patch)
+                : (TResult)MergedObject(target.GetType(), target, patch);
 
         private object MergedObject<TSource>(Type resultType, object target, TSource source)
         {
@@ -161,7 +139,7 @@ namespace Xemo.Bench
                             if (incoming.GetType().IsArray)
                             {
                                 mergedValues[collected] =
-                                    this.solve1ToMany(
+                                    solve1toMany(
                                         targetProp.GetValue(target),
                                         incoming.GetType().GetElementType().IsAssignableTo(typeof(ICocoon)) ?
                                         Mapped._(
@@ -174,7 +152,7 @@ namespace Xemo.Bench
                             else
                             {
                                 mergedValues[collected] =
-                                    this.solve1To1(
+                                    solve1to1(
                                         targetProp.GetValue(target),
                                         incoming.GetType().IsAssignableTo(typeof(ICocoon)) ?
                                         (incoming as ICocoon).Grip() :

@@ -7,38 +7,26 @@ namespace Xemo.Cocoon
     /// Xemo which overrides data in the inner object by using the given function
     /// to generate the override.
     /// </summary>
-    public sealed class XoOverride<TOverride> : ICocoon
+    public sealed class XoOverride<TOverride>(Func<TOverride> overrides, ICocoon inner) : ICocoon
     {
-        private readonly Func<TOverride> overrides;
-        private readonly ICocoon inner;
-
-        /// <summary>
-        /// Xemo which overrides data in the inner object by using the given function.
-        /// </summary>
-        public XoOverride(Func<TOverride> overrides, ICocoon inner)
-        {
-            this.overrides = overrides;
-            this.inner = inner;
-        }
-
-        public IGrip Grip() => this.inner.Grip();
+        public IGrip Grip() => inner.Grip();
 
         public TSlice Sample<TSlice>(TSlice wanted) =>
                 Merge.Target(
-                    this.inner.Sample(wanted)
-                ).Post(this.overrides());
+                    inner.Sample(wanted)
+                ).Post(overrides());
 
         public ICocoon Mutate<TDefaults>(TDefaults mutation) =>
-            this.inner.Mutate(mutation);
+            inner.Mutate(mutation);
 
         public ICocoon Schema<TMask>(TMask mask) =>
-            this.inner.Schema(mask);
+            inner.Schema(mask);
     }
 
     public static class XoOverride
     {
         public static XoOverride<TOverride> _<TOverride>(Func<TOverride> overrides, ICocoon inner) =>
-            new XoOverride<TOverride>(overrides, inner);
+            new(overrides, inner);
     }
 }
 

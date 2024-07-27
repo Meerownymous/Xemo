@@ -6,10 +6,8 @@ namespace Xemo.Cluster
     /// <summary>
     /// Envelope for clusters.
     /// </summary>
-	public abstract class ClusterEnvelope : ICluster
+	public abstract class ClusterEnvelope(ICluster core) : ICluster
 	{
-        private readonly ICluster core;
-
         /// <summary>
         /// Envelope for clusters.
         /// </summary>
@@ -18,31 +16,22 @@ namespace Xemo.Cluster
         )
         { }
 
-        /// <summary>
-        /// Envelope for clusters.
-        /// </summary>
-        public ClusterEnvelope(ICluster core)
-		{
-            this.core = core;
-        }
-
-        public ICocoon Xemo(string id) =>
-            this.core.Xemo(id);
+        public ICocoon Xemo(string id) => core.Xemo(id);
 
         public IEnumerator<ICocoon> GetEnumerator() =>
-            this.core.GetEnumerator();
+            core.GetEnumerator();
 
         public ISamples<TSample> Samples<TSample>(TSample sample) =>
-            this.core.Samples(sample);
+            core.Samples(sample);
 
         public ICocoon Create<TNew>(TNew input) =>
-            this.core.Create(input);
+            core.Create(input);
 
         public ICluster Removed(params ICocoon[] gone) =>
-            this.core.Removed(gone);
+            core.Removed(gone);
 
         IEnumerator IEnumerable.GetEnumerator() =>
-            this.core.GetEnumerator();
+            core.GetEnumerator();
     }
 }
 

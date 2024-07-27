@@ -26,29 +26,13 @@ namespace Xemo.Cluster.Probe
     /// <summary>
     /// Probe of items in ram.
     /// </summary>
-    public sealed class RamSamples<TContent, TSample> : ISamples<TSample>
+    public sealed class RamSamples<TContent, TSample>(
+        ConcurrentDictionary<string, TContent> mem,
+        string subject,
+        TContent originSchema,
+        TSample sampleSchema
+    ) : ISamples<TSample>
     {
-        private readonly ConcurrentDictionary<string, TContent> mem;
-        private readonly string subject;
-        private readonly TSample sampleSchema;
-        private readonly TContent originSchema;
-
-        /// <summary>
-        /// Probe of items in ram.
-        /// </summary>
-        public RamSamples(
-            ConcurrentDictionary<string, TContent> mem,
-            string subject,
-            TContent originSchema,
-            TSample sampleSchema
-        )
-        {
-            this.mem = mem;
-            this.subject = subject;
-            this.sampleSchema = sampleSchema;
-            this.originSchema = originSchema;
-        }
-
         public IEnumerable<ISample<TSample>> Filtered(Func<TSample, bool> match)
         {
             foreach (var seed in mem.Keys)
@@ -56,15 +40,15 @@ namespace Xemo.Cluster.Probe
                 TContent husk;
                 if (mem.TryGetValue(seed, out husk))
                 {
-                    var sample = Merge.Target(this.sampleSchema).Post(husk);
+                    var sample = Merge.Target(sampleSchema).Post(husk);
                     if (match(sample))
                     {
                         yield return
                             AsSample._(
                                 new XoRam<TContent>(
-                                    new AsGrip(this.subject, seed),
-                                    this.mem,
-                                    this.originSchema
+                                    new AsGrip(subject, seed), 
+                                    mem,
+                                    originSchema
                                 ),
                                 sample
                             );
@@ -79,7 +63,7 @@ namespace Xemo.Cluster.Probe
             foreach (var seed in mem.Keys)
             {
                 TContent content;
-                if (mem.TryGetValue(seed, out content) && match(Merge.Target(this.sampleSchema).Post(content)))
+                if (mem.TryGetValue(seed, out content) && match(Merge.Target(sampleSchema).Post(content)))
                 {
                     result++;
                 }
@@ -87,10 +71,8 @@ namespace Xemo.Cluster.Probe
             return result;
         }
 
-        public int Count() => this.mem.Keys.Count;
-
-
-
+        public int Count() => mem.Keys.Count;
+        
         public IEnumerator<ISample<TSample>> GetEnumerator()
         {
             foreach (var seed in mem.Keys)
@@ -100,11 +82,11 @@ namespace Xemo.Cluster.Probe
                     yield return
                         new AsSample<TSample>(
                             XoRam.Make(
-                                new AsGrip(this.subject, seed),
-                                this.mem,
-                                this.originSchema
+                                new AsGrip(subject, seed),
+                                mem,
+                                originSchema
                             ),
-                            Merge.Target(this.sampleSchema).Post(content)
+                            Merge.Target(sampleSchema).Post(content)
                         );
             }
         }
