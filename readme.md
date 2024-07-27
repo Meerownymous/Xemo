@@ -60,12 +60,11 @@ var todo =
         Created = DateTime.Now,
         Subject = subject,
         Author = ""
-    }.AsXemo("todo", new Ram()); //Ram is a xemo memory. 
+    }.AsCocoon("todo", new Ram()); //Ram is a xemo memory. 
                                  //It can be ram, file, database or others. 
-                                 //We'll get to that later.
 ```
 
-Your schema is now encapsulated. The Xemo takes care of querying or manipulating the data.
+Your schema is now encapsulated. The Cocoon takes care of querying or manipulating the data.
 Now manipulate the empty schema by patching it with actual data.
 
 ```csharp
@@ -74,7 +73,7 @@ todo.Mutate(new { Subject = "Complete Examples", Author = "John Doe", Done = fal
 
 ```
 
-You can now get a slice of data by passing an empty data structure to the Xemo. It will then fill that for you by merging the encapsulated data into the passed slice.
+You can now get a slice of data by passing an empty data structure to the Cocoon. It will then fill that for you by merging the encapsulated data into the passed slice.
 
 ```csharp
 
@@ -106,10 +105,10 @@ Assert.Equal(
 
 ```csharp
 /// A piece of data which is based on a schema.
-public interface IXemo
+public interface ICocoon
 {
-   /// ID Card which uniquely identifies this Xemo.
-   IIDCard Card();
+   /// Grip is a unique identifier, carrying what subject the cocoon is about as well as a unique id.
+   IGrip Grip();
 
    /// Fill properties of the given slice with data available inside.
    TSlice Fill<TSlice>(TSlice wanted);
@@ -125,6 +124,6 @@ public interface IXemo
 ------
 
 ## Not yet documented but available
-    - Cluster (multiple Xemo)
+    - Cluster (multiple Cocoons, filterable)
     - Relations
     - Data Sampling
