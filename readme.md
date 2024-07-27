@@ -80,11 +80,14 @@ You can now get a slice of data by passing an empty data structure to the Cocoon
 var simple =
    todo.Fill(new { Subject = "", Done = false });
 
-//Note that the above slice is an anonymous object. You can also use concrete objects with properties, if you prefer. Using anonymous types might have advantages in agile development. Here is an example using a property object:
+//Note that the above slice is an anonymous object. 
+//You can also use concrete objects with properties, if you prefer. 
+//Using anonymous types might have advantages in agile development. 
+//Here is an example using a property object:
 
 public class Simple
 {
-	String Suject { get; set; }
+    String Subject { get; set; }
     Bool Done { get; set; }
 }
 
