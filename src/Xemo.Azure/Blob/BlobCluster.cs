@@ -75,6 +75,7 @@ public sealed class BlobCluster<TContent>(
 
     public ICocoon Create<TNew>(TNew plan)
     {
+        container.Value.CreateIfNotExists();
         var id = new PropertyValue("ID", plan, fallBack: () => Guid.NewGuid()).AsString(); 
         return
             new BlobCocoon<TContent>(
@@ -100,34 +101,38 @@ public sealed class BlobCluster<TContent>(
     {
         var cache = new ConcurrentDictionary<string, Tuple<BlobClient,ISample<TContent>>>();
         var container = blobHome.GetBlobContainerClient(subject);
-        foreach (var blob in container.GetBlobs())
+
+        if (container.Exists())
         {
-            cache.AddOrUpdate(
-                blob.Name, _ =>
-                {
-                    var cocoon = 
-                        new BlobCocoon<TContent>(
-                            new AsGrip(subject, blob.Name), 
-                            relations, 
-                            container,
-                            cache,
-                            schema
-                        );
-                    return
+            foreach (var blob in container.GetBlobs())
+            {
+                cache.AddOrUpdate(
+                    blob.Name, _ =>
+                    {
+                        var cocoon =
+                            new BlobCocoon<TContent>(
+                                new AsGrip(subject, blob.Name),
+                                relations,
+                                container,
+                                cache,
+                                schema
+                            );
+                        return
+                            new Tuple<BlobClient, ISample<TContent>>(
+                                container.GetBlobClient(blob.Name),
+                                new LazySample<TContent>(cocoon, () => cocoon.Sample(schema))
+                            );
+                    },
+                    (_, existing) =>
                         new Tuple<BlobClient, ISample<TContent>>(
-                            container.GetBlobClient(blob.Name),
-                            new LazySample<TContent>(cocoon, () => cocoon.Sample(schema))
-                        );
-                },
-                (_, existing) =>
-                    new Tuple<BlobClient, ISample<TContent>>(
-                        existing.Item1,
+                            existing.Item1,
                             new LazySample<TContent>(
-                                existing.Item2.Cocoon(), 
+                                existing.Item2.Cocoon(),
                                 () => existing.Item2.Cocoon().Sample(schema)
                             )
-                    )
+                        )
                 );
+            }
         }
         return cache;
     }
