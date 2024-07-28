@@ -17,10 +17,10 @@ public static class BlobCocoon
     public static BlobCocoon<TSchema> Make<TSchema>(
         IGrip grip, 
         IMem relations,
-        BlobContainerClient containers,
+        BlobContainerClient container,
         ConcurrentDictionary<string, Tuple<BlobClient,ISample<TSchema>>> cache, TSchema schema 
     ) =>
-        new(grip, relations, containers, cache, schema);
+        new(grip, relations, container, cache, schema);
 }
 
 /// <summary>
@@ -29,7 +29,7 @@ public static class BlobCocoon
 public sealed class BlobCocoon<TContent>(
     IGrip grip,
     IMem relations,
-    BlobContainerClient containers,
+    BlobContainerClient container,
     ConcurrentDictionary<string,Tuple<BlobClient,ISample<TContent>>> cache,
     TContent schema
 ) : ICocoon
@@ -53,7 +53,8 @@ public sealed class BlobCocoon<TContent>(
         cache.AddOrUpdate(grip.Combined(), 
         _ =>
         {
-            var blobClient = containers.GetBlobClient(grip.ID());
+            var blobClient = 
+                container.GetBlobClient(new EncodedBlobName(grip.ID()).AsString());
             var patched = 
                 Patch
                     .Target(Current(), relations)
@@ -75,7 +76,8 @@ public sealed class BlobCocoon<TContent>(
     private TContent Current() =>
         cache.GetOrAdd(grip.Combined(), _ =>
             {
-                var blobClient = containers.GetBlobClient(grip.ID());
+                var blobClient = 
+                    container.GetBlobClient(new EncodedBlobName(grip.ID()).AsString());
                 var content = 
                     blobClient.Exists()
                     ? JsonConvert.DeserializeAnonymousType(

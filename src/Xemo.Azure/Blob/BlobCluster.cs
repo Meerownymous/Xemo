@@ -1,8 +1,14 @@
 using System.Collections;
 using System.Collections.Concurrent;
+using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
 using Azure.Storage.Blobs;
 using Xemo.Azure.Blob.Probe;
 using Xemo.Cluster;
+using Xemo.Cluster.Probe;
 using Xemo.Grip;
 
 namespace Xemo.Azure.Blob;
@@ -42,7 +48,8 @@ public sealed class BlobCluster<TContent>(
     BlobServiceClient client
 ) : ICluster
 {
-    private readonly Lazy<BlobContainerClient> container = new(() => client.GetBlobContainerClient(subject));
+    private readonly Lazy<BlobContainerClient> container = 
+        new(() => client.GetBlobContainerClient(new EncodedContainerName(subject).AsString()));
     private readonly Lazy<ConcurrentDictionary<string, Tuple<BlobClient, ISample<TContent>>>> cache = 
         new(() => PrefilledClientCache(subject, relations, client, schema));
     
@@ -100,8 +107,9 @@ public sealed class BlobCluster<TContent>(
     )
     {
         var cache = new ConcurrentDictionary<string, Tuple<BlobClient,ISample<TContent>>>();
-        var container = blobHome.GetBlobContainerClient(subject);
-
+        var container = 
+            blobHome.GetBlobContainerClient(new EncodedContainerName(subject).AsString());
+        
         if (container.Exists())
         {
             foreach (var blob in container.GetBlobs())
