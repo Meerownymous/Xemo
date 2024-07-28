@@ -96,11 +96,14 @@ public sealed class BlobClusterTests
                 )
             );
 
-        var container = blobClient.GetBlobContainerClient(subject);
+        var container = 
+            blobClient.GetBlobContainerClient(
+                new EncodedContainerName(subject).AsString()
+            );
         container.CreateIfNotExists();
         try
         {
-            container.GetBlobClient(id1)
+            container.GetBlobClient(new EncodedBlobName(id1).AsString())
                 .Upload(
                     new MemoryStream(
                         Encoding.UTF8.GetBytes(
@@ -112,7 +115,7 @@ public sealed class BlobClusterTests
                         )
                     )
                 );
-            container.GetBlobClient(id2)
+            container.GetBlobClient(new EncodedBlobName(id2).AsString())
                 .Upload(
                     new MemoryStream(
                         Encoding.UTF8.GetBytes(
@@ -160,11 +163,14 @@ public sealed class BlobClusterTests
                 )
             );
 
-        var container = blobClient.GetBlobContainerClient(subject);
+        var container = 
+            blobClient.GetBlobContainerClient(
+                new EncodedContainerName(subject).AsString()    
+            );
         container.CreateIfNotExists();
         try
         {
-            container.GetBlobClient(id)
+            container.GetBlobClient(new EncodedBlobName(id).AsString())
                 .Upload(
                     new MemoryStream(
                         Encoding.UTF8.GetBytes(
@@ -225,11 +231,14 @@ public sealed class BlobClusterTests
                 )
             );
 
-        var container = blobClient.GetBlobContainerClient(subject);
+        var container = 
+            blobClient.GetBlobContainerClient(
+                new EncodedContainerName(subject).AsString()
+            );
         container.CreateIfNotExists();
         try
         {
-            container.GetBlobClient(id)
+            container.GetBlobClient(new EncodedBlobName(id).AsString())
                 .Upload(
                     new MemoryStream(
                         Encoding.UTF8.GetBytes(
@@ -254,7 +263,9 @@ public sealed class BlobClusterTests
                 ).Value()
                 .Content();
 
-            container.GetBlobClient(id).Delete();
+            container.GetBlobClient(
+                new EncodedBlobName(id).AsString()
+            ).Delete();
             
             Assert.Equal(
                 "Bob",
