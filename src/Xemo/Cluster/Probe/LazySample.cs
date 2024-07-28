@@ -1,5 +1,4 @@
-﻿using System;
-namespace Xemo.Cluster
+﻿namespace Xemo.Cluster.Probe
 {
     /// <summary>
     /// Simple sample.
