@@ -36,7 +36,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Cluster\" />
-    <Folder Include="Bench\" />
     <Folder Include="Tonga\" />
     <Folder Include="Tonga\Text\" />
     <Folder Include="Cluster\Probe\" />

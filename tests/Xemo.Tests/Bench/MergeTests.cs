@@ -1,15 +1,15 @@
 ﻿using System.Diagnostics;
-using System.Reflection;
-using Xemo.Grip;
+using Xemo.Bench;
 using Xemo.Cocoon;
+using Xemo.Grip;
 using Xunit;
 
-namespace Xemo.Bench.Tests
+namespace Xemo.Tests.Bench
 {
     public sealed class MergeTests
     {
         [Fact]
-        public void FillsPropertyObjects()
+        public void FillsDTOFromAnonymous()
         {
             Assert.Equal(
                 9,
@@ -21,9 +21,38 @@ namespace Xemo.Bench.Tests
                     .Number
             );
         }
+        
+        [Fact]
+        public void FillsDTOFromDTO()
+        {
+            Assert.Equal(
+                9,
+                Merge
+                    .Target(new Example())
+                    .Post(
+                        new Example()
+                        {
+                            Number = 9
+                        }
+                    )
+                    .Number
+            );
+        }
+        
+        [Fact]
+        public void RejectsDTOWithNoParameterLessConstructor()
+        {
+            AssertException.MessageStartsWith<ArgumentException>(
+                "Cannot merge into object of type",
+                () => 
+                    Merge
+                        .Target(new ExampleNoParameterless(0))
+                        .Post(new { Number = 9 })
+            );
+        }
 
         [Fact]
-        public void FillsNestedPropertyObjects()
+        public void FillsDTOFromNestedDTO()
         {
             Assert.Equal(
                 100,
@@ -72,7 +101,7 @@ namespace Xemo.Bench.Tests
             Merge
                 .Target(schema,
                     (leftID, rightID) => { result = leftID; return rightID; },
-                    (left, right) => throw new Exception("one to many is not tested here.")
+                    (_, _) => throw new Exception("one to many is not tested here.")
                 )
                 .Post(new { Author = new XoRam("User", "1") });
 
@@ -93,8 +122,8 @@ namespace Xemo.Bench.Tests
                         Todo = "Succeed",
                         Author = Link.One("User")
                     },
-                    (left, right) => { result = right; return right; },
-                    (left, right) => throw new Exception("one to many is not tested here.")
+                    (_, right) => { result = right; return right; },
+                    (_, _) => throw new Exception("one to many is not tested here.")
                 )
                 .Post(patch);
 
@@ -133,33 +162,34 @@ namespace Xemo.Bench.Tests
         {
             Assert.Equal(
                 100,
-                Merge.Target(new Example { Numbers = new int[0] })
+                Merge.Target(new Example { Numbers = [] })
                     .Post(
-                        new Example { Numbers = new[] { 100 } }
+                        new Example { Numbers = [100] }
                     )
                     .Numbers[0]
             );
         }
 
         [Fact]
-        public void FillsPropertyObjectArrays()
+        public void FillsDTOArrays()
         {
             Assert.Equal(
                 123,
-                Merge.Target(new Example()
-                {
-                    Nesteds = new NestedExample[]
+                Merge.Target(
+                    new Example()
                     {
-                        new NestedExample() { NestedNumber = 0 }
-                    }
-                })
+                        Nesteds =
+                        [
+                            new NestedExample { NestedNumber = 0 }
+                        ]
+                    })
                     .Post(
                         new Example
                         {
-                            Nesteds = new NestedExample[]
-                            {
-                                new NestedExample() { NestedNumber = 123 }
-                            }
+                            Nesteds =
+                            [
+                                new NestedExample { NestedNumber = 123 }
+                            ]
                         }
                     )
                     .Nesteds[0]
@@ -210,20 +240,30 @@ namespace Xemo.Bench.Tests
         }
 
         [Fact]
-        public void DoesNotChangeConcreteInput()
+        public void DoesNotChangeSourceDTO()
         {
-            var a = new { Name = "Test" };
-            var b = new { Name = "Test2" };
-
-            var c = a with { };
-
             var example = new Example() { Number = 100 };
 
-            Merge.Target(example)
-                .Post(new { Number = 999  });
+            var changed = 
+                Merge.Target(example)
+                    .Post(new { Number = 999  });
+            
             Assert.Equal(
                 100,
                 example.Number
+            );
+        }
+        
+        [Fact]
+        public void ToleratesPrivateProperties()
+        {
+            Assert.Equal(
+                0,
+                Merge.Target(
+                    new ExamplePrivateProperty()
+                )
+                .Post(new { Number = 8, Numbers = new int[999]  })
+                .Numbers[0]
             );
         }
 
@@ -240,8 +280,8 @@ namespace Xemo.Bench.Tests
             );
         }
 
-        [Fact(Skip = "For performance analysis only")]
-        //[Fact]
+        //[Fact(Skip = "For performance analysis only")]
+        [Fact]
         public void Investigation()
         {
             var sw = new Stopwatch();
@@ -289,11 +329,18 @@ namespace Xemo.Bench.Tests
             public NestedExample Nested { get; set; }
             public NestedExample[] Nesteds { get; set; }
         }
-
-        internal sealed class Example2
+        
+        internal sealed class ExamplePrivateProperty
         {
-            public int Number { get; set; }
+            public int[] Numbers { get; set; }
+            private int Number { get; set; }
             public NestedExample Nested { get; set; }
+            public NestedExample[] Nesteds { get; set; }
+        }
+        
+        internal sealed class ExampleNoParameterless(int number)
+        {
+            public int Number { get; set; } = number;
         }
 
         internal sealed class NestedExample

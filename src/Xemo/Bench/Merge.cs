@@ -2,7 +2,6 @@
 using Tonga.Enumerable;
 using Tonga.Scalar;
 using Xemo.Grip;
-using Xemo.Tonga;
 
 namespace Xemo.Bench
 {
@@ -57,22 +56,16 @@ namespace Xemo.Bench
                 ? (TResult)MergedArray(target.GetType(), target, patch)
                 : (TResult)MergedObject(target.GetType(), target, patch);
 
-        private object MergedObject<TSource>(Type resultType, object target, TSource source)
+        private object MergedObject<TSource>(Type targetType, object target, TSource source)
         {
             object result = null;
             if (source != null)
             {
-                if (target == null) target = Instance(resultType);
-                var isAnonymous = IsAnonymous(resultType);
-                var values = Values(source, target);
-                if (isAnonymous)
-                {
-                    result = MakeAnonymous(resultType, values);
-                }
-                else
-                {
-                    result = MakeConcrete(resultType, values, target.GetType().GetProperties());
-                }
+                if (target == null) target = Instance(targetType);
+                result =
+                    IsAnonymous(targetType)
+                        ? MakeAnonymous(targetType, Values(source, target))
+                        : MakeDTO(targetType, Values(source, target));
             }
             return result;
         }
@@ -135,18 +128,18 @@ namespace Xemo.Bench
                         }
                         else if (IsSolvableRelation(targetProp.PropertyType, sourceProp.PropertyType))
                         {
-                            var incoming = sourceProp.GetValue(source);
-                            if (incoming.GetType().IsArray)
+                            var sourceValue = sourceProp.GetValue(source);
+                            if (sourceValue.GetType().IsArray)
                             {
                                 mergedValues[collected] =
                                     solve1toMany(
                                         targetProp.GetValue(target),
-                                        incoming.GetType().GetElementType().IsAssignableTo(typeof(ICocoon)) ?
+                                        sourceValue.GetType().GetElementType().IsAssignableTo(typeof(ICocoon)) ?
                                         Mapped._(
                                             item => item.Grip(),
-                                            incoming as ICocoon[]
+                                            sourceValue as ICocoon[]
                                         ).ToArray() :
-                                        (incoming as IGrip[])
+                                        (sourceValue as IGrip[])
                                     );
                             }
                             else
@@ -154,9 +147,9 @@ namespace Xemo.Bench
                                 mergedValues[collected] =
                                     solve1to1(
                                         targetProp.GetValue(target),
-                                        incoming.GetType().IsAssignableTo(typeof(ICocoon)) ?
-                                        (incoming as ICocoon).Grip() :
-                                        (incoming as IGrip)
+                                        sourceValue.GetType().IsAssignableTo(typeof(ICocoon)) ?
+                                        (sourceValue as ICocoon).Grip() :
+                                        (sourceValue as IGrip)
                                     );
                             }
                         }
@@ -200,8 +193,9 @@ namespace Xemo.Bench
                 .Value()
                 .Invoke(values);
 
-        private static object MakeConcrete(Type type, object[] values, PropertyInfo[] propInfos)
+        private static object MakeDTO(Type type, object[] values)
         {
+            var propInfos = type.GetProperties();
             var result = Instance(type);
             for (var i = 0; i < propInfos.Length; i++)
             {
@@ -209,11 +203,46 @@ namespace Xemo.Bench
             }
             return result;
         }
+        
+        private static PropertyInfo[] GetAndSetableProperties(Type type)
+        {
+            PropertyInfo[] properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var propertiesWithPublicSetters = new List<PropertyInfo>();
+
+            foreach (var property in properties)
+            {
+                var setMethod = property.GetSetMethod();
+                if (setMethod != null && setMethod.IsPublic)
+                {
+                    propertiesWithPublicSetters.Add(property);
+                }
+            }
+            return propertiesWithPublicSetters.ToArray();
+        }
+        
+        private static PropertyInfo[] GettableProperties(Type type)
+        {
+            PropertyInfo[] properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var propertiesWithPublicGetters = new List<PropertyInfo>();
+
+            foreach (var property in properties)
+            {
+                var getMethod = property.GetMethod;
+                if (getMethod != null && getMethod.IsPublic)
+                {
+                    propertiesWithPublicGetters.Add(property);
+                }
+            }
+            return propertiesWithPublicGetters.ToArray();
+        }
 
         private static object Instance(Type type)
         {
             var ctor = type.GetConstructor(Type.EmptyTypes);
-            return ctor.Invoke(new object[0]);
+            if (ctor == null)
+                throw new ArgumentException(
+                    $"Cannot merge into object of type '{type.FullName}' because it does not provide a parameterless constructor.");
+            return ctor.Invoke([]);
         }
 
         private static bool IsCompatible(PropertyInfo targetProp, PropertyInfo sourceProp)
@@ -246,27 +275,18 @@ namespace Xemo.Bench
             return result;
         }
 
-        private static bool IsLive(PropertyInfo source)
-        {
-            return
-                source.PropertyType.IsGenericType &&
-                source.PropertyType.GetGenericTypeDefinition() == typeof(Live<>);
-        }
+        private static bool IsLive(PropertyInfo source) =>
+            source.PropertyType.IsGenericType &&
+            source.PropertyType.GetGenericTypeDefinition() == typeof(Live<>);
 
-        private static bool SameType(Type target, Type source)
-        {
-            return Type.GetTypeCode(target) == Type.GetTypeCode(source);
-        }
+        private static bool SameType(Type target, Type source) =>
+            Type.GetTypeCode(target) == Type.GetTypeCode(source);
 
-        private static bool BothAnonymous(Type target, Type source)
-        {
-            return IsAnonymous(target) && IsAnonymous(source);
-        }
+        private static bool BothAnonymous(Type target, Type source) =>
+            IsAnonymous(target) && IsAnonymous(source);
 
-        private static bool BothNumbers(Type source, Type target)
-        {
-            return IsNumber(target) && IsNumber(source);
-        }
+        private static bool BothNumbers(Type source, Type target) =>
+            IsNumber(target) && IsNumber(source);
 
         private static bool IsNumber(Type input)
         {
@@ -287,34 +307,26 @@ namespace Xemo.Bench
             return Type.GetTypeCode(candidate) is TypeCode.String;
         }
 
-        private static bool IsPrimitive(Type input)
-        {
-            return
-                (input.IsArray ?
-                    Type.GetTypeCode(input.GetElementType()) : Type.GetTypeCode(input)
-                ) != TypeCode.Object;
-        }
+        private static bool IsPrimitive(Type input) =>
+            (input.IsArray ?
+                Type.GetTypeCode(input.GetElementType()) : Type.GetTypeCode(input)
+            ) != TypeCode.Object;
 
         private static bool IsAnonymous(Type type) => type.Namespace == null;
 
-        private static bool IsSolvableRelation(Type leftPropType, Type rightPropType)
-        {
-            return IsSolvable1To1Relation(leftPropType, rightPropType)
-                ||
-                IsSolvable1ToManyRelation(leftPropType, rightPropType);
-        }
+        private static bool IsSolvableRelation(Type leftPropType, Type rightPropType) =>
+            IsSolvable1To1Relation(leftPropType, rightPropType)
+            ||
+            IsSolvable1ToManyRelation(leftPropType, rightPropType);
 
-        private static bool IsSolvable1To1Relation(Type leftPropType, Type rightPropType)
-        {
-            return
-                leftPropType.IsAssignableTo(typeof(IGrip))
+        private static bool IsSolvable1To1Relation(Type leftPropType, Type rightPropType) =>
+            leftPropType.IsAssignableTo(typeof(IGrip))
+            ||
+            (
+                rightPropType.IsAssignableTo(typeof(ICocoon))
                 ||
-                (
-                    rightPropType.IsAssignableTo(typeof(ICocoon))
-                    ||
-                    rightPropType.IsAssignableTo(typeof(IGrip))
-                );
-        }
+                rightPropType.IsAssignableTo(typeof(IGrip))
+            );
 
         private static bool IsSolvable1ToManyRelation(Type leftPropType, Type rightPropType)
         {

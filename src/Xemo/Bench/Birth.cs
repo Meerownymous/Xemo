@@ -19,22 +19,18 @@
             return newItem;
         }
 
-        private IGrip EnsureLinkable(IGrip card)
-        {
-            return
-                String.IsNullOrEmpty(card.Kind()) && string.IsNullOrEmpty(card.ID()) ?
-                card
-                :
-                mem.Cocoon(card.Kind(), card.ID()).Grip();
-        }
+        private IGrip EnsureLinkable(IGrip grip) =>
+            String.IsNullOrEmpty(grip.Kind()) && string.IsNullOrEmpty(grip.ID()) 
+                ? grip
+                : mem.Cocoon(grip.Kind(), grip.ID()).Grip();
 
-        private IGrip[] EnsureLinkable(IGrip[] cards)
+        private IGrip[] EnsureLinkable(IGrip[] grips)
         {
-            foreach(var card in cards)
+            foreach(var card in grips)
             {
                 mem.Cocoon(card.Kind(), card.ID()).Grip();
             }
-            return cards;
+            return grips;
         }
     }
 
