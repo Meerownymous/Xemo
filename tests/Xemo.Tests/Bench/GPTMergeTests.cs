@@ -6,14 +6,14 @@ using Xunit;
 
 namespace Xemo.Tests.Bench
 {
-    public sealed class MergeTests
+    public sealed class GPTMergeTests
     {
         [Fact]
         public void FillsDTOFromAnonymous()
         {
             Assert.Equal(
                 9,
-                Merge
+                GPTMerge
                     .Target(new Example())
                     .Post(
                         new { Number = 9 }
@@ -27,7 +27,7 @@ namespace Xemo.Tests.Bench
         {
             Assert.Equal(
                 9,
-                Merge
+                GPTMerge
                     .Target(new Example())
                     .Post(
                         new Example()
@@ -45,7 +45,7 @@ namespace Xemo.Tests.Bench
             AssertException.MessageStartsWith<ArgumentException>(
                 "Cannot merge into object of type",
                 () => 
-                    Merge
+                    GPTMerge
                         .Target(new ExampleNoParameterless(0))
                         .Post(new { Number = 9 })
             );
@@ -56,7 +56,7 @@ namespace Xemo.Tests.Bench
         {
             Assert.Equal(
                 100,
-                Merge
+                GPTMerge
                     .Target(new Example())
                     .Post(
                         new { Nested = new NestedExample { NestedNumber = 100 } }
@@ -70,7 +70,7 @@ namespace Xemo.Tests.Bench
         public void UsesGivenSolve1to1Strategy()
         {
             var solved = false;
-            Merge
+            GPTMerge
                 .Target(
                     new
                     {
@@ -98,7 +98,7 @@ namespace Xemo.Tests.Bench
                     Author = Link.One("User")
                 };
 
-            Merge
+            GPTMerge
                 .Target(schema,
                     (leftID, rightID) => { result = leftID; return rightID; },
                     (_, _) => throw new Exception("one to many is not tested here.")
@@ -115,7 +115,7 @@ namespace Xemo.Tests.Bench
 
             var patch = new { Author = new XoRam("User", "1") };
 
-            Merge
+            GPTMerge
                 .Target(
                     new
                     {
@@ -143,7 +143,7 @@ namespace Xemo.Tests.Bench
                 };
 
             var result = 
-                Merge
+                GPTMerge
                     .Target(
                         new
                         {
@@ -162,7 +162,7 @@ namespace Xemo.Tests.Bench
         {
             Assert.Equal(
                 100,
-                Merge.Target(new Example { Numbers = [] })
+                GPTMerge.Target(new Example { Numbers = [] })
                     .Post(
                         new Example { Numbers = [100] }
                     )
@@ -175,7 +175,7 @@ namespace Xemo.Tests.Bench
         {
             Assert.Equal(
                 123,
-                Merge.Target(
+                GPTMerge.Target(
                     new Example()
                     {
                         Nesteds =
@@ -202,7 +202,7 @@ namespace Xemo.Tests.Bench
         {
             Assert.Equal(
                 100,
-                Merge
+                GPTMerge
                     .Target(new { Number = 0 })
                     .Post(
                         new { Number = 100 }
@@ -216,7 +216,7 @@ namespace Xemo.Tests.Bench
         {
             Assert.Equal(
                 100,
-                Merge
+                GPTMerge
                     .Target(new { Nested = new { NestedNumber = 0 } })
                     .Post(
                         new { Nested = new { NestedNumber = 100 } }
@@ -231,7 +231,7 @@ namespace Xemo.Tests.Bench
         {
             Assert.Equal(
                 100,
-                Merge.Target(new { Numbers = new int[0] })
+                GPTMerge.Target(new { Numbers = new int[0] })
                     .Post(
                         new { Numbers = new[] { 100 } }
                     )
@@ -245,7 +245,7 @@ namespace Xemo.Tests.Bench
             var example = new Example() { Number = 100 };
 
             var changed = 
-                Merge.Target(example)
+                GPTMerge.Target(example)
                     .Post(new { Number = 999  });
             
             Assert.Equal(
@@ -259,7 +259,7 @@ namespace Xemo.Tests.Bench
         {
             Assert.Equal(
                 0,
-                Merge.Target(
+                GPTMerge.Target(
                     new ExamplePrivateProperty(0)
                 )
                 .Post(new { Number = 8, Numbers = new int[999]  })
@@ -272,7 +272,7 @@ namespace Xemo.Tests.Bench
         {
             Assert.Equal(
                 123,
-                Merge.Target(new { Things = new[] { new { ID = 0 } } })
+                GPTMerge.Target(new { Things = new[] { new { ID = 0 } } })
                     .Post(
                         new { Things = new[] { new { ID = 123 } } }
                     )
@@ -287,7 +287,7 @@ namespace Xemo.Tests.Bench
             var sw = new Stopwatch();
             sw.Start();
 
-            var merge = new Merge<Example>(new Example());
+            var merge = new GPTMerge<Example>(new Example());
             for (var i = 0; i < 1000000; i++)
             {
                 Assert.Equal(
@@ -305,7 +305,7 @@ namespace Xemo.Tests.Bench
             var sw2 = new Stopwatch();
             sw2.Start();
 
-            var target = Merge.Target(new Example());
+            var target = GPTMerge.Target(new Example());
             for (var i = 0; i < 1000000; i++)
             {
                 Assert.Equal(

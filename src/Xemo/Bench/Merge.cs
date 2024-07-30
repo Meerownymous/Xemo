@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using Tonga.Enumerable;
-using Tonga.Scalar;
 using Xemo.Grip;
 
 namespace Xemo.Bench
@@ -58,16 +57,12 @@ namespace Xemo.Bench
 
         private object MergedObject<TSource>(Type targetType, object target, TSource source)
         {
-            object result = null;
-            if (source != null)
-            {
-                if (target == null) target = Instance(targetType);
-                result =
-                    IsAnonymous(targetType)
-                        ? MakeAnonymous(targetType, Values(source, target))
-                        : MakeDTO(targetType, Values(source, target));
-            }
-            return result;
+            if (source == null) throw new ArgumentException("Cannot merge from object which is null.");
+            if (target == null) target = Instance(targetType);
+            return
+                IsAnonymous(targetType)
+                    ? MakeAnonymous(targetType, Values(source, target))
+                    : MakeDTO(targetType, Values(source, target));
         }
 
         private object MergedArray<TSource>(Type resultType, object target, TSource source)
@@ -189,8 +184,7 @@ namespace Xemo.Bench
         }
 
         private static object MakeAnonymous(Type type, object[] values) =>
-            First._(type.GetConstructors())
-                .Value()
+            type.GetConstructors()[0]
                 .Invoke(values);
 
         private static object MakeDTO(Type type, object[] values)
@@ -202,38 +196,6 @@ namespace Xemo.Bench
                 propInfos[i].SetValue(result, values[i]);
             }
             return result;
-        }
-        
-        private static PropertyInfo[] GetAndSetableProperties(Type type)
-        {
-            PropertyInfo[] properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            var propertiesWithPublicSetters = new List<PropertyInfo>();
-
-            foreach (var property in properties)
-            {
-                var setMethod = property.GetSetMethod();
-                if (setMethod != null && setMethod.IsPublic)
-                {
-                    propertiesWithPublicSetters.Add(property);
-                }
-            }
-            return propertiesWithPublicSetters.ToArray();
-        }
-        
-        private static PropertyInfo[] GettableProperties(Type type)
-        {
-            PropertyInfo[] properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            var propertiesWithPublicGetters = new List<PropertyInfo>();
-
-            foreach (var property in properties)
-            {
-                var getMethod = property.GetMethod;
-                if (getMethod != null && getMethod.IsPublic)
-                {
-                    propertiesWithPublicGetters.Add(property);
-                }
-            }
-            return propertiesWithPublicGetters.ToArray();
         }
 
         private static object Instance(Type type)
@@ -346,4 +308,3 @@ namespace Xemo.Bench
         }
     }
 }
-
