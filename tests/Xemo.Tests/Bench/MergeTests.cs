@@ -43,11 +43,11 @@ namespace Xemo.Tests.Bench
         public void RejectsDTOWithNoParameterLessConstructor()
         {
             AssertException.MessageStartsWith<ArgumentException>(
-                "Cannot merge into object of type",
-                () => 
-                    Merge
-                        .Target(new ExampleNoParameterless(0))
-                        .Post(new { Number = 9 })
+                 "A DTO must have a parameterless constructor",
+                 () => 
+                Merge
+                    .Target(new ExampleNoParameterless(0))
+                    .Post(new { Number = 9 })
             );
         }
 
@@ -260,7 +260,7 @@ namespace Xemo.Tests.Bench
             Assert.Equal(
                 0,
                 Merge.Target(
-                    new ExamplePrivateProperty(0)
+                    new ExamplePrivateProperty()
                 )
                 .Post(new { Number = 8, Numbers = new int[999]  })
                 .Numbers[0]
@@ -333,10 +333,7 @@ namespace Xemo.Tests.Bench
         
         internal sealed class ExamplePrivateProperty
         {
-            public ExamplePrivateProperty(int number)
-            {
-                Number = number;
-            }
+            public ExamplePrivateProperty(){ }
 
             public int[] Numbers { get; set; }
             private int Number { get; set; }
