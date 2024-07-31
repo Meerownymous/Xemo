@@ -16,7 +16,7 @@ namespace Xemo.Grip
     /// <summary>
     /// Link to another Xemo subject (eg User -> Address) in a schema.
     /// </summary>
-    internal sealed class OneToOne(string targetSubject) : IGrip
+    public sealed class OneToOne(string targetSubject) : IGrip
     {
         public string ID() =>
             throw new InvalidOperationException(

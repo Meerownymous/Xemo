@@ -1,7 +1,7 @@
-﻿using Xemo.Cocoon;
+﻿using Xemo.Bench;
 using Xunit;
 
-namespace Xemo.Bench.Tests
+namespace Xemo.Tests.Bench
 {
     public sealed class DeepMergeTests
     {

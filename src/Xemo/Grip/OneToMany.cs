@@ -17,7 +17,7 @@ namespace Xemo.Grip
     /// <summary>
     /// Link to other Xemo subjects (eg User -> Friends) in a schema.
     /// </summary>
-    internal sealed class OneToMany(string targetSubject) : IGrip
+    public sealed class OneToMany(string targetSubject) : IGrip
     {
         public string ID() =>
             throw new InvalidOperationException(
