@@ -18,17 +18,17 @@ public sealed class EncodedContainerName(string origin) : TextEnvelope(
     private static string Escaped(string subject)
     {
         using SHA256 sha256 = SHA256.Create();
-        var legalized = 
-            Regex.Replace(
-                Regex.Replace(subject, @"[^a-zA-Z0-9-]", "-"), 
-                "-{2,}", "-"
-            );
+        var legalized = Regex.Replace(subject, @"[^a-zA-Z0-9-]", "-");
         var maxLength = 54;
         legalized = legalized.Length <= maxLength ? legalized : legalized.Substring(0, maxLength);
-        return 
-            $"{legalized}-{
-                AsBase36(sha256.ComputeHash(Encoding.UTF8.GetBytes(subject)))
-                }";
+        return
+            Regex.Replace(
+                $"{legalized}-{
+                    AsBase36(sha256.ComputeHash(Encoding.UTF8.GetBytes(subject)))
+                }", 
+                "-{2,}", 
+                "-"
+            );
     }
 
     private static string AsBase36(byte[] bytes)

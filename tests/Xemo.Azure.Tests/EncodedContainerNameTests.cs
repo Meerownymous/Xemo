@@ -8,7 +8,7 @@ public sealed class EncodedContainerNameTests
     public void RemovesInvalidChars()
     {
         Assert.Equal(
-            "ABC--------------14qi1wxx",
+            "ABC-14qi1wxx",
             new EncodedContainerName("ABC!@#$%^&*()_+=").AsString()
         );
     }
