@@ -23,6 +23,15 @@ public sealed class EncodedContainerNameTests
     }
     
     [Fact]
+    public void ReducesMultipleDashesToSingle()
+    {
+        Assert.Equal(
+            "A-B-1wraxci6",
+            new EncodedContainerName("A---B").AsString()
+        );
+    }
+    
+    [Fact]
     public void ShortensIfNecessary()
     {
         Assert.Equal(

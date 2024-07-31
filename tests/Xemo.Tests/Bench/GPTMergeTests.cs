@@ -305,7 +305,7 @@ namespace Xemo.Tests.Bench
             var sw2 = new Stopwatch();
             sw2.Start();
 
-            var target = GPTMerge.Target(new Example());
+            var target = new GPTMerge2<Example>(new Example());
             for (var i = 0; i < 1000000; i++)
             {
                 Assert.Equal(
