@@ -4,7 +4,7 @@ namespace Xemo.Cocoon
     /// <summary>
     /// Dead xemo.
     /// </summary>
-    public sealed class XoDead : ICocoon
+    public sealed class Dead : ICocoon
     {
         private readonly Func<string, InvalidOperationException> death =
             (action) => new InvalidOperationException($"Cannot {action} a dead xemo.");

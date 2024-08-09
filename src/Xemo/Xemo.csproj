@@ -20,7 +20,6 @@
     <None Remove="Grip\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Cluster\" />
     <Folder Include="Bench\" />
     <Folder Include="Tonga\" />
     <Folder Include="Cocoon\" />

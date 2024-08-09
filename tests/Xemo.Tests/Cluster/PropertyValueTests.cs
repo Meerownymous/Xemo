@@ -1,7 +1,7 @@
 ﻿using Xemo.Cluster;
 using Xunit;
 
-namespace Xemo.Bench.Tests
+namespace Xemo.Tests.Cluster
 {
     public sealed class PropertyValueTests
     {

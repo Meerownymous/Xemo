@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Concurrent;
+using Tonga;
+using Tonga.Text;
 using Xemo.Grip;
 using Xemo.Bench;
 using Xemo.Cluster.Probe;
@@ -10,15 +12,26 @@ namespace Xemo.Cluster
     /// <summary>
     /// Cluster of information stored in Ram.
     /// </summary>
-    public sealed class RamCluster
+    public static class RamCluster
     {
+        /// <summary>
+        /// Cluster of information stored in Ram.
+        /// </summary>
+        public static RamCluster<TSchema> Allocate<TSchema>(TSchema schema) =>
+            new(
+                new DeadMem("This cluster is isolated and has its own memory."),
+                new AsText(() => Guid.NewGuid().ToString()),
+                new ConcurrentDictionary<string, TSchema>(),
+                schema
+            );
+        
         /// <summary>
         /// Cluster of information stored in Ram.
         /// </summary>
         public static RamCluster<TSchema> Allocate<TSchema>(string subject, TSchema schema) =>
             new(
                 new DeadMem("This cluster is isolated and has its own memory."),
-                subject,
+                new AsText(subject),
                 new ConcurrentDictionary<string, TSchema>(),
                 schema
             );
@@ -27,14 +40,21 @@ namespace Xemo.Cluster
         /// Cluster of information stored in Ram.
         /// </summary>
         public static RamCluster<TSchema> Allocate<TSchema>(IMem home, string subject, TSchema schema) =>
-            new(home, subject, new ConcurrentDictionary<string, TSchema>(), schema);
+            new(home, new AsText(subject), new ConcurrentDictionary<string, TSchema>(), schema);
     }
 
     /// <summary>
     /// Cluster of information stored in Ram.
     /// </summary>
-    public sealed class RamCluster<TContent>(IMem mem, string subject, ConcurrentDictionary<string, TContent> storage, TContent schema) : ICluster
+    public sealed class RamCluster<TContent>(
+        IMem mem, 
+        IText subject, 
+        ConcurrentDictionary<string, TContent> storage, 
+        TContent schema
+    ) : ICluster
     {
+        private Lazy<string> subject = new(() => subject.AsString());
+        
         private readonly Lazy<List<string>> index =
             new(() =>
             {
@@ -48,17 +68,30 @@ namespace Xemo.Cluster
         /// </summary>
         public RamCluster() : this(
             new DeadMem("This cluster is isolated."),
-            string.Empty,
+            new Blank(),
             new ConcurrentDictionary<string, TContent>(),
             default
+        )
+        { }
+        
+        public RamCluster(
+            IMem mem, 
+            string subject, 
+            ConcurrentDictionary<string, TContent> storage, 
+            TContent schema
+        ) : this(
+            mem,
+            new AsText(subject),
+            storage, 
+            schema
         )
         { }
 
         public IEnumerator<ICocoon> GetEnumerator()
         {
             foreach (var key in index.Value)
-                yield return new XoRam<TContent>(
-                    new AsGrip(subject, key),
+                yield return new AsCocoon<TContent>(
+                    new AsGrip(subject.Value, key),
                     storage,
                     mem,
                     schema
@@ -69,11 +102,11 @@ namespace Xemo.Cluster
         {
             if (!storage.ContainsKey(id))
                 throw new ArgumentException($"{subject} '{id}' does not exist.");
-            return new XoRam<TContent>(new AsGrip(subject, id), storage, mem, schema);
+            return new AsCocoon<TContent>(new AsGrip(subject.Value, id), storage, mem, schema);
         }
 
         public ISamples<TShape> Samples<TShape>(TShape blueprint) =>
-            new RamSamples<TContent, TShape>(storage, subject, schema, blueprint);
+            new RamSamples<TContent, TShape>(storage, subject.Value, schema, blueprint);
 
         public ICluster Removed(params ICocoon[] gone)
         {
@@ -108,8 +141,8 @@ namespace Xemo.Cluster
                 }
             );
             return
-                new XoRam<TContent>(
-                    new AsGrip(subject, id),
+                new AsCocoon<TContent>(
+                    new AsGrip(subject.Value, id),
                     storage,
                     mem,
                     schema

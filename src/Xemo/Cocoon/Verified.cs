@@ -6,14 +6,14 @@ namespace Xemo.Cocoon
     /// <summary>
     /// Information that ensures it is being filled with all necessary data.
     /// </summary>
-    public sealed class XoVerified<TInvestigate> : ICocoon
+    public sealed class Verified<TInvestigate> : ICocoon
     {
         private readonly Func<TInvestigate, (bool, string)>[] validations;
 
         /// <summary>
         /// Information that ensures it is being filled with all necessary data.
         /// </summary>
-        public XoVerified(TInvestigate candidate, params Func<TInvestigate, (bool, string)>[] valid)
+        public Verified(params Func<TInvestigate, (bool, string)>[] valid)
         {
             this.validations = valid;
         }
@@ -59,7 +59,7 @@ namespace Xemo.Cocoon
             }
             return
                 Merge.Target(
-                    (TInvestigate)First._(typeof(TInvestigate).GetConstructors())
+                    (TInvestigate)global::Tonga.Scalar.First._(typeof(TInvestigate).GetConstructors())
                     .Value()
                     .Invoke(parameters)
                 ).Post(candidate);
@@ -69,15 +69,15 @@ namespace Xemo.Cocoon
     /// <summary>
     /// Information that ensures it is being filled with all necessary data.
     /// </summary>
-    public static class XoVerified
+    public static class VerifiedCocoon
     {
         /// <summary>
         /// Information that ensures it is being filled with all necessary data.
         /// </summary>
-        public static XoVerified<TInvestigate> _<TInvestigate>(
+        public static Verified<TInvestigate> _<TInvestigate>(
             TInvestigate candidate,
             params Func<TInvestigate, (bool, string)>[] isValid
         ) =>
-            new(candidate, isValid);
+            new(isValid);
     }
 }

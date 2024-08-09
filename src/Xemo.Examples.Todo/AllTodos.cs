@@ -1,5 +1,6 @@
 ﻿using Xemo.Cluster;
 using Xemo.Cocoon;
+using Lazy = Xemo.Cluster.Lazy;
 
 namespace Xemo.Examples.Todo;
 
@@ -7,7 +8,7 @@ namespace Xemo.Examples.Todo;
 /// All todos which exist.
 /// </summary>
 public sealed class AllTodos(IMem memory) : ClusterEnvelope(
-    new LazyCluster(() =>
+    new Lazy(() =>
         XoSpawnCluster._(
             new
             {
@@ -15,7 +16,7 @@ public sealed class AllTodos(IMem memory) : ClusterEnvelope(
                 Due = DateTime.Now,
                 Subject = ""
             },
-            XoValidate.That(
+            Validated.That(
                 new { Subject = "", Due = DateTime.MinValue },
                 todo => (todo.Due > DateTime.Now, "Due date must be in the future.")
             ),

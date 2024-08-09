@@ -7,7 +7,7 @@ namespace Xemo.Cocoon
     /// Xemo which overrides data in the inner object by using the given function
     /// to generate the override.
     /// </summary>
-    public sealed class XoOverride<TOverride>(Func<TOverride> overrides, ICocoon inner) : ICocoon
+    public sealed class Overriding<TOverride>(Func<TOverride> overrides, ICocoon inner) : ICocoon
     {
         public IGrip Grip() => inner.Grip();
 
@@ -23,9 +23,9 @@ namespace Xemo.Cocoon
             inner.Schema(mask);
     }
 
-    public static class XoOverride
+    public static class Overriding
     {
-        public static XoOverride<TOverride> _<TOverride>(Func<TOverride> overrides, ICocoon inner) =>
+        public static Overriding<TOverride> _<TOverride>(Func<TOverride> overrides, ICocoon inner) =>
             new(overrides, inner);
     }
 }

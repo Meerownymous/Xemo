@@ -8,6 +8,7 @@ using Xemo.Azure.Blob.Probe;
 using Xemo.Cocoon;
 using Xemo.Grip;
 using Xunit;
+using First = Tonga.Scalar.First;
 
 namespace Xemo.Azure.Tests.Blob.Probe;
 

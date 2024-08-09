@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Xemo.Tests.Cocoon
 {
-    public sealed class XoRamTests
+    public sealed class AsCocoonTests
     {
         [Fact]
         public void CreatesWithIDInSlice()
@@ -194,7 +194,7 @@ namespace Xemo.Tests.Cocoon
         public void RejectsIDChange()
         {
             Assert.Throws<InvalidOperationException>(() =>
-                new XoRam("User")
+                new AsCocoon("User")
                     .Schema(
                         new
                         {
@@ -215,7 +215,7 @@ namespace Xemo.Tests.Cocoon
         public void MutatesInformation()
         {
             var info =
-                new XoRam("User").Schema(
+                new AsCocoon("User").Schema(
                     new
                     {
                         FirstName = "Ramirez",
@@ -234,7 +234,7 @@ namespace Xemo.Tests.Cocoon
         public void PreservesInformationOnMutation()
         {
             var info =
-                new XoRam("User").Schema(
+                new AsCocoon("User").Schema(
                     new
                     {
                         FirstName = "Ramirez",
@@ -253,7 +253,7 @@ namespace Xemo.Tests.Cocoon
         public void RemutatesInformation()
         {
             var info =
-                new XoRam("User").Schema(
+                new AsCocoon("User").Schema(
                     new
                     {
                         FirstName = "Ramirez",
@@ -279,7 +279,7 @@ namespace Xemo.Tests.Cocoon
                     LastName = "Memorius"
                 };
             var storage = AnonymousTypeDictionary._(schema);
-            XoRam
+            AsCocoon
                 .Make(new AsGrip("User", "1"), storage, schema)
                 .Mutate(new { FirstName = "Ulf", LastName = "Saveman" });
 
@@ -298,7 +298,7 @@ namespace Xemo.Tests.Cocoon
         {
             var users = new ConcurrentDictionary<string, object>();
             var xemo =
-                XoRam.Make(new AsGrip("User", "1"), users,
+                AsCocoon.Make(new AsGrip("User", "1"), users,
                     new
                     {
                         FirstName = "Ramirez",
