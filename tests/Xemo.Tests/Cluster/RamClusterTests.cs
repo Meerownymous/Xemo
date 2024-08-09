@@ -1,9 +1,10 @@
-﻿using Tonga.Scalar;
-using Xemo.Cocoon;
+﻿
+using Tonga.Scalar;
+using Xemo.Cluster;
 using Xunit;
 using First = Xemo.Cocoon.First;
 
-namespace Xemo.Cluster.Tests
+namespace Xemo.Tests.Cluster
 {
 	public sealed class RamClusterTests
 	{

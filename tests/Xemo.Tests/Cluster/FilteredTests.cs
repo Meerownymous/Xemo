@@ -1,11 +1,8 @@
-﻿
-using System;
-using Tonga.Scalar;
-using Xemo;
+﻿using Tonga.Scalar;
 using Xemo.Cluster;
 using Xunit;
 
-namespace Xemo.Cluster.Tests
+namespace Xemo.Tests.Cluster
 {
     public sealed class FilteredTests
     {

@@ -1,6 +1,7 @@
-﻿using Xunit;
+﻿using Xemo.Cocoon;
+using Xunit;
 
-namespace Xemo.Cocoon.Tests
+namespace Xemo.Tests.Cocoon
 {
 
     public sealed class OverridingTests
