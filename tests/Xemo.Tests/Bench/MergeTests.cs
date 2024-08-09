@@ -280,8 +280,8 @@ namespace Xemo.Tests.Bench
             );
         }
 
-        //[Fact(Skip = "For performance analysis only")]
-        [Fact]
+        [Fact(Skip = "For performance analysis only")]
+        //[Fact]
         public void Investigation()
         {
             var sw = new Stopwatch();
