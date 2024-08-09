@@ -25,6 +25,24 @@ public sealed class NoDuplicatesTests
     }
     
     [Fact]
+    public void OptionallyIgnoresDuplicate()
+    {
+        var book =
+            new { Title = "The tale of anonymous clusters", Author = "Cody Codeson" };
+        
+        var books = 
+            NoDuplicates._(
+                new{ Title = "", Author = "" },
+                RamCluster.Allocate("books", new { Title = "", ISBN = "", Author = "" }),
+                throwOnDuplicate: false
+            );
+        books.Create(book);
+        books.Create(book);
+
+        Assert.Single(books);
+    }
+    
+    [Fact]
     public void AllowsCreationOfNonDuplicates()
     {
         var book =
