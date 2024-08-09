@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Xemo.Cocoon.Tests
 {
-    public sealed class XoFirstTests
+    public sealed class FirstTests
     {
         [Fact]
         public void FindsFirst()
@@ -12,8 +12,8 @@ namespace Xemo.Cocoon.Tests
 
             Assert.Equal(
                 "Meerow",
-                new XoFirst(
-                    new XoWith(
+                new First(
+                    new With(
                         RamCluster.Allocate("Personalities", schema),
                         new { ID = "Meerow" },
                         new { ID = "Dobertus Meow" }
@@ -29,9 +29,9 @@ namespace Xemo.Cocoon.Tests
 
             Assert.Equal(
                 "Dobertus Meow",
-                XoFirst.Sampled(
+                First.Sampled(
                     schema,
-                    new XoWith(
+                    new With(
                         RamCluster.Allocate("Personalities", schema),
                         new { ID = "Meerow" },
                         new { ID = "Dobertus Meow" }

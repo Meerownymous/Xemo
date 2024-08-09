@@ -4,7 +4,7 @@ namespace Xemo.Cocoon
     /// <summary>
     /// Information whic is created on first request.
     /// </summary>
-    public sealed class XoLazy(Func<ICocoon> origin) : ICocoon
+    public sealed class Lazy(Func<ICocoon> origin) : ICocoon
     {
         private readonly Lazy<ICocoon> core = new(origin);
 

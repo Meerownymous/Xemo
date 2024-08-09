@@ -45,7 +45,7 @@ namespace Xemo.Cluster.Probe
                     {
                         yield return
                             AsSample._(
-                                new XoRam<TContent>(
+                                new AsCocoon<TContent>(
                                     new AsGrip(subject, seed), 
                                     mem,
                                     originSchema
@@ -81,7 +81,7 @@ namespace Xemo.Cluster.Probe
                 if (mem.TryGetValue(seed, out content))
                     yield return
                         new AsSample<TSample>(
-                            XoRam.Make(
+                            AsCocoon.Make(
                                 new AsGrip(subject, seed),
                                 mem,
                                 originSchema

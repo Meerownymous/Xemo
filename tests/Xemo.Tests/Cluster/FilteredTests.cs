@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Xemo.Cluster.Tests
 {
-    public sealed class XoFilteredTests
+    public sealed class FilteredTests
     {
         [Fact]
         public void Reduces()
@@ -19,7 +19,7 @@ namespace Xemo.Cluster.Tests
             Assert.Equal(
                 "Twenty",
                 First._(
-                    XoFiltered._(
+                    Filtered._(
                         cluster,
                         new { ID = "" },
                         slice => slice.ID == "20"

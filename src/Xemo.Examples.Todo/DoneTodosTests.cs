@@ -1,6 +1,7 @@
 ﻿using Tonga.Scalar;
 using Xemo.Cocoon;
 using Xunit;
+using First = Xemo.Cocoon.First;
 
 namespace Xemo.Examples.Todo
 {
@@ -46,7 +47,7 @@ namespace Xemo.Examples.Todo
             );
             Assert.Equal(
                 "I am done",
-                new XoFirst(
+                new First(
                     new DoneTodos(cluster)
                 )
                 .Sample(

@@ -3,7 +3,7 @@
 namespace Xemo.Cocoon.Tests
 {
 
-    public sealed class XoOverrideTests
+    public sealed class OverridingTests
     {
         [Fact]
         public void OverridesContents()
@@ -11,9 +11,9 @@ namespace Xemo.Cocoon.Tests
             var schema = new { Title = "", Watched = false };
 
             Assert.True(
-                XoOverride
+                Overriding
                     ._(() => new { Watched = true },
-                        new XoRam("Movie")
+                        new AsCocoon("Movie")
                         .Schema(schema)
                         .Mutate(
                             new { Title = "Back to the future" }

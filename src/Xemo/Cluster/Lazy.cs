@@ -6,7 +6,7 @@ namespace Xemo.Cluster
     /// <summary>
     /// Cluster which is lazyliy initialized.
     /// </summary>
-	public sealed class LazyCluster(Func<ICluster> origin) : ICluster
+	public sealed class Lazy(Func<ICluster> origin) : ICluster
 	{
         private readonly Lazy<ICluster> origin = new(origin);
 

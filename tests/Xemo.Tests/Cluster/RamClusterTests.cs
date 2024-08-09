@@ -1,6 +1,7 @@
 ﻿using Tonga.Scalar;
 using Xemo.Cocoon;
 using Xunit;
+using First = Xemo.Cocoon.First;
 
 namespace Xemo.Cluster.Tests
 {
@@ -15,7 +16,7 @@ namespace Xemo.Cluster.Tests
 
             Assert.Equal(
                 13,
-                XoFirst.Sample(
+                First.Sample(
                     users.Samples(new { Name = "", Age = 0 })
                         .Filtered(info => info.Name == "Jay")
                 ).Age
@@ -29,7 +30,7 @@ namespace Xemo.Cluster.Tests
             users.Create(new { Name = "Dobert", Age = 1 });
             Assert.Equal(
                 1,
-                XoFirst.Sample(
+                First.Sample(
                     users.Samples(new { Name = "", Age = 0 })
                         .Filtered(u => u.Name == "Dobert")
                 ).Age

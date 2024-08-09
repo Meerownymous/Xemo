@@ -2,14 +2,14 @@
 
 namespace Xemo.Cocoon.Tests
 {
-	public sealed class XoValidateTests
+	public sealed class ValidatedTests
 	{
         [Fact]
         public void PreservesAdditionalInformation()
         {
             Assert.Equal(
                 "Important",
-                XoValidate.That(
+                Validated.That(
                     new { Name = "", Success = false }
                 ).Sample(
                     new { Name = "Succeed please", Success = true, SomeThingElse = "Important" }
@@ -21,7 +21,7 @@ namespace Xemo.Cocoon.Tests
         public void PassesWhenInformationSufficient()
         {
             Assert.True(
-                XoValidate.That(
+                Validated.That(
                     new { Name = "", Success = false }
                 ).Sample(
                     new { Name = "Succeed please", Success = true }
