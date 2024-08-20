@@ -22,7 +22,7 @@ public sealed class BlobMemory(string blobStorageUri, string storageAccountName,
         )
     );
     
-    public ICocoon Cocoon(string subject, string id) => Cluster(subject).Xemo(id);
+    public ICocoon Cocoon(string subject, string id) => Cluster(subject).Cocoon(id);
 
     public ICluster Cluster(string subject)
     {

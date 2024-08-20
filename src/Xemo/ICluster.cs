@@ -8,7 +8,7 @@
 		/// <summary>
 		/// Single item in this cluster.
 		/// </summary>
-        ICocoon Xemo(string id);
+        ICocoon Cocoon(string id);
 
 		/// <summary>
 		/// Samples from this cluster in the given example shape.

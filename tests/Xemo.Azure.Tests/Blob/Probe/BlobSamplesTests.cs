@@ -50,7 +50,6 @@ public sealed class BlobSamplesTests
                 BlobCocoon.Make(
                     new AsGrip(subject, id1), 
                     new DeadMem("testing"), 
-                    container, 
                     cache,
                     new { Type = "", Name = "Cocoon"}
                 ),
@@ -62,7 +61,6 @@ public sealed class BlobSamplesTests
                 BlobCocoon.Make(
                     new AsGrip(subject, id2), 
                     new DeadMem("testing"), 
-                    container, 
                     cache,
                     new { Type = "", Name = ""}
                 ),
@@ -116,7 +114,6 @@ public sealed class BlobSamplesTests
                 BlobCocoon.Make(
                     new AsGrip(subject, id1), 
                     new DeadMem("testing"), 
-                    container, 
                     cache,
                     new { Type = "", Name = ""}
                 ),
@@ -128,7 +125,6 @@ public sealed class BlobSamplesTests
                 BlobCocoon.Make(
                     new AsGrip(subject, id2), 
                     new DeadMem("testing"), 
-                    container, 
                     cache,
                     new { Type = "", Name = ""}
                 ),

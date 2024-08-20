@@ -8,9 +8,9 @@ namespace Xemo.Cluster
     /// </summary>
     public sealed class XoFiltered<TFilterSlice>(ICluster origin, TFilterSlice filterSlice, Func<TFilterSlice, bool> match) : ICluster
     {
-        public ICocoon Xemo(string id)
+        public ICocoon Cocoon(string id)
         {
-            var xemo = origin.Xemo(id);
+            var xemo = origin.Cocoon(id);
             if (!match(xemo.Sample(filterSlice)))
                 throw new ArgumentException($"'{id}' does not match the filter critera.");
             return xemo;

@@ -81,6 +81,53 @@ public sealed class BlobClusterTests
     }
     
     [Fact]
+    public void ListsEntriesOnce()
+    {
+        string subject = "container-" + Guid.NewGuid();
+        string id1 = "cocoon-" + Guid.NewGuid();
+        
+        var blobClient =
+            new BlobServiceClient(
+                new Uri(new Secret("blobStorageUri").AsString()),
+                new StorageSharedKeyCredential(
+                    new Secret("storageAccountName").AsString(),
+                    new Secret("storageAccountSecret").AsString()
+                )
+            );
+
+        var container = 
+            blobClient.GetBlobContainerClient(
+                new EncodedContainerName(subject).AsString()
+            );
+        container.CreateIfNotExists();
+        try
+        {
+            container.GetBlobClient(new EncodedBlobName(id1).AsString())
+                .Upload(
+                    new MemoryStream(
+                        Encoding.UTF8.GetBytes(
+                            JsonConvert.SerializeObject(new
+                            {
+                                Type = "Cutter",
+                                Name = "Bob"
+                            })
+                        )
+                    )
+                );
+
+            Assert.Equal(1,
+                BlobCluster.Allocate(
+                    new DeadMem("no references"), subject, new { Type = "", Name = "" }, blobClient
+                ).Count()
+            );
+        }
+        finally
+        {
+            container.Delete();
+        }
+    }
+    
+    [Fact]
     public void FeedsSamplesFromRemote()
     {
         string subject = "container-" + Guid.NewGuid();
@@ -208,6 +255,62 @@ public sealed class BlobClusterTests
                 .Sample(new { Name = "" })
                 .Name
                 
+            );
+        }
+        finally
+        {
+            container.Delete();
+        }
+    }
+    
+        [Fact]
+    public void CanCreateCocoon()
+    {
+        string subject = "container-" + Guid.NewGuid();
+        string id = "cocoon-" + Guid.NewGuid();
+        
+        var blobClient =
+            new BlobServiceClient(
+                new Uri(new Secret("blobStorageUri").AsString()),
+                new StorageSharedKeyCredential(
+                    new Secret("storageAccountName").AsString(),
+                    new Secret("storageAccountSecret").AsString()
+                )
+            );
+
+        var container = 
+            blobClient.GetBlobContainerClient(
+                new EncodedContainerName(subject).AsString()
+            );
+        container.CreateIfNotExists();
+        try
+        {
+            var cluster =
+                BlobCluster.Allocate(
+                    new DeadMem("unit testing"), subject, new { Type = "", Name = "" }, blobClient
+                );
+
+            cluster.Create(new
+            {
+                Name = "Bob",
+                Type = "Cutter"
+            });
+            
+            Assert.Equal(
+                new
+                {
+                    Name = "Bob",
+                    Type = "Cutter"
+                }.ToString(),
+                First._(
+                        cluster
+                            .Samples(new { Type = "", Name = "" })
+                            .Filtered(sample => sample.Type == "Cutter")
+                    ).Value()
+                    .Cocoon()
+                    .Sample(new { Name = "", Type = "" })
+                    .ToString()
+                    
             );
         }
         finally

@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Concurrent;
-using System.Numerics;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
+using System.ComponentModel.Design.Serialization;
 using System.Text;
-using System.Text.RegularExpressions;
 using Azure.Storage.Blobs;
+using Newtonsoft.Json;
+using Tonga.IO;
+using Tonga.Text;
 using Xemo.Azure.Blob.Probe;
+using Xemo.Bench;
 using Xemo.Cluster;
 using Xemo.Cluster.Probe;
 using Xemo.Grip;
@@ -36,22 +37,48 @@ public sealed class BlobCluster
         IMem relations, 
         string subject, 
         TContent schema, 
-        BlobServiceClient blobClient
+        BlobServiceClient blobHome
     ) =>
-        new(relations, subject, schema, blobClient);
+        new(relations, subject, schema, blobHome);
+    
+    /// <summary>
+    /// Cluster of information stored in Ram.
+    /// </summary>
+    public static BlobCluster<TContent> Allocate<TContent>(
+        IMem relations, 
+        string subject, 
+        TContent schema, 
+        BlobServiceClient blobHome,
+        Func<ConcurrentDictionary<string, Tuple<BlobClient, ISample<TContent>>>> makeCache) =>
+        new(relations, subject, schema, blobHome, makeCache);
 }
 
 public sealed class BlobCluster<TContent>(
     IMem relations, 
     string subject,
     TContent schema,
-    BlobServiceClient client
+    BlobServiceClient blobHome,
+    Func<ConcurrentDictionary<string, Tuple<BlobClient, ISample<TContent>>>> makeCache
 ) : ICluster
 {
     private readonly Lazy<BlobContainerClient> container = 
-        new(() => client.GetBlobContainerClient(new EncodedContainerName(subject).AsString()));
+        new(() => blobHome.GetBlobContainerClient(new EncodedContainerName(subject).AsString()));
     private readonly Lazy<ConcurrentDictionary<string, Tuple<BlobClient, ISample<TContent>>>> cache = 
-        new(() => PrefilledClientCache(subject, relations, client, schema));
+        new(makeCache);
+    
+    public BlobCluster(
+        IMem relations, 
+        string subject,
+        TContent schema,
+        BlobServiceClient blobHome    
+    ) : this(
+        relations,
+        subject,
+        schema,
+        blobHome,
+        () => PrefilledClientCache(subject, relations, blobHome, schema)
+    )
+    { }
     
     public IEnumerator<ICocoon> GetEnumerator()
     {
@@ -66,11 +93,11 @@ public sealed class BlobCluster<TContent>(
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public ICocoon Xemo(string id)
+    public ICocoon Cocoon(string id)
     {
         Tuple<BlobClient, ISample<TContent>> cached;
         if (!this.cache.Value.TryGetValue(new AsGrip(subject,id).Combined(), out cached))
-            throw new ArgumentException($"{subject} '{id}' does not exist.");
+            throw new ArgumentException($"'{subject}.{id}' does not exist.");
         return cached.Item2.Cocoon();}
 
 
@@ -82,20 +109,43 @@ public sealed class BlobCluster<TContent>(
 
     public ICocoon Create<TNew>(TNew plan)
     {
-        container.Value.CreateIfNotExists();
-        var id = new PropertyValue("ID", plan, fallBack: () => Guid.NewGuid()).AsString(); 
+        var id = new PropertyValue("ID", plan, fallBack: () => Guid.NewGuid()).AsString();
         return
-            new BlobCocoon<TContent>(
-                new AsGrip(subject, id),
-                relations,
-                this.container.Value,
-                this.cache.Value,
-                schema
-            ).Mutate(plan);
+            this.cache.Value.AddOrUpdate(
+                $"{subject}.{id}",
+                _ =>
+                {
+                    container.Value.CreateIfNotExists();
+                    var content = Patch.Target(schema, relations).Post(plan);
+                    var blobClient = container.Value.GetBlobClient(id);
+                    Upload(content, blobClient);
+                    return new Tuple<BlobClient, ISample<TContent>>(
+                        blobClient,
+                        new AsSample<TContent>(
+                            new BlobCocoon<TContent>(
+                                new AsGrip(subject, id),
+                                relations,
+                                cache.Value,
+                                schema
+                            ),
+                            content
+                        )
+                    );
+                },
+                (key, _) => throw new ApplicationException($"{key} cannot be created because it already exists.")
+            ).Item2.Cocoon();
+        
     }
 
     public ICluster Removed(params ICocoon[] gone)
     {
+        foreach (var cocoon in gone)
+        {
+            Tuple<BlobClient, ISample<TContent>> toRemove;
+            if (this.cache.Value.TryRemove(cocoon.Grip().Combined(), out toRemove))
+                toRemove.Item1.Delete();
+
+        }
         return this;
     }
 
@@ -115,33 +165,46 @@ public sealed class BlobCluster<TContent>(
             foreach (var blob in container.GetBlobs())
             {
                 cache.AddOrUpdate(
-                    blob.Name, _ =>
+                    $"{subject}.{blob.Name}", _ =>
                     {
                         var cocoon =
                             new BlobCocoon<TContent>(
                                 new AsGrip(subject, blob.Name),
                                 relations,
-                                container,
                                 cache,
                                 schema
                             );
+                        var blobClient = container.GetBlobClient(blob.Name);
                         return
                             new Tuple<BlobClient, ISample<TContent>>(
-                                container.GetBlobClient(blob.Name),
-                                new LazySample<TContent>(cocoon, () => cocoon.Sample(schema))
+                                blobClient,
+                                new LazySample<TContent>(
+                                    cocoon,
+                                    () => 
+                                    JsonConvert.DeserializeAnonymousType(
+                                        AsText._(
+                                            new AsInput(blobClient.Download().Value.Content),
+                                            Encoding.UTF8
+                                        ).AsString(),
+                                        schema
+                                    )
+                                )
                             );
                     },
-                    (_, existing) =>
-                        new Tuple<BlobClient, ISample<TContent>>(
-                            existing.Item1,
-                            new LazySample<TContent>(
-                                existing.Item2.Cocoon(),
-                                () => existing.Item2.Cocoon().Sample(schema)
-                            )
-                        )
+                    (_, existing) => existing
                 );
             }
         }
         return cache;
     }
+    
+    private static void Upload(TContent newContent, BlobClient blobClient) =>
+        blobClient.Upload(
+            new MemoryStream(
+                Encoding.UTF8.GetBytes(
+                    JsonConvert.SerializeObject(newContent)
+                )
+            ),
+            overwrite: true
+        );
 }

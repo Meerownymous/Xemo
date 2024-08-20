@@ -16,7 +16,7 @@ namespace Xemo.Cluster
         )
         { }
 
-        public ICocoon Xemo(string id) => core.Xemo(id);
+        public ICocoon Cocoon(string id) => core.Cocoon(id);
 
         public IEnumerator<ICocoon> GetEnumerator() =>
             core.GetEnumerator();

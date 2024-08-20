@@ -28,7 +28,7 @@ namespace Xemo
             ICluster result;
             if (!this.clusters.TryGetValue(subject, out result))
                 throw new ArgumentException($"'{subject}' is an unknown subject.");
-            return result.Xemo(id);
+            return result.Cocoon(id);
         }
 
         public IMem Allocate<TSchema>(string subject, TSchema schema, bool errorIfExists = true)

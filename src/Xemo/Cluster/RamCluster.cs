@@ -65,7 +65,7 @@ namespace Xemo.Cluster
                 );
         }
 
-        public ICocoon Xemo(string id)
+        public ICocoon Cocoon(string id)
         {
             if (!storage.ContainsKey(id))
                 throw new ArgumentException($"{subject} '{id}' does not exist.");

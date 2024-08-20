@@ -17,10 +17,9 @@ public static class BlobCocoon
     public static BlobCocoon<TSchema> Make<TSchema>(
         IGrip grip, 
         IMem relations,
-        BlobContainerClient container,
         ConcurrentDictionary<string, Tuple<BlobClient,ISample<TSchema>>> cache, TSchema schema 
     ) =>
-        new(grip, relations, container, cache, schema);
+        new(grip, relations, cache, schema);
 }
 
 /// <summary>
@@ -29,7 +28,6 @@ public static class BlobCocoon
 public sealed class BlobCocoon<TContent>(
     IGrip grip,
     IMem relations,
-    BlobContainerClient container,
     ConcurrentDictionary<string,Tuple<BlobClient,ISample<TContent>>> cache,
     TContent schema
 ) : ICocoon
@@ -50,47 +48,28 @@ public sealed class BlobCocoon<TContent>(
 
     public ICocoon Mutate<TPatch>(TPatch mutation)
     {
-        cache.AddOrUpdate(grip.Combined(), 
-        _ =>
-        {
-            var blobClient = 
-                container.GetBlobClient(new EncodedBlobName(grip.ID()).AsString());
-            var patched = 
-                Patch
-                    .Target(Current(), relations)
-                    .Post(mutation);
-            Upload(patched, blobClient);
-            return new Tuple<BlobClient, ISample<TContent>>(blobClient, AsSample._(this, patched));
-        }, 
-        (_, existing) =>
-        {
-            var patched = Patch.Target(existing.Item2.Content(), relations).Post(mutation);
-            Upload(patched, existing.Item1);
-            return new Tuple<BlobClient, ISample<TContent>>(existing.Item1, AsSample._(this, patched));
-        });
+        cache.AddOrUpdate(
+            grip.Combined(), 
+            _ => throw new ApplicationException($"{grip.Combined()} was assumed to exist in cache but doesn't."), 
+            (_, existing) =>
+            {
+                var patched = Patch.Target(existing.Item2.Content(), relations).Post(mutation);
+                var blobClient = existing.Item1; 
+                Upload(patched, blobClient);
+                return new Tuple<BlobClient, ISample<TContent>>(existing.Item1, AsSample._(this, patched));
+            });
         return this;
     }
 
     private bool HasSchema() => schema != null && !schema.Equals(default(TContent));
-    
-    private TContent Current() =>
-        cache.GetOrAdd(grip.Combined(), _ =>
-            {
-                var blobClient = 
-                    container.GetBlobClient(new EncodedBlobName(grip.ID()).AsString());
-                var content = 
-                    blobClient.Exists()
-                    ? JsonConvert.DeserializeAnonymousType(
-                        AsText._(
-                            new AsInput(blobClient.Download().Value.Content),
-                            Encoding.UTF8
-                        ).AsString(),
-                        schema
-                    )
-                    : schema;
-                return new Tuple<BlobClient, ISample<TContent>>(blobClient, AsSample._(this, content));
-            }
-        ).Item2.Content();
+
+    private TContent Current()
+    {
+        Tuple<BlobClient, ISample<TContent>> existing;
+        if (!cache.TryGetValue(grip.Combined(), out existing))
+            throw new ApplicationException($"{grip.Combined()} should exist in cache, but does not.");
+        return existing.Item2.Content();
+    }
 
     private static void Upload(TContent newContent, BlobClient blobClient) =>
         blobClient.Upload(

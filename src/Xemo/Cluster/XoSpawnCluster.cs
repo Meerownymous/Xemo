@@ -10,7 +10,7 @@ namespace Xemo.Cluster
     /// </summary>
     public sealed class XoSpawnCluster<TSchema>(TSchema schema, ICocoon spawnGuard, ICluster origin) : ICluster
     {
-        public ICocoon Xemo(string id) => origin.Xemo(id);
+        public ICocoon Cocoon(string id) => origin.Cocoon(id);
 
         public ICocoon Create<TNew>(TNew plan) =>
             origin
