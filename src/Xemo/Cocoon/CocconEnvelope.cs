@@ -9,7 +9,7 @@
         /// Envelope for Information.
         /// </summary>
         public CocoonEnvelope(Func<ICocoon> core) : this(
-            new XoLazy(core)
+            new Lazy(core)
         )
         { }
 

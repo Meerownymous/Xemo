@@ -8,7 +8,7 @@ namespace Xemo.Cocoon;
     /// <summary>
     /// Information stored in RAM.
     /// </summary>
-    public sealed class XoRam : ICocoon
+    public sealed class AsCocoon : ICocoon
     {
         private readonly IGrip passport;
 
@@ -17,7 +17,7 @@ namespace Xemo.Cocoon;
         /// Before using, you need to define a schema, calling
         /// Schema(propertyObject).
         /// </summary>
-        public XoRam(string subject) : this(
+        public AsCocoon(string subject) : this(
             new LazyGrip(() => Guid.NewGuid().ToString(), () => subject)
         )
         {
@@ -28,7 +28,7 @@ namespace Xemo.Cocoon;
         /// Before using, you need to define a schema, calling
         /// Schema(propertyObject).
         /// </summary>
-        public XoRam(string subject, string id) : this(new AsGrip(subject, id))
+        public AsCocoon(string subject, string id) : this(new AsGrip(subject, id))
         {
         }
 
@@ -37,7 +37,7 @@ namespace Xemo.Cocoon;
         /// Before using, you need to define a schema, calling
         /// Schema(propertyObject).
         /// </summary>
-        public XoRam(IGrip id)
+        public AsCocoon(IGrip id)
         {
             this.passport = id;
         }
@@ -51,18 +51,18 @@ namespace Xemo.Cocoon;
             throw new InvalidOperationException("Define a schema first.");
 
         public ICocoon Schema<TSchema>(TSchema schema) =>
-            new XoRam<TSchema>(this.passport, new ConcurrentDictionary<string, TSchema>(), schema);
+            new AsCocoon<TSchema>(this.passport, new ConcurrentDictionary<string, TSchema>(), schema);
 
-        public static XoRam<TSchema> Make<TSchema>(
+        public static AsCocoon<TSchema> Make<TSchema>(
             IGrip id, ConcurrentDictionary<string, TSchema> storage, TSchema schema
         ) =>
-            new XoRam<TSchema>(id, storage, schema);
+            new AsCocoon<TSchema>(id, storage, schema);
     }
 
     /// <summary>
     /// Information stored in RAM.
     /// </summary>
-    public sealed class XoRam<TContent>(
+    public sealed class AsCocoon<TContent>(
         IGrip grip,
         ConcurrentDictionary<string, TContent> storage,
         IMem mem,
@@ -72,14 +72,14 @@ namespace Xemo.Cocoon;
         /// <summary>
         /// Information stored in RAM.
         /// </summary>
-        public XoRam() : this(new BlankGrip())
+        public AsCocoon() : this(new BlankGrip())
         {
         }
 
         /// <summary>
         /// Information stored in RAM.
         /// </summary>
-        public XoRam(IGrip id) : this(
+        public AsCocoon(IGrip id) : this(
             id,
             new ConcurrentDictionary<string, TContent>()
         )
@@ -89,7 +89,7 @@ namespace Xemo.Cocoon;
         /// <summary>
         /// Information stored in RAM.
         /// </summary>
-        public XoRam(
+        public AsCocoon(
             IGrip id,
             ConcurrentDictionary<string, TContent> storage,
             TContent schema
@@ -105,7 +105,7 @@ namespace Xemo.Cocoon;
         /// <summary>
         /// Information stored in RAM.
         /// </summary>
-        public XoRam(
+        public AsCocoon(
             IGrip id,
             ConcurrentDictionary<string, TContent> storage
         ) : this(
@@ -120,7 +120,7 @@ namespace Xemo.Cocoon;
         /// <summary>
         /// Information stored in RAM.
         /// </summary>
-        public XoRam(
+        public AsCocoon(
             IGrip id,
             ConcurrentDictionary<string, TContent> storage,
             IMem mem

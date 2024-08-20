@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Xemo.Bench;
 using Xemo.Grip;
 using Xunit;
 
-namespace Xemo.Bench.Tests
+namespace Xemo.Tests.Bench
 {
     public sealed class BirthTests
     {

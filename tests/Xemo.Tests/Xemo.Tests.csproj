@@ -35,7 +35,6 @@
     <None Remove="Debug\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Cluster\" />
     <Folder Include="Tonga\" />
     <Folder Include="Tonga\Text\" />
     <Folder Include="Cluster\Probe\" />

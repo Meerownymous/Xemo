@@ -12,7 +12,7 @@ namespace Xemo.Cluster
         /// Envelope for clusters.
         /// </summary>
         public ClusterEnvelope(Func<ICluster> core) : this(
-            new LazyCluster(core)
+            new Lazy(core)
         )
         { }
 

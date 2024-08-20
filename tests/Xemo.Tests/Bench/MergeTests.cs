@@ -103,7 +103,7 @@ namespace Xemo.Tests.Bench
                     (leftID, rightID) => { result = leftID; return rightID; },
                     (_, _) => throw new Exception("one to many is not tested here.")
                 )
-                .Post(new { Author = new XoRam("User", "1") });
+                .Post(new { Author = new AsCocoon("User", "1") });
 
             Assert.Equal(schema.Author, result);
         }
@@ -113,7 +113,7 @@ namespace Xemo.Tests.Bench
         {
             IGrip result = default;
 
-            var patch = new { Author = new XoRam("User", "1") };
+            var patch = new { Author = new AsCocoon("User", "1") };
 
             Merge
                 .Target(
@@ -280,8 +280,8 @@ namespace Xemo.Tests.Bench
             );
         }
 
-        //[Fact(Skip = "For performance analysis only")]
-        [Fact]
+        [Fact(Skip = "For performance analysis only")]
+        //[Fact]
         public void Investigation()
         {
             var sw = new Stopwatch();

@@ -8,7 +8,7 @@ namespace Xemo.Cluster
     /// spawn guard. That guard ensures that the minimum data for a xemo is
     /// declared when creating an object.
     /// </summary>
-    public sealed class XoSpawnCluster<TSchema>(TSchema schema, ICocoon spawnGuard, ICluster origin) : ICluster
+    public sealed class SpawnGuarded<TSchema>(TSchema schema, ICocoon spawnGuard, ICluster origin) : ICluster
     {
         public ICocoon Cocoon(string id) => origin.Cocoon(id);
 
@@ -45,7 +45,7 @@ namespace Xemo.Cluster
         /// spawn guard. That guard ensures that the minimum data for a xemo is
         /// declared when creating an object.
         /// </summary>
-        public static XoSpawnCluster<TSchema> _<TSchema>(TSchema schema, ICocoon spawnGuard, ICluster origin) =>
+        public static SpawnGuarded<TSchema> _<TSchema>(TSchema schema, ICocoon spawnGuard, ICluster origin) =>
             new(schema, spawnGuard, origin);
     }
 }
