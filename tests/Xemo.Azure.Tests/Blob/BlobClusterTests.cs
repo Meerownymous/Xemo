@@ -19,96 +19,64 @@ public sealed class BlobClusterTests
         string subject = "container-" + Guid.NewGuid();
         string id1 = "cocoon-" + Guid.NewGuid();
         string id2 = "cocoon-" + Guid.NewGuid();
-        
-        var blobClient =
-            new BlobServiceClient(
-                new Uri(new Secret("blobStorageUri").AsString()),
-                new StorageSharedKeyCredential(
-                    new Secret("storageAccountName").AsString(),
-                    new Secret("storageAccountSecret").AsString()
+
+        var service = new TestBlobServiceClient();
+        using var container = new TestBlobContainer(subject, service);
+        new TestBlobClient(id1, container).Value()
+            .Upload(
+                new MemoryStream(
+                    Encoding.UTF8.GetBytes(
+                        JsonConvert.SerializeObject(new
+                        {
+                            Type = "Cutter",
+                            Name = "Bob"
+                        })
+                    )
                 )
             );
-
-        var container = 
-            blobClient.GetBlobContainerClient(
-                new EncodedContainerName(subject).AsString()
+        new TestBlobClient(id2, container).Value()
+            .Upload(
+                new MemoryStream(
+                    Encoding.UTF8.GetBytes(
+                        JsonConvert.SerializeObject(new
+                        {
+                            Type = "Ketch",
+                            Name = "Raven"
+                        })
+                    )
+                )
             );
-        container.CreateIfNotExists();
-        try
-        {
-            container.GetBlobClient(new EncodedBlobName(id1).AsString())
-                .Upload(
-                    new MemoryStream(
-                        Encoding.UTF8.GetBytes(
-                            JsonConvert.SerializeObject(new
-                            {
-                                Type = "Cutter",
-                                Name = "Bob"
-                            })
-                        )
-                    )
-                );
-            container.GetBlobClient(new EncodedBlobName(id2).AsString())
-                .Upload(
-                    new MemoryStream(
-                        Encoding.UTF8.GetBytes(
-                            JsonConvert.SerializeObject(new
-                            {
-                                Type = "Ketch",
-                                Name = "Raven"
-                            })
-                        )
-                    )
-                );
             
-            Assert.Equal(
-                result,
-                ItemAt._(
-                    Mapped._(
-                        cocoon => cocoon.Sample(new { Name = "" }).Name,
-                        BlobCluster.Allocate(
-                            new DeadMem("unit testing"), subject, new{ Type = "", Name = "" }, blobClient
-                        )
-                    ).Order(),
-                    needle
-                ).Value()
-            );
-        }
-        finally
-        {
-            container.Delete();
-        }
+        Assert.Equal(
+            result,
+            ItemAt._(
+                Mapped._(
+                    cocoon => cocoon.Sample(new { Name = "" }).Name,
+                    BlobCluster.Allocate(
+                        new DeadMem("unit testing"), 
+                        subject, 
+                        new{ Type = "", Name = "" }, 
+                        service.Value()
+                    )
+                ).Order(),
+                needle
+            ).Value()
+        );
     }
     
     [Fact]
     public void RejectsOverriding()
     {
         string subject = "container-" + Guid.NewGuid();
-        
-        var blobClient =
-            new BlobServiceClient(
-                new Uri(new Secret("blobStorageUri").AsString()),
-                new StorageSharedKeyCredential(
-                    new Secret("storageAccountName").AsString(),
-                    new Secret("storageAccountSecret").AsString()
-                )
-            );
-        try
+
+        var service = new TestBlobServiceClient();
+        using (new TestBlobContainer(subject, service))
         {
-            var users = BlobCluster.Allocate(subject, new { ID = 0, Name = "", Age = 0 }, blobClient);
+            var users = BlobCluster.Allocate(subject, new { ID = 0, Name = "", Age = 0 }, service.Value());
             users.Create(new { ID = 1, Name = "Dobert", Age = 2 });
             Assert.Throws<InvalidOperationException>(() =>
                 users.Create(new { ID = 1, Name = "Dobert", Age = 1 }, overrideExisting: false)
             );
-        }
-        finally
-        {
-            var container = 
-                blobClient.GetBlobContainerClient(
-                    new EncodedContainerName(subject).AsString()
-                );
-            if(container.Exists())
-                container.Delete();
         }
     }
         
@@ -116,22 +84,13 @@ public sealed class BlobClusterTests
     public void AllowsOverridingOnDemand()
     {
         string subject = "container-" + Guid.NewGuid();
-        
-        var blobClient =
-            new BlobServiceClient(
-                new Uri(new Secret("blobStorageUri").AsString()),
-                new StorageSharedKeyCredential(
-                    new Secret("storageAccountName").AsString(),
-                    new Secret("storageAccountSecret").AsString()
-                )
-            );
-        
-        try
+        var service = new TestBlobServiceClient();
+        using (new TestBlobContainer(subject, service))
         {
-            var users = BlobCluster.Allocate(subject, new { ID = 0, Name = "", Age = 0 }, blobClient);
+            var users = BlobCluster.Allocate(subject, new { ID = 0, Name = "", Age = 0 }, service.Value());
             users.Create(new { ID = 1, Name = "Dobert", Age = 2 });
             users.Create(new { ID = 1, Name = "Dobert", Age = 1 }, overrideExisting: true);
-                
+
             Assert.Equal(
                 1,
                 users.Samples(new { Name = "", Age = 0 })
@@ -141,15 +100,6 @@ public sealed class BlobClusterTests
                     .Age
             );
         }
-        finally
-        {
-            var container = 
-                blobClient.GetBlobContainerClient(
-                    new EncodedContainerName(subject).AsString()
-                );
-            if(container.Exists())
-                container.Delete();
-        }
     }
     
     [Fact]
@@ -157,45 +107,29 @@ public sealed class BlobClusterTests
     {
         string subject = "container-" + Guid.NewGuid();
         string id1 = "cocoon-" + Guid.NewGuid();
-        
-        var blobClient =
-            new BlobServiceClient(
-                new Uri(new Secret("blobStorageUri").AsString()),
-                new StorageSharedKeyCredential(
-                    new Secret("storageAccountName").AsString(),
-                    new Secret("storageAccountSecret").AsString()
+
+        var service = new TestBlobServiceClient();
+        using (var container = new TestBlobContainer(subject, service))
+        using (var client = new TestBlobClient(id1, container))
+        {
+
+            client.Value().Upload(
+                new MemoryStream(
+                    Encoding.UTF8.GetBytes(
+                        JsonConvert.SerializeObject(new
+                        {
+                            Type = "Cutter",
+                            Name = "Bob"
+                        })
+                    )
                 )
             );
-
-        var container = 
-            blobClient.GetBlobContainerClient(
-                new EncodedContainerName(subject).AsString()
-            );
-        container.CreateIfNotExists();
-        try
-        {
-            container.GetBlobClient(new EncodedBlobName(id1).AsString())
-                .Upload(
-                    new MemoryStream(
-                        Encoding.UTF8.GetBytes(
-                            JsonConvert.SerializeObject(new
-                            {
-                                Type = "Cutter",
-                                Name = "Bob"
-                            })
-                        )
-                    )
-                );
 
             Assert.Single(
                 BlobCluster.Allocate(
-                    new DeadMem("no references"), subject, new { Type = "", Name = "" }, blobClient
+                    new DeadMem("no references"), subject, new { Type = "", Name = "" }, service.Value()
                 )
             );
-        }
-        finally
-        {
-            container.Delete();
         }
     }
     
@@ -203,26 +137,11 @@ public sealed class BlobClusterTests
     public void FeedsSamplesFromRemote()
     {
         string subject = "container-" + Guid.NewGuid();
-        string id1 = "cocoon-" + Guid.NewGuid();
-        string id2 = "cocoon-" + Guid.NewGuid();
-        
-        var blobClient =
-            new BlobServiceClient(
-                new Uri(new Secret("blobStorageUri").AsString()),
-                new StorageSharedKeyCredential(
-                    new Secret("storageAccountName").AsString(),
-                    new Secret("storageAccountSecret").AsString()
-                )
-            );
 
-        var container = 
-            blobClient.GetBlobContainerClient(
-                new EncodedContainerName(subject).AsString()
-            );
-        container.CreateIfNotExists();
-        try
+        var client = new TestBlobServiceClient();
+        using(var container = new TestBlobContainer(subject, client))
         {
-            container.GetBlobClient(new EncodedBlobName(id1).AsString())
+            new TestBlobClient("cocoon-" + Guid.NewGuid(), container).Value()
                 .Upload(
                     new MemoryStream(
                         Encoding.UTF8.GetBytes(
@@ -234,7 +153,7 @@ public sealed class BlobClusterTests
                         )
                     )
                 );
-            container.GetBlobClient(new EncodedBlobName(id2).AsString())
+            new TestBlobClient("cocoon-" + Guid.NewGuid(), container).Value()
                 .Upload(
                     new MemoryStream(
                         Encoding.UTF8.GetBytes(
@@ -251,7 +170,7 @@ public sealed class BlobClusterTests
                 "Raven",
                 First._(
                     BlobCluster.Allocate(
-                        new DeadMem("unit testing"), subject, new{ Type = "", Name = "" }, blobClient
+                        new DeadMem("unit testing"), subject, new{ Type = "", Name = "" }, client.Value()
                     )
                     .Samples(new { Type = "", Name = "" })
                     .Filtered(sample => sample.Type == "Ketch")
@@ -261,10 +180,6 @@ public sealed class BlobClusterTests
                 
             );
         }
-        finally
-        {
-            container.Delete();
-        }
     }
     
     [Fact]
@@ -272,40 +187,28 @@ public sealed class BlobClusterTests
     {
         string subject = "container-" + Guid.NewGuid();
         string id = "cocoon-" + Guid.NewGuid();
-        
-        var blobClient =
-            new BlobServiceClient(
-                new Uri(new Secret("blobStorageUri").AsString()),
-                new StorageSharedKeyCredential(
-                    new Secret("storageAccountName").AsString(),
-                    new Secret("storageAccountSecret").AsString()
-                )
-            );
 
-        var container = 
-            blobClient.GetBlobContainerClient(
-                new EncodedContainerName(subject).AsString()    
-            );
-        container.CreateIfNotExists();
-        try
+        var service = new TestBlobServiceClient();
+        using (var container = new TestBlobContainer(subject, service))
         {
-            container.GetBlobClient(new EncodedBlobName(id).AsString())
-                .Upload(
-                    new MemoryStream(
-                        Encoding.UTF8.GetBytes(
-                            JsonConvert.SerializeObject(new
-                            {
-                                Type = "Cutter",
-                                Name = "Bob"
-                            })
+            var client = new TestBlobClient(id, container).Value();
+                client
+                    .Upload(
+                        new MemoryStream(
+                            Encoding.UTF8.GetBytes(
+                                JsonConvert.SerializeObject(new
+                                {
+                                    Type = "Cutter",
+                                    Name = "Bob"
+                                })
+                            )
                         )
-                    )
-                );
+                    );
 
             var cluster =
-            BlobCluster.Allocate(
-                new DeadMem("unit testing"), subject, new { Type = "", Name = "" }, blobClient
-            );
+                BlobCluster.Allocate(
+                    new DeadMem("unit testing"), subject, new { Type = "", Name = "" }, service.Value()
+                );
 
             First._(
                 cluster
@@ -314,7 +217,7 @@ public sealed class BlobClusterTests
             ).Value()
             .Content();
 
-            container.GetBlobClient(id).Delete();
+            client.Delete();
             
             Assert.Equal(
                 "Bob",
@@ -329,37 +232,19 @@ public sealed class BlobClusterTests
                 
             );
         }
-        finally
-        {
-            container.Delete();
-        }
     }
     
         [Fact]
     public void CanCreateCocoon()
     {
         string subject = "container-" + Guid.NewGuid();
-        string id = "cocoon-" + Guid.NewGuid();
-        
-        var blobClient =
-            new BlobServiceClient(
-                new Uri(new Secret("blobStorageUri").AsString()),
-                new StorageSharedKeyCredential(
-                    new Secret("storageAccountName").AsString(),
-                    new Secret("storageAccountSecret").AsString()
-                )
-            );
 
-        var container = 
-            blobClient.GetBlobContainerClient(
-                new EncodedContainerName(subject).AsString()
-            );
-        container.CreateIfNotExists();
-        try
+        var service = new TestBlobServiceClient();
+        using(var container = new TestBlobContainer(subject, service))
         {
             var cluster =
                 BlobCluster.Allocate(
-                    new DeadMem("unit testing"), subject, new { Type = "", Name = "" }, blobClient
+                    new DeadMem("unit testing"), subject, new { Type = "", Name = "" }, service.Value()
                 );
 
             cluster.Create(new
@@ -384,10 +269,6 @@ public sealed class BlobClusterTests
                     .ToString()
                     
             );
-        }
-        finally
-        {
-            container.Delete();
         }
     }
     
