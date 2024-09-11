@@ -17,10 +17,10 @@
 		/// </summary>
 		ISamples<TSample> Samples<TSample>(TSample shape);
 
-        /// <summary>
-        /// Create new information in this cluster from the given plan.
-        /// </summary>
-        ICocoon Create<TNew>(TNew plan);
+		/// <summary>
+		/// Create new information in this cluster from the given plan.
+		/// </summary>
+		ICocoon Create<TNew>(TNew plan, bool overrideExisting = true);
 
         /// <summary>
         /// Remove information from this cluster which matches the given filter

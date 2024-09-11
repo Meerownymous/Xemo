@@ -22,8 +22,8 @@ namespace Xemo.Cluster
         public ISamples<TSample> Samples<TSample>(TSample sample) =>
             origin.Value.Samples(sample);
 
-        public ICocoon Create<TNew>(TNew input) =>
-            origin.Value.Create(input);
+        public ICocoon Create<TNew>(TNew input, bool overrideExisting = false) =>
+            origin.Value.Create(input, overrideExisting);
 
         public ICluster Removed(params ICocoon[] gone) =>
             origin.Value.Removed(gone);

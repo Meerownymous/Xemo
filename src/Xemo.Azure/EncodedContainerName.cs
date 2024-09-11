@@ -18,7 +18,7 @@ public sealed class EncodedContainerName(string origin) : TextEnvelope(
     private static string Escaped(string subject)
     {
         using SHA256 sha256 = SHA256.Create();
-        var legalized = Regex.Replace(subject, @"[^a-zA-Z0-9-]", "-");
+        var legalized = Regex.Replace(subject.ToLower(), @"[^a-zA-Z0-9-]", "-");
         var maxLength = 54;
         legalized = legalized.Length <= maxLength ? legalized : legalized.Substring(0, maxLength);
         return

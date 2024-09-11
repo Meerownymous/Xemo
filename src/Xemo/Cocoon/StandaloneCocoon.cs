@@ -1,14 +1,15 @@
-using Xemo.Memory;
+using Xemo.Bench;
 
 namespace Xemo.Cocoon;
 
 /// <summary>
 /// A cocoon
 /// </summary>
-public sealed class StandaloneCocoon<TBlueprint>(string identifier, TBlueprint blueprint, Func<IMem> memory) : CocoonEnvelope(() =>
-    new BoxedMemory("standalone", memory()) 
-        .Allocate(identifier, blueprint, errorIfExists: false)
-        .Cluster(identifier)
-        .Create(blueprint)
-)
-{ }
+public sealed class StandaloneCocoon<TBlueprint>(
+    string name, TBlueprint blueprint, Func<IMem> memory
+) : CocoonEnvelope(() =>
+        memory() 
+            .Allocate("standalones", blueprint, errorIfExists: false)
+            .Cluster("standalones")
+            .Create(Merge.Target(blueprint).Post(new { ID = name }))
+);

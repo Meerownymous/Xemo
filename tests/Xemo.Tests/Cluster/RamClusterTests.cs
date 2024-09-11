@@ -37,6 +37,32 @@ namespace Xemo.Tests.Cluster
                 ).Age
             );
         }
+        
+        [Fact]
+        public void RejectsOverriding()
+        {
+            var users = RamCluster.Allocate("Person", new { ID = 0, Name = "", Age = 0 });
+            users.Create(new { ID = 1, Name = "Dobert", Age = 2 });
+            Assert.Throws<InvalidOperationException>(() =>
+                users.Create(new { ID = 1, Name = "Dobert", Age = 1 }, overrideExisting: false)
+            );
+        }
+        
+        [Fact]
+        public void AllowsOverridingOnDemand()
+        {
+            var users = RamCluster.Allocate("Person", new { ID = 0, Name = "", Age = 0 });
+            users.Create(new { ID = 1, Name = "Dobert", Age = 2 });
+            users.Create(new { ID = 1, Name = "Dobert", Age = 1 }, overrideExisting: true);
+            
+            Assert.Equal(
+                1,
+                First.Sample(
+                    users.Samples(new { Name = "", Age = 0 })
+                        .Filtered(u => u.Name == "Dobert")
+                ).Age
+            );
+        }
 
         [Fact]
         public void AutoGeneratesID()

@@ -14,12 +14,13 @@ namespace Xemo.Cluster
 
         public ICocoon Cocoon(string id) => origin.Cocoon(id);
 
-        public ICocoon Create<TNew>(TNew plan) =>
+        public ICocoon Create<TNew>(TNew plan, bool overrideExisting = false) =>
             origin
                 .Create(
                     spawnGuard.Sample(
                         Merge.Target(schema).Post(plan)
-                    )
+                    ),
+                    overrideExisting
                 );
 
         public IEnumerator<ICocoon> GetEnumerator() =>

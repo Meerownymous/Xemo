@@ -81,6 +81,78 @@ public sealed class BlobClusterTests
     }
     
     [Fact]
+    public void RejectsOverriding()
+    {
+        string subject = "container-" + Guid.NewGuid();
+        
+        var blobClient =
+            new BlobServiceClient(
+                new Uri(new Secret("blobStorageUri").AsString()),
+                new StorageSharedKeyCredential(
+                    new Secret("storageAccountName").AsString(),
+                    new Secret("storageAccountSecret").AsString()
+                )
+            );
+        try
+        {
+            var users = BlobCluster.Allocate(subject, new { ID = 0, Name = "", Age = 0 }, blobClient);
+            users.Create(new { ID = 1, Name = "Dobert", Age = 2 });
+            Assert.Throws<InvalidOperationException>(() =>
+                users.Create(new { ID = 1, Name = "Dobert", Age = 1 }, overrideExisting: false)
+            );
+        }
+        finally
+        {
+            var container = 
+                blobClient.GetBlobContainerClient(
+                    new EncodedContainerName(subject).AsString()
+                );
+            if(container.Exists())
+                container.Delete();
+        }
+    }
+        
+    [Fact]
+    public void AllowsOverridingOnDemand()
+    {
+        string subject = "container-" + Guid.NewGuid();
+        
+        var blobClient =
+            new BlobServiceClient(
+                new Uri(new Secret("blobStorageUri").AsString()),
+                new StorageSharedKeyCredential(
+                    new Secret("storageAccountName").AsString(),
+                    new Secret("storageAccountSecret").AsString()
+                )
+            );
+        
+        try
+        {
+            var users = BlobCluster.Allocate("Person", new { ID = 0, Name = "", Age = 0 }, blobClient);
+            users.Create(new { ID = 1, Name = "Dobert", Age = 2 });
+            users.Create(new { ID = 1, Name = "Dobert", Age = 1 }, overrideExisting: true);
+                
+            Assert.Equal(
+                1,
+                users.Samples(new { Name = "", Age = 0 })
+                    .Filtered(u => u.Name == "Dobert")
+                    .First()
+                    .Content()
+                    .Age
+            );
+        }
+        finally
+        {
+            var container = 
+                blobClient.GetBlobContainerClient(
+                    new EncodedContainerName(subject).AsString()
+                );
+            if(container.Exists())
+                container.Delete();
+        }
+    }
+    
+    [Fact]
     public void ListsEntriesOnce()
     {
         string subject = "container-" + Guid.NewGuid();
@@ -115,10 +187,10 @@ public sealed class BlobClusterTests
                     )
                 );
 
-            Assert.Equal(1,
+            Assert.Single(
                 BlobCluster.Allocate(
                     new DeadMem("no references"), subject, new { Type = "", Name = "" }, blobClient
-                ).Count()
+                )
             );
         }
         finally

@@ -123,7 +123,7 @@ namespace Xemo.Cluster
             return this;
         }
 
-        public ICocoon Create<TNew>(TNew input)
+        public ICocoon Create<TNew>(TNew input, bool overrideExisting = false)
         {
             var id = new PropertyValue("ID", input, fallBack: () => Guid.NewGuid()).AsString();
             storage.AddOrUpdate(
@@ -139,7 +139,11 @@ namespace Xemo.Cluster
                 },
                 (key, existing) =>
                 {
-                    throw new ApplicationException($"Cannot create item. ID '{key}' is expected to not exist, but it does: {existing}.");
+                    if (!overrideExisting)
+                        throw new InvalidOperationException(
+                            $"Cannot create item. ID '{key}' is expected to not exist, but it does: {existing}."
+                        );
+                    return Merge.Target(schema).Post(input);
                 }
             );
             return

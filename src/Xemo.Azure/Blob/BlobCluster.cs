@@ -109,7 +109,7 @@ public sealed class BlobCluster<TContent>(
             cache.Value
         );
 
-    public ICocoon Create<TNew>(TNew plan)
+    public ICocoon Create<TNew>(TNew plan, bool overrideExisting = false)
     {
         var id = new PropertyValue("ID", plan, fallBack: () => Guid.NewGuid()).AsString();
         return
@@ -134,8 +134,27 @@ public sealed class BlobCluster<TContent>(
                         )
                     );
                 },
-                (key, _) => throw new ApplicationException($"{key} cannot be created because it already exists.")
-            ).Item2.Cocoon();
+                (key, _) =>
+                {
+                    if(!overrideExisting)
+                        throw new InvalidOperationException($"{key} cannot be created because it already exists.");
+                    
+                    var content = Patch.Target(schema, relations).Post(plan);
+                    var blobClient = container.Value.GetBlobClient(id);
+                    Upload(content, blobClient);
+                    return new Tuple<BlobClient, ISample<TContent>>(
+                        blobClient,
+                        new AsSample<TContent>(
+                            new BlobCocoon<TContent>(
+                                new AsGrip(subject, id),
+                                relations,
+                                cache.Value,
+                                schema
+                            ),
+                            content
+                        )
+                    );
+                }).Item2.Cocoon();
         
     }
 

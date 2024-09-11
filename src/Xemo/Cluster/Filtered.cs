@@ -6,7 +6,8 @@ namespace Xemo.Cluster
     /// <summary>
     /// Cluster which is filtered by a given mask + match.
     /// </summary>
-    public sealed class Filtered<TFilterSlice>(ICluster origin, TFilterSlice filterSlice, Func<TFilterSlice, bool> match) : ICluster
+    public sealed class Filtered<TFilterSlice>(ICluster origin, TFilterSlice filterSlice, Func<TFilterSlice, bool> match) : 
+        ICluster
     {
         public string Subject() => origin.Subject();
 
@@ -18,8 +19,8 @@ namespace Xemo.Cluster
             return xemo;
         }
 
-        public ICocoon Create<TNew>(TNew plan) =>
-            origin.Create(plan);
+        public ICocoon Create<TNew>(TNew plan, bool overrideExisting = true) =>
+            origin.Create(plan, overrideExisting);
 
         public IEnumerator<ICocoon> GetEnumerator() =>
             AsCocoons._(

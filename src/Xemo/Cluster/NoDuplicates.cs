@@ -42,7 +42,7 @@ public sealed class NoDuplicates<TRelevant>(
 
     public ISamples<TSample> Samples<TSample>(TSample shape) => origin.Samples(shape);
 
-    public ICocoon Create<TNew>(TNew plan)
+    public ICocoon Create<TNew>(TNew plan, bool overrideExisting = false)
     {
         var candidate = Merge.Target(relevant).Post(plan);
         ICocoon result;
@@ -51,13 +51,13 @@ public sealed class NoDuplicates<TRelevant>(
                 .Samples(relevant)
                 .Filtered(existing => existing.Equals(candidate))
                 .GetEnumerator();
-        if (existing.MoveNext())
+        if (existing.MoveNext() && !overrideExisting)
         {
             reactToDuplicate(Merge.Target(relevant).Post(plan));
             result = existing.Current.Cocoon();
         }
         else
-            result = origin.Create(plan);
+            result = origin.Create(plan, overrideExisting);
 
         return result;
     }
