@@ -128,7 +128,7 @@ public sealed class BlobClusterTests
         
         try
         {
-            var users = BlobCluster.Allocate("Person", new { ID = 0, Name = "", Age = 0 }, blobClient);
+            var users = BlobCluster.Allocate(subject, new { ID = 0, Name = "", Age = 0 }, blobClient);
             users.Create(new { ID = 1, Name = "Dobert", Age = 2 });
             users.Create(new { ID = 1, Name = "Dobert", Age = 1 }, overrideExisting: true);
                 

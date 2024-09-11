@@ -45,7 +45,7 @@ namespace Xemo.Cluster.Probe
                     {
                         yield return
                             AsSample._(
-                                new AsCocoon<TContent>(
+                                new RamCocoon<TContent>(
                                     new AsGrip(subject, seed), 
                                     mem,
                                     originSchema
@@ -81,7 +81,7 @@ namespace Xemo.Cluster.Probe
                 if (mem.TryGetValue(seed, out content))
                     yield return
                         new AsSample<TSample>(
-                            AsCocoon.Make(
+                            RamCocoon.Make(
                                 new AsGrip(subject, seed),
                                 mem,
                                 originSchema

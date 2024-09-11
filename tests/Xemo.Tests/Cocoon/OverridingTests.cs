@@ -14,7 +14,7 @@ namespace Xemo.Tests.Cocoon
             Assert.True(
                 Overriding
                     ._(() => new { Watched = true },
-                        new AsCocoon("Movie")
+                        new RamCocoon("Movie")
                         .Schema(schema)
                         .Mutate(
                             new { Title = "Back to the future" }

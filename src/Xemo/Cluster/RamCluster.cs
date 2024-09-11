@@ -90,7 +90,7 @@ namespace Xemo.Cluster
         public IEnumerator<ICocoon> GetEnumerator()
         {
             foreach (var key in index.Value)
-                yield return new AsCocoon<TContent>(
+                yield return new RamCocoon<TContent>(
                     new AsGrip(subject.Value, key),
                     storage,
                     mem,
@@ -104,7 +104,7 @@ namespace Xemo.Cluster
         {
             if (!storage.ContainsKey(id))
                 throw new ArgumentException($"{subject} '{id}' does not exist.");
-            return new AsCocoon<TContent>(new AsGrip(subject.Value, id), storage, mem, schema);
+            return new RamCocoon<TContent>(new AsGrip(subject.Value, id), storage, mem, schema);
         }
 
         public ISamples<TShape> Samples<TShape>(TShape blueprint) =>
@@ -147,7 +147,7 @@ namespace Xemo.Cluster
                 }
             );
             return
-                new AsCocoon<TContent>(
+                new RamCocoon<TContent>(
                     new AsGrip(subject.Value, id),
                     storage,
                     mem,

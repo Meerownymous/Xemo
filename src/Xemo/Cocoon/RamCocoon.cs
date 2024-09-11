@@ -8,7 +8,7 @@ namespace Xemo.Cocoon;
     /// <summary>
     /// Information stored in RAM.
     /// </summary>
-    public sealed class AsCocoon : ICocoon
+    public sealed class RamCocoon : ICocoon
     {
         private readonly IGrip grip;
 
@@ -17,7 +17,7 @@ namespace Xemo.Cocoon;
         /// Before using, you need to define a schema, calling
         /// Schema(propertyObject).
         /// </summary>
-        public AsCocoon(string subject) : this(
+        public RamCocoon(string subject) : this(
             new LazyGrip(() => Guid.NewGuid().ToString(), () => subject)
         )
         {
@@ -28,7 +28,7 @@ namespace Xemo.Cocoon;
         /// Before using, you need to define a schema, calling
         /// Schema(propertyObject).
         /// </summary>
-        public AsCocoon(string subject, string id) : this(new AsGrip(subject, id))
+        public RamCocoon(string subject, string id) : this(new AsGrip(subject, id))
         {
         }
 
@@ -37,7 +37,7 @@ namespace Xemo.Cocoon;
         /// Before using, you need to define a schema, calling
         /// Schema(propertyObject).
         /// </summary>
-        public AsCocoon(IGrip id)
+        public RamCocoon(IGrip id)
         {
             this.grip = id;
         }
@@ -51,35 +51,33 @@ namespace Xemo.Cocoon;
             throw new InvalidOperationException("Define a schema first.");
 
         public ICocoon Schema<TSchema>(TSchema schema) =>
-            new AsCocoon<TSchema>(this.grip, new ConcurrentDictionary<string, TSchema>(), schema);
+            new RamCocoon<TSchema>(this.grip, new ConcurrentDictionary<string, TSchema>(), schema);
 
-        public static AsCocoon<TSchema> Make<TSchema>(
-            IGrip id, ConcurrentDictionary<string, TSchema> storage, TSchema schema
-        ) =>
-            new AsCocoon<TSchema>(id, storage, schema);
+        public static RamCocoon<TSchema> Make<TSchema>(IGrip id, ConcurrentDictionary<string, TSchema> storage,
+            TSchema schema) =>
+            new(id, storage, schema);
     }
 
     /// <summary>
     /// Information stored in RAM.
     /// </summary>
-    public sealed class AsCocoon<TContent>(
+    public sealed class RamCocoon<TContent>(
         IGrip grip,
         ConcurrentDictionary<string, TContent> storage,
         IMem mem,
-        TContent schema
-    ) : ICocoon
+        TContent schema = default) : ICocoon
     {
         /// <summary>
         /// Information stored in RAM.
         /// </summary>
-        public AsCocoon() : this(new BlankGrip())
+        public RamCocoon() : this(new BlankGrip())
         {
         }
 
         /// <summary>
         /// Information stored in RAM.
         /// </summary>
-        public AsCocoon(IGrip id) : this(
+        public RamCocoon(IGrip id) : this(
             id,
             new ConcurrentDictionary<string, TContent>()
         )
@@ -89,7 +87,7 @@ namespace Xemo.Cocoon;
         /// <summary>
         /// Information stored in RAM.
         /// </summary>
-        public AsCocoon(
+        public RamCocoon(
             IGrip id,
             ConcurrentDictionary<string, TContent> storage,
             TContent schema
@@ -105,27 +103,13 @@ namespace Xemo.Cocoon;
         /// <summary>
         /// Information stored in RAM.
         /// </summary>
-        public AsCocoon(
+        public RamCocoon(
             IGrip id,
             ConcurrentDictionary<string, TContent> storage
         ) : this(
             id,
             storage,
-            new DeadMem("This Xemo has not been setup to support relations."),
-            default(TContent)
-        )
-        {
-        }
-
-        /// <summary>
-        /// Information stored in RAM.
-        /// </summary>
-        public AsCocoon(
-            IGrip id,
-            ConcurrentDictionary<string, TContent> storage,
-            IMem mem
-        ) : this(
-            id, storage, mem, default(TContent)
+            new DeadMem("This Xemo has not been setup to support relations.")
         )
         {
         }
