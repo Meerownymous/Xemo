@@ -93,6 +93,8 @@ public sealed class BlobCluster<TContent>(
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+    public string Subject() => subject;
+
     public ICocoon Cocoon(string id)
     {
         Tuple<BlobClient, ISample<TContent>> cached;

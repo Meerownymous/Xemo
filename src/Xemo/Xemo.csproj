@@ -22,7 +22,6 @@
   <ItemGroup>
     <Folder Include="Bench\" />
     <Folder Include="Tonga\" />
-    <Folder Include="Cocoon\" />
     <Folder Include="Grip\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

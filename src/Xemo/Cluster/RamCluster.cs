@@ -98,6 +98,8 @@ namespace Xemo.Cluster
                 );
         }
 
+        public string Subject() => subject.Value;
+
         public ICocoon Cocoon(string id)
         {
             if (!storage.ContainsKey(id))

@@ -10,6 +10,9 @@ namespace Xemo.Cluster
 	{
         private readonly Lazy<ICluster> origin = new(origin);
 
+        public string Subject() => 
+            origin.Value.Subject();
+
         public ICocoon Cocoon(string id) =>
             origin.Value.Cocoon(id);
 

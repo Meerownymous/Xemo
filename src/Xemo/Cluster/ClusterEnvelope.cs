@@ -16,6 +16,8 @@ namespace Xemo.Cluster
         )
         { }
 
+        public string Subject() => core.Subject();
+
         public ICocoon Cocoon(string id) => core.Cocoon(id);
 
         public IEnumerator<ICocoon> GetEnumerator() =>

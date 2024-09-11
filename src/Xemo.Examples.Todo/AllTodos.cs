@@ -9,7 +9,7 @@ namespace Xemo.Examples.Todo;
 /// </summary>
 public sealed class AllTodos(IMem memory) : ClusterEnvelope(
     new Lazy(() =>
-        XoSpawnCluster._(
+        SpawnGuarded._(
             new
             {
                 Done = false,

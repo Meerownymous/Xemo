@@ -8,6 +8,8 @@ namespace Xemo.Cluster
     /// </summary>
     public sealed class Filtered<TFilterSlice>(ICluster origin, TFilterSlice filterSlice, Func<TFilterSlice, bool> match) : ICluster
     {
+        public string Subject() => origin.Subject();
+
         public ICocoon Cocoon(string id)
         {
             var xemo = origin.Cocoon(id);

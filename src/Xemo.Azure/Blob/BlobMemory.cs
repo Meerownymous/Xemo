@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Concurrent;
 using Azure.Storage;
 using Azure.Storage.Blobs;
@@ -8,7 +9,8 @@ namespace Xemo.Azure.Blob;
 /// <summary>
 /// Memmory in Azure Blob storage.
 /// </summary>
-public sealed class BlobMemory(string blobStorageUri, string storageAccountName, string storageAccountSecret) : IMem
+public sealed class BlobMemory(string blobStorageUri, string storageAccountName, string storageAccountSecret) : 
+    IMem
 {
     private readonly ConcurrentDictionary<string, ICluster> clusters = new();
     private readonly ConcurrentDictionary<string, object> schemata = new();
@@ -65,4 +67,10 @@ public sealed class BlobMemory(string blobStorageUri, string storageAccountName,
             throw new ArgumentException($"No schema for '{subject}' has been allocated yet.");
         return JsonConvert.SerializeObject(schema, Formatting.Indented);
     }
+
+    public IEnumerator<ICluster> GetEnumerator() =>
+        this.clusters.Values.GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator() => 
+        this.GetEnumerator();
 }

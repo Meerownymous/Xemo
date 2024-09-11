@@ -36,6 +36,8 @@ public sealed class NoDuplicates<TRelevant>(
     
     public IEnumerator<ICocoon> GetEnumerator() => origin.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => origin.GetEnumerator();
+    public string Subject() => origin.Subject();
+
     public ICocoon Cocoon(string id) => origin.Cocoon(id);
 
     public ISamples<TSample> Samples<TSample>(TSample shape) => origin.Samples(shape);

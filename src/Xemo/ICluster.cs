@@ -5,6 +5,8 @@
 	/// </summary>
 	public interface ICluster : IEnumerable<ICocoon>
 	{
+		String Subject();
+		
 		/// <summary>
 		/// Single item in this cluster.
 		/// </summary>

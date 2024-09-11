@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+
 namespace Xemo
 {
     public sealed class DeadMem(string reason) : IMem
@@ -19,6 +21,11 @@ namespace Xemo
 
         public string Schema(string subject) =>
             throw this.death("deliver schema from");
+
+        public IEnumerator<ICluster> GetEnumerator() =>
+            throw this.death("deliver clusters from");
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
 

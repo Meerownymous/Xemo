@@ -10,7 +10,7 @@ namespace Xemo.Cocoon;
     /// </summary>
     public sealed class AsCocoon : ICocoon
     {
-        private readonly IGrip passport;
+        private readonly IGrip grip;
 
         /// <summary>
         /// Information stored in RAM.
@@ -39,19 +39,19 @@ namespace Xemo.Cocoon;
         /// </summary>
         public AsCocoon(IGrip id)
         {
-            this.passport = id;
+            this.grip = id;
         }
 
         public TSlice Sample<TSlice>(TSlice wanted) =>
             throw new InvalidOperationException("Define a schema first.");
 
-        public IGrip Grip() => this.passport;
+        public IGrip Grip() => this.grip;
 
         public ICocoon Mutate<TSlice>(TSlice mutation) =>
             throw new InvalidOperationException("Define a schema first.");
 
         public ICocoon Schema<TSchema>(TSchema schema) =>
-            new AsCocoon<TSchema>(this.passport, new ConcurrentDictionary<string, TSchema>(), schema);
+            new AsCocoon<TSchema>(this.grip, new ConcurrentDictionary<string, TSchema>(), schema);
 
         public static AsCocoon<TSchema> Make<TSchema>(
             IGrip id, ConcurrentDictionary<string, TSchema> storage, TSchema schema
