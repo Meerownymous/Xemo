@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Xemo.Bench;
+using Xemo.Cluster;
 using Xemo.Cocoon;
 using Xemo.Grip;
 using Xunit;
@@ -103,7 +104,7 @@ namespace Xemo.Tests.Bench
                     (leftID, rightID) => { result = leftID; return rightID; },
                     (_, _) => throw new Exception("one to many is not tested here.")
                 )
-                .Post(new { Author = new RamCocoon("User", "1") });
+                .Post(new { Author = new RamClusterCocoon("User", "1") });
 
             Assert.Equal(schema.Author, result);
         }
@@ -113,7 +114,7 @@ namespace Xemo.Tests.Bench
         {
             IGrip result = default;
 
-            var patch = new { Author = new RamCocoon("User", "1") };
+            var patch = new { Author = new RamClusterCocoon("User", "1") };
 
             Merge
                 .Target(

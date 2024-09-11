@@ -7,14 +7,18 @@ namespace Xemo.Memory;
 /// </summary>
 public sealed class BoxedMemory(string box, IMem origin) : IMem
 {
-    public ICocoon Cocoon(string subject, string id) =>
-        origin.Cocoon($"{box}-{subject}", id);
+    public ICocoon Cocoon(string name) =>
+        origin.Cocoon(name);
+
+    public IMem AllocateCocoon<TSchema>(string subject, TSchema schema, bool errorIfExists = true) =>
+        origin.AllocateCocoon($"{box}-{subject}", schema, errorIfExists);
+        
 
     public ICluster Cluster(string subject) =>
         origin.Cluster($"{box}-{subject}");
 
-    public IMem Allocate<TSchema>(string subject, TSchema schema, bool errorIfExists = true) =>
-        new BoxedMemory(box, origin.Allocate($"{box}-{subject}", schema, errorIfExists));
+    public IMem AllocateCluster<TSchema>(string subject, TSchema schema, bool errorIfExists = true) =>
+        new BoxedMemory(box, origin.AllocateCluster($"{box}-{subject}", schema, errorIfExists));
 
     public string Schema(string subject) =>
         origin.Schema($"{box}-{subject}");

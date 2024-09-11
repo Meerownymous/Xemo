@@ -59,7 +59,7 @@ namespace Xemo.Tests.Bench
         [Fact]
         public void SlicesFrom1to1Relation()
         {
-            var mem = new Ram().Allocate("User", new { FirstName = "", LastName = "" });
+            var mem = new Ram().AllocateCluster("User", new { FirstName = "", LastName = "" });
             var stanley =
                 mem.Cluster("User")
                     .Create(
@@ -91,7 +91,7 @@ namespace Xemo.Tests.Bench
         [Fact]
         public void SlicesFrom1toManyRelation()
         {
-            var mem = new Ram().Allocate("User", new { FirstName = "", LastName = "" });
+            var mem = new Ram().AllocateCluster("User", new { FirstName = "", LastName = "" });
             var stanley =
                 mem.Cluster("User")
                     .Create(

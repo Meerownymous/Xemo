@@ -1,4 +1,5 @@
-﻿using Xemo.Cocoon;
+﻿using Xemo.Cluster;
+using Xemo.Cocoon;
 using Xunit;
 
 namespace Xemo.Tests.Cocoon
@@ -14,7 +15,7 @@ namespace Xemo.Tests.Cocoon
             Assert.True(
                 Overriding
                     ._(() => new { Watched = true },
-                        new RamCocoon("Movie")
+                        new RamClusterCocoon("Movie")
                         .Schema(schema)
                         .Mutate(
                             new { Title = "Back to the future" }

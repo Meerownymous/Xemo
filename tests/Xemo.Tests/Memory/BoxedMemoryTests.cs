@@ -11,14 +11,15 @@ public sealed class BoxedMemoryTests
     public void AllocatesStorageWithPrefix()
     {
         var clusters = new ConcurrentDictionary<string, ICluster>();
+        var standalones = new ConcurrentDictionary<string, ICocoon>();
         var storages = new ConcurrentDictionary<string, object>();
         var schemata = new ConcurrentDictionary<string, object>();
-        var mem = new Ram(clusters, storages, schemata);
+        var mem = new Ram(clusters, standalones, storages, schemata);
         
         new BoxedMemory("sandbox", mem)
-            .Allocate("El Allocazione", new { Name = "" });
+            .AllocateCluster("El Allocazione", new { Name = "" });
 
-        Assert.Equal("sandbox-El Allocazione", storages.Keys.First());
+        Assert.Equal("cluster-sandbox-El Allocazione", storages.Keys.First());
 
     }
     
@@ -26,42 +27,45 @@ public sealed class BoxedMemoryTests
     public void AllocatesClusterWithPrefix()
     {
         var clusters = new ConcurrentDictionary<string, ICluster>();
+        var standalones = new ConcurrentDictionary<string, ICocoon>();
         var storages = new ConcurrentDictionary<string, object>();
         var schemata = new ConcurrentDictionary<string, object>();
-        var mem = new Ram(clusters, storages, schemata);
+        var mem = new Ram(clusters, standalones, storages, schemata);
         
         new BoxedMemory("sandbox", mem)
-            .Allocate("El Allocazione", new { Name = "" });
+            .AllocateCluster("El Allocazione", new { Name = "" });
 
-        Assert.Equal("sandbox-El Allocazione", clusters.Keys.First());
+        Assert.Equal("cluster-sandbox-El Allocazione", clusters.Keys.First());
     }
     
     [Fact]
     public void StoresSchemaWithPrefix()
     {
         var clusters = new ConcurrentDictionary<string, ICluster>();
+        var standalones = new ConcurrentDictionary<string, ICocoon>();
         var storages = new ConcurrentDictionary<string, object>();
         var schemata = new ConcurrentDictionary<string, object>();
-        var mem = new Ram(clusters, storages, schemata);
+        var mem = new Ram(clusters, standalones, storages, schemata);
         
         new BoxedMemory("sandbox", mem)
-            .Allocate("El Allocazione", new { Name = "" });
+            .AllocateCluster("El Allocazione", new { Name = "" });
 
-        Assert.Equal("sandbox-El Allocazione", schemata.Keys.First());
+        Assert.Equal("cluster-sandbox-El Allocazione", schemata.Keys.First());
     }
     
     [Fact]
     public void Updates()
     {
         var clusters = new ConcurrentDictionary<string, ICluster>();
+        var standalones = new ConcurrentDictionary<string, ICocoon>();
         var storages = new ConcurrentDictionary<string, object>();
         var schemata = new ConcurrentDictionary<string, object>();
-        var mem = new Ram(clusters, storages, schemata);
+        var mem = new Ram(clusters, standalones, storages, schemata);
 
         Assert.Equal(
             "Captain Blobert",
             new BoxedMemory("sandbox", mem)
-                .Allocate("El Allocazione", new { Name = "" })
+                .AllocateCluster("El Allocazione", new { Name = "" })
                 .Cluster("El Allocazione")
                 .Create(new { Name = "Blobert" })
                 .Mutate(new { Name = "Captain Blobert" })
@@ -78,7 +82,7 @@ public sealed class BoxedMemoryTests
             Mapped._(
                 cluster => cluster.Subject(),
                 new BoxedMemory("sandbox", new Ram())
-                    .Allocate("El Allocazione", new { })
+                    .AllocateCluster("El Allocazione", new { })
             )
         );
     }

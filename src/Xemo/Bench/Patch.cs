@@ -16,14 +16,14 @@ namespace Xemo.Bench
 
         private IGrip AssertExists(IGrip card)
         {
-            return mem.Cocoon(card.Kind(), card.ID()).Grip();
+            return mem.Cluster(card.Kind()).Cocoon(card.ID()).Grip();
         }
 
         private IGrip[] AssertExists(IGrip[] cards)
         {
             foreach(var card in cards)
             {
-                mem.Cocoon(card.Kind(), card.ID()).Grip();
+                mem.Cluster(card.Kind()).Cocoon(card.ID()).Grip();
             }
             return cards;
         }

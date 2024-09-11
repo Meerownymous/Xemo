@@ -214,7 +214,7 @@ namespace Xemo.Bench
         {
             var ctor = type.GetConstructor(Type.EmptyTypes);
             if (ctor == null) throw new ArgumentException("A DTO must have a parameterless constructor to use it in a cocoon.");
-            return ctor.Invoke(new object[0]);
+            return ctor.Invoke([]);
         }
 
         private static bool IsCompatible(PropertyInfo targetProp, PropertyInfo sourceProp)

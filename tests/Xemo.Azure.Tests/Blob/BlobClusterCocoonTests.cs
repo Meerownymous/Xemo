@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Xemo.Azure.Tests.Blob;
 
-public sealed class BlobCocoonTests
+public sealed class BlobClusterCocoonTests
 {
     /// <summary>
     /// This is an integration test.

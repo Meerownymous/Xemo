@@ -124,7 +124,7 @@ public sealed class BlobCluster<TContent>(
                     return new Tuple<BlobClient, ISample<TContent>>(
                         blobClient,
                         new AsSample<TContent>(
-                            new BlobCocoon<TContent>(
+                            new BlobClusterCocoon<TContent>(
                                 new AsGrip(subject, id),
                                 relations,
                                 cache.Value,
@@ -145,7 +145,7 @@ public sealed class BlobCluster<TContent>(
                     return new Tuple<BlobClient, ISample<TContent>>(
                         blobClient,
                         new AsSample<TContent>(
-                            new BlobCocoon<TContent>(
+                            new BlobClusterCocoon<TContent>(
                                 new AsGrip(subject, id),
                                 relations,
                                 cache.Value,
@@ -189,7 +189,7 @@ public sealed class BlobCluster<TContent>(
                     $"{subject}.{blob.Name}", _ =>
                     {
                         var cocoon =
-                            new BlobCocoon<TContent>(
+                            new BlobClusterCocoon<TContent>(
                                 new AsGrip(subject, blob.Name),
                                 relations,
                                 cache,

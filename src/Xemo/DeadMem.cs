@@ -10,14 +10,17 @@ namespace Xemo
                 new InvalidOperationException(
                     $"Cannot {action} a dead memory{(reason.Length > 0 ? $", because {reason}." : ".")}");
 
-        public IMem Allocate<TSchema>(string subject, TSchema schema, bool errorIfExists = true) =>
+        public IMem AllocateCluster<TSchema>(string subject, TSchema schema, bool errorIfExists = true) =>
+            throw this.death("allocate in");
+        
+        public IMem AllocateCocoon<TSchema>(string subject, TSchema schema, bool errorIfExists = true) =>
             throw this.death("allocate in");
 
         public ICluster Cluster(string subject) =>
             throw this.death("deliver cluster from");
 
-        public ICocoon Cocoon(string subject, string id)=>
-            throw this.death("deliver xemo from");
+        public ICocoon Cocoon(string name)=>
+            throw this.death("deliver standalone cocoon from");
 
         public string Schema(string subject) =>
             throw this.death("deliver schema from");

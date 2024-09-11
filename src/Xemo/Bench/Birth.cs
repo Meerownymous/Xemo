@@ -22,13 +22,13 @@
         private IGrip EnsureLinkable(IGrip grip) =>
             String.IsNullOrEmpty(grip.Kind()) && string.IsNullOrEmpty(grip.ID()) 
                 ? grip
-                : mem.Cocoon(grip.Kind(), grip.ID()).Grip();
+                : mem.Cluster(grip.Kind()).Cocoon(grip.ID()).Grip();
 
         private IGrip[] EnsureLinkable(IGrip[] grips)
         {
             foreach(var card in grips)
             {
-                mem.Cocoon(card.Kind(), card.ID()).Grip();
+                mem.Cluster(card.Kind()).Cocoon(card.ID()).Grip();
             }
             return grips;
         }

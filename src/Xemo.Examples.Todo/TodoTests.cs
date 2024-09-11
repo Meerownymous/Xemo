@@ -8,7 +8,7 @@ namespace Xemo.Examples.Todo
 		public void DeliversInformation()
 		{
 			var mem =
-                new Ram().Allocate(
+				new Ram().AllocateCluster(
 					"todo",
 					new
 					{
@@ -31,7 +31,7 @@ namespace Xemo.Examples.Todo
         public void MutatesInformation()
         {
             var mem =
-				new Ram().Allocate(
+				new Ram().AllocateCluster(
 					"todo",
 					new
 					{

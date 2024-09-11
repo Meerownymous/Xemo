@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Concurrent;
 using Newtonsoft.Json;
-using Tonga.Enumerable;
 using Xemo.Cluster;
+using Xemo.Cocoon;
+using Xemo.Grip;
 
 namespace Xemo
 {
@@ -11,6 +12,7 @@ namespace Xemo
     /// </summary>
     public sealed class Ram(
         ConcurrentDictionary<string, ICluster> clusters,
+        ConcurrentDictionary<string, ICocoon> standalones,
         ConcurrentDictionary<string, object> storages,
         ConcurrentDictionary<string, object> schemata
     ) : IMem
@@ -20,6 +22,7 @@ namespace Xemo
         /// </summary>
         public Ram() : this(    
             new ConcurrentDictionary<string, ICluster>(),
+            new ConcurrentDictionary<string, ICocoon>(),
             new ConcurrentDictionary<string, object>(),
             new ConcurrentDictionary<string, object>()
         )
@@ -28,35 +31,50 @@ namespace Xemo
         public ICluster Cluster(string subject)
         {
             ICluster result;
-            if (!clusters.TryGetValue(subject, out result))
+            if (!clusters.TryGetValue($"cluster-{subject}", out result))
                 throw new ArgumentException(
                     $"'{subject}' is an unknown subject. You need to allocate it before you can use it."
                 );
             return result;
         }
 
-        public ICocoon Cocoon(string subject, string id)
+        public ICocoon Cocoon(string id)
         {
-            ICluster result;
-            if (!clusters.TryGetValue(subject, out result))
-                throw new ArgumentException($"'{subject}' is an unknown subject.");
-            return result.Cocoon(id);
+            ICocoon result;
+            if (!standalones.TryGetValue($"standalone-{id}", out result))
+                throw new ArgumentException($"'{id}' is an unknown cocoon.");
+            return result;
+        }
+        
+        public IMem AllocateCocoon<TSchema>(string name, TSchema schema, bool errorIfExists = true)
+        {
+            standalones.AddOrUpdate($"standalone-{name}",
+                key =>
+                {
+                    schemata.TryAdd(key, schema);
+                    return
+                        new RamCocoon<TSchema>(key, this, schema);
+                },
+                (key, existing) =>
+                {
+                    if(errorIfExists)
+                        throw new InvalidOperationException(
+                            $"Memory for standalone cocoon '{key}' has already been allocated."
+                        );
+                    return existing;
+                }
+            );
+            return this;
         }
 
-        public IMem Allocate<TSchema>(string subject, TSchema schema, bool errorIfExists = true)
+        public IMem AllocateCluster<TSchema>(string subject, TSchema schema, bool errorIfExists = true)
         {
-            storages.AddOrUpdate(subject,
+            storages.AddOrUpdate($"cluster-{subject}",
                 key =>
                 {
                     var subjectMemory = new ConcurrentDictionary<string, TSchema>();
-                    clusters.TryAdd(
-                        key,
-                        new RamCluster<TSchema>(
-                            this,
-                            key,
-                            subjectMemory,
-                            schema
-                        )
+                    clusters.TryAdd(key,
+                        new RamCluster<TSchema>(this, subject, subjectMemory, schema)
                     );
                     schemata.TryAdd(key, schema);
                     return subjectMemory;
@@ -76,7 +94,7 @@ namespace Xemo
         public string Schema(string subject)
         {
             object schema;
-            if (!schemata.TryGetValue(subject, out schema))
+            if (!schemata.TryGetValue($"cluster-{subject}", out schema))
                 throw new ArgumentException($"{subject} is an unknown subject. It has not yet been allocated.");
 
             return JsonConvert.SerializeObject(schema);
