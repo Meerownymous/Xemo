@@ -10,7 +10,8 @@ using Xemo.Cluster.Probe;
 namespace Xemo.Azure.Blob;
 
  /// <summary>
-/// Information stored in RAM.
+/// Information stored in RAM as part of a clustder.
+/// This is usually retrieved from a cluster and not instantiated manually.
 /// </summary>
 public static class BlobClusterCocoon
 {
@@ -23,7 +24,8 @@ public static class BlobClusterCocoon
 }
 
 /// <summary>
-/// A cocoon stored using an Azure Blob Client.
+/// Information stored in RAM as part of a clustder.
+/// This is usually retrieved from a cluster and not instantiated manually.
 /// </summary>
 public sealed class BlobClusterCocoon<TContent>(
     IGrip grip,

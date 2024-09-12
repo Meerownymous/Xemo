@@ -132,12 +132,13 @@ namespace Xemo.Tests.Cluster
                 new
                 {
                     Name = "",
-                    Friend = Link.One("User")
+                    Friend = Link.OneFrom("User")
                 };
-            var mem = new Ram().AllocateCluster("User", schema);
+            var mem = new Ram();
+            var users = mem.Cluster("User", schema);
 
-            var donald = mem.Cluster("User").Create(new { Name = "Donald" });
-            var daisy = mem.Cluster("User").Create(new { Name = "Daisy", Friend = donald });
+            var donald = users.Create(new { Name = "Donald" });
+            var daisy = users.Create(new { Name = "Daisy", Friend = donald });
 
             Assert.Equal(
                 "Donald",
@@ -157,13 +158,13 @@ namespace Xemo.Tests.Cluster
                 new
                 {
                     Name = "",
-                    Friend = Link.One("User")
+                    Friend = Link.OneFrom("User")
                 };
-            var mem = new Ram().AllocateCluster("User", schema);
-
-            var donald = mem.Cluster("User").Create(new { Name = "Donald" });
-            var daisy = mem.Cluster("User").Create(new { Name = "Daisy", Friend = donald });
-            var gustav = mem.Cluster("User").Create(new { Name = "Gustav" });
+            var mem = new Ram();
+            var users = mem.Cluster("User", schema);
+            var donald = users.Create(new { Name = "Donald" });
+            var daisy = users.Create(new { Name = "Daisy", Friend = donald });
+            var gustav = users.Create(new { Name = "Gustav" });
 
             daisy
                 .Mutate(

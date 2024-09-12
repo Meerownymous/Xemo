@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using Newtonsoft.Json;
 using Xemo.Cluster;
 using Xemo.Cocoon;
-using Xemo.Grip;
 
 namespace Xemo
 {
@@ -38,57 +37,55 @@ namespace Xemo
             return result;
         }
 
-        public ICocoon Cocoon(string id)
+        public ICocoon Vault(string name)
         {
             ICocoon result;
-            if (!standalones.TryGetValue($"standalone-{id}", out result))
-                throw new ArgumentException($"'{id}' is an unknown cocoon.");
+            if (!standalones.TryGetValue($"standalone-{name}", out result))
+                throw new ArgumentException($"'{name}' is an unknown vault. It needs to be allocated by passing a schema.");
             return result;
         }
         
-        public IMem AllocateCocoon<TSchema>(string name, TSchema schema, bool errorIfExists = true)
-        {
+        public ICocoon Vault<TSchema>(string name, TSchema schema, bool rejectExisting = false) =>
             standalones.AddOrUpdate($"standalone-{name}",
                 key =>
                 {
                     schemata.TryAdd(key, schema);
-                    return
-                        new RamCocoon<TSchema>(key, this, schema);
+                    return new RamCocoon<TSchema>(key, this, schema);
                 },
                 (key, existing) =>
                 {
-                    if(errorIfExists)
+                    if (rejectExisting)
                         throw new InvalidOperationException(
                             $"Memory for standalone cocoon '{key}' has already been allocated."
                         );
                     return existing;
                 }
             );
-            return this;
-        }
 
-        public IMem AllocateCluster<TSchema>(string subject, TSchema schema, bool errorIfExists = true)
+        public ICluster Cluster<TSchema>(string subject, TSchema schema, bool rejectExisting = false)
         {
-            storages.AddOrUpdate($"cluster-{subject}",
+            ICluster result = default;
+            var prefixedKey = $"cluster-{subject}";
+            storages.AddOrUpdate(prefixedKey,
                 key =>
                 {
                     var subjectMemory = new ConcurrentDictionary<string, TSchema>();
-                    clusters.TryAdd(key,
-                        new RamCluster<TSchema>(this, subject, subjectMemory, schema)
-                    );
+                    result = new RamCluster<TSchema>(this, subject, subjectMemory, schema); 
+                    clusters.TryAdd(key, result);
                     schemata.TryAdd(key, schema);
                     return subjectMemory;
                 },
                 (key, existing) =>
                 {
-                    if(errorIfExists)
+                    if (rejectExisting)
                         throw new InvalidOperationException(
                             $"Memory for '{key}' has already been allocated."
                         );
+                    clusters.TryGetValue(key, out result);
                     return existing;
                 }
             );
-            return this;
+            return result;
         }
 
         public string Schema(string subject)

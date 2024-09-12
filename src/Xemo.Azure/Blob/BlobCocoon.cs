@@ -5,7 +5,9 @@ using Newtonsoft.Json;
 using Tonga.IO;
 using Tonga.Text;
 using Xemo.Bench;
+using Xemo.Cluster;
 using Xemo.Cluster.Probe;
+using Xemo.Grip;
 
 namespace Xemo.Azure.Blob;
 
@@ -15,12 +17,19 @@ namespace Xemo.Azure.Blob;
 public static class BlobCocoon
 {
     public static BlobCocoon<TSchema> Make<TSchema>(
-        IGrip grip, 
+        string id, 
+        BlobServiceClient blobHome, 
+        TSchema schema 
+    ) =>
+        new(new AsGrip("standalone", id), new DeadMem($"cocoon '{id}' is not configured to solve relations."), blobHome, schema);
+    
+    public static BlobCocoon<TSchema> Make<TSchema>(
+        string id, 
         IMem relations,
         BlobServiceClient blobHome, 
         TSchema schema 
     ) =>
-        new(grip, relations, blobHome, schema);
+        new(new AsGrip("standalone", id), relations, blobHome, schema);
 }
 
 /// <summary>
@@ -48,6 +57,7 @@ public sealed class BlobCocoon<TContent> : ICocoon
             {
                 var sample = new AsSample<TContent>(this, schema);
                 var container = blobHome.GetBlobContainerClient("standalones");
+                container.CreateIfNotExists();
                 var blobClient = container.GetBlobClient(grip.ID());
                 if (blobClient.Exists())
                 {
@@ -86,8 +96,14 @@ public sealed class BlobCocoon<TContent> : ICocoon
         lock (cache)
         {
             var patched = Patch.Target(this.cache.Value[0].Item2.Content(), relations).Post(mutation);
+            var newID = new PropertyValue("ID", patched, () => string.Empty).AsString();
+            if (newID != string.Empty
+                && newID != new PropertyValue("ID", this.cache.Value[0].Item2.Content()).AsString()
+            )
+                throw new InvalidOperationException("ID change is not supported.");
             var blobClient = this.cache.Value[0].Item1; 
             Upload(patched, blobClient);
+            UpdateCache(patched);
             return this;        
         }
     }
@@ -96,6 +112,15 @@ public sealed class BlobCocoon<TContent> : ICocoon
 
     private TContent Current() =>
         this.cache.Value[0].Item2.Content();
+
+    private void UpdateCache(TContent patched)
+    {
+        this.cache.Value[0] =
+            new Tuple<BlobClient, ISample<TContent>>(
+                this.cache.Value[0].Item1,
+                new AsSample<TContent>(this, patched)
+            );
+    }
 
     private static void Upload(TContent newContent, BlobClient blobClient) =>
         blobClient.Upload(

@@ -17,7 +17,7 @@ public sealed class BoxedMemoryTests
         var mem = new Ram(clusters, standalones, storages, schemata);
         
         new BoxedMemory("sandbox", mem)
-            .AllocateCluster("El Allocazione", new { Name = "" });
+            .Cluster("El Allocazione", new { Name = "" });
 
         Assert.Equal("cluster-sandbox-El Allocazione", storages.Keys.First());
 
@@ -33,7 +33,7 @@ public sealed class BoxedMemoryTests
         var mem = new Ram(clusters, standalones, storages, schemata);
         
         new BoxedMemory("sandbox", mem)
-            .AllocateCluster("El Allocazione", new { Name = "" });
+            .Cluster("El Allocazione", new { Name = "" });
 
         Assert.Equal("cluster-sandbox-El Allocazione", clusters.Keys.First());
     }
@@ -48,7 +48,7 @@ public sealed class BoxedMemoryTests
         var mem = new Ram(clusters, standalones, storages, schemata);
         
         new BoxedMemory("sandbox", mem)
-            .AllocateCluster("El Allocazione", new { Name = "" });
+            .Cluster("El Allocazione", new { Name = "" });
 
         Assert.Equal("cluster-sandbox-El Allocazione", schemata.Keys.First());
     }
@@ -65,8 +65,7 @@ public sealed class BoxedMemoryTests
         Assert.Equal(
             "Captain Blobert",
             new BoxedMemory("sandbox", mem)
-                .AllocateCluster("El Allocazione", new { Name = "" })
-                .Cluster("El Allocazione")
+                .Cluster("El Allocazione", new { Name = "" })
                 .Create(new { Name = "Blobert" })
                 .Mutate(new { Name = "Captain Blobert" })
                 .Sample(new { Name = "" })
@@ -77,13 +76,14 @@ public sealed class BoxedMemoryTests
     [Fact]
     public void ListsClusters()
     {
-        Assert.Equal(
+        var mem = new BoxedMemory("sandbox", new Ram());
+        mem.Cluster("El Allocazione", new { });
+        Assert.Equal<string[]>(
             ["sandbox-El Allocazione"],
             Mapped._(
-                cluster => cluster.Subject(),
-                new BoxedMemory("sandbox", new Ram())
-                    .AllocateCluster("El Allocazione", new { })
-            )
+                cluster => cluster.Subject(), 
+                mem
+            ).ToArray()
         );
     }
 }

@@ -21,7 +21,7 @@ namespace Xemo.Tests.Cocoon
             Assert.Equal(
                 "Ramirez",
                 RamCocoon
-                    .Make("user", schema)
+                    .Make("Main Character", schema)
                     .Mutate(new { FirstName = "Ramirez" })
                     .Sample(schema)
                     .FirstName
@@ -41,7 +41,7 @@ namespace Xemo.Tests.Cocoon
 
             Assert.Equal(
                 "Dive",
-                RamCocoon.Make("user", schema)
+                RamCocoon.Make("Main Character", schema)
                     .Mutate(
                         new
                         {
@@ -71,7 +71,7 @@ namespace Xemo.Tests.Cocoon
 
             Assert.Equal(
                 "Dive",
-                RamCocoon.Make("user", schema)
+                RamCocoon.Make("Main Character", schema)
                     .Mutate(
                         new
                         {
@@ -95,14 +95,15 @@ namespace Xemo.Tests.Cocoon
                 new
                 {
                     Name = "",
-                    Friend = Link.One("Friends")
+                    Friend = Link.OneFrom("Friends")
                 };
-            var mem = new Ram().AllocateCluster("Friends", schema);
-            var daisy = mem.Cluster("Friends").Create(new { Name = "Daisy" });
+            var mem = new Ram();
+            var friends  = mem.Cluster("Friends", schema);
+            var daisy = friends.Create(new { Name = "Daisy" });
 
             Assert.Equal(
                 "Daisy",
-                RamCocoon.Make("user", mem, schema)
+                RamCocoon.Make("Main Character", mem, schema)
                     .Mutate(
                         new
                         {
@@ -120,22 +121,23 @@ namespace Xemo.Tests.Cocoon
         }
 
         [Fact]
-        public void Mutates1to1Relation()
+        public void Mutates1to1RelationTarget()
         {
             var schema =
                 new
                 {
                     Name = "",
-                    Friend = Link.One("Friends")
+                    Friend = Link.OneFrom("Friends")
                 };
-            var mem = new Ram().AllocateCluster("User", schema);
+            var mem = new Ram();
+            var friends = mem.Cluster("Friends", schema);
             
-            var daisy = mem.Cluster("User").Create(new { Name = "Daisy" });
-            var gustav = mem.Cluster("User").Create(new { Name = "Gustav" });
+            var daisy = friends.Create(new { Name = "Daisy" });
+            var gustav = friends.Create(new { Name = "Gustav" });
             
             Assert.Equal(
                 "Gustav",
-                RamCocoon.Make("user", mem, schema)
+                RamCocoon.Make("Main Character", mem, schema)
                     .Mutate(
                         new
                         {
@@ -167,7 +169,7 @@ namespace Xemo.Tests.Cocoon
                 };
             
             Assert.Throws<InvalidOperationException>(() =>
-                RamCocoon.Make("user", schema)
+                RamCocoon.Make("Main Character", schema)
                     .Mutate(
                         new
                         {
@@ -185,9 +187,9 @@ namespace Xemo.Tests.Cocoon
         [Fact]
         public void PreservesInformationOnMutation()
         {
-            var info =
+            var mainCharacter =
                 RamCocoon.Make(
-                    "user",
+                    "Main Character",
                     new
                     {
                         ID = "",
@@ -196,12 +198,12 @@ namespace Xemo.Tests.Cocoon
                     }
                 );
             
-            info.Mutate(new { FirstName = "Ramirez" });
-            info.Mutate(new { LastName = "Saveman" });
+            mainCharacter.Mutate(new { FirstName = "Ramirez" });
+            mainCharacter.Mutate(new { LastName = "Saveman" });
 
             Assert.Equal(
                 "Ramirez",
-                info.Sample(new { FirstName = "" }).FirstName
+                mainCharacter.Sample(new { FirstName = "" }).FirstName
             );
         }
 
@@ -233,7 +235,7 @@ namespace Xemo.Tests.Cocoon
         public void ToleratesConcurrency()
         {
             var xemo =
-                RamCocoon.Make("user",
+                RamCocoon.Make("Main Character",
                     new
                     {
                         FirstName = "",

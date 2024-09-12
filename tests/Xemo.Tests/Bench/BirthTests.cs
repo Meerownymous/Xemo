@@ -58,12 +58,11 @@ namespace Xemo.Tests.Bench
                 new
                 {
                     Name = "",
-                    BestFriend = Link.One("User")
+                    BestFriend = Link.OneFrom("User")
                 };
 
             var pumba =
-                mem.AllocateCluster("User", schema)
-                    .Cluster("User")
+                mem.Cluster("User", schema)
                     .Create(
                         new
                         {
@@ -94,12 +93,11 @@ namespace Xemo.Tests.Bench
                 new
                 {
                     Name = "",
-                    BestFriend = Link.One("User")
+                    BestFriend = Link.OneFrom("User")
                 };
 
             var pumba =
-                mem.AllocateCluster("User", schema)
-                    .Cluster("User")
+                mem.Cluster("User", schema)
                     .Create(
                         new
                         {
@@ -130,9 +128,9 @@ namespace Xemo.Tests.Bench
                 new
                 {
                     Name = "",
-                    BestFriend = Link.One("User")
+                    BestFriend = Link.OneFrom("User")
                 };
-            mem.AllocateCluster("User", schema);
+            mem.Cluster("User", schema);
 
             Assert.Throws<ArgumentException>(() =>
                 Birth
@@ -160,8 +158,7 @@ namespace Xemo.Tests.Bench
                 };
 
             var tick =
-                mem.AllocateCluster("User", schema)
-                    .Cluster("User")
+                mem.Cluster("User", schema)
                     .Create(
                         new
                         {
@@ -204,8 +201,7 @@ namespace Xemo.Tests.Bench
                 };
 
             var tick =
-                mem.AllocateCluster("User", schema)
-                    .Cluster("User")
+                mem.Cluster("User", schema)
                     .Create(
                         new
                         {

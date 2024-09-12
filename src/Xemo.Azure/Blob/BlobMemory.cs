@@ -26,7 +26,7 @@ public sealed class BlobMemory(string blobStorageUri, string storageAccountName,
         )
     );
 
-    public ICocoon Cocoon(string id)
+    public ICocoon Vault(string id)
     {
         ICocoon standalone;
         if (!this.standalones.TryGetValue(id, out standalone))
@@ -42,8 +42,7 @@ public sealed class BlobMemory(string blobStorageUri, string storageAccountName,
         return cluster;
     }
 
-    public IMem AllocateCocoon<TSchema>(string id, TSchema schema, bool errorIfExists = false)
-    {
+    public ICocoon Vault<TSchema>(string id, TSchema schema, bool rejectExisting = false) =>
         this.standalones.AddOrUpdate(id,
             key =>
                 new BlobCocoon<TSchema>(
@@ -55,11 +54,8 @@ public sealed class BlobMemory(string blobStorageUri, string storageAccountName,
             (_, _) =>
                 throw new ArgumentException($"Cocoon '{id}' is already allocated.")
         );
-        return this;
-    }
 
-    public IMem AllocateCluster<TSchema>(string subject, TSchema schema, bool errorIfExists = true)
-    {
+    public ICluster Cluster<TSchema>(string subject, TSchema schema, bool rejectExisting = false) =>
         this.clusters.AddOrUpdate(subject,
             key =>
             {
@@ -74,15 +70,13 @@ public sealed class BlobMemory(string blobStorageUri, string storageAccountName,
             },
             (key, existing) =>
             {
-                if(errorIfExists)
+                if(rejectExisting)
                     throw new InvalidOperationException(
                         $"Memory for '{key}' has already been allocated."
                     );
                 return existing;
             }
         );
-        return this;
-    }
 
     public string Schema(string subject)
     {

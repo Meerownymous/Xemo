@@ -76,7 +76,7 @@ namespace Xemo.Tests.Bench
                     new
                     {
                         Todo = "Succeed",
-                        Author = Link.One("User")
+                        Author = Link.OneFrom("User")
                     },
                     (_, rightID) => { solved = true; return rightID; },
                     (_, _) => throw new Exception("one to many is not tested here.")
@@ -96,7 +96,7 @@ namespace Xemo.Tests.Bench
                 new
                 {
                     Todo = "Succeed",
-                    Author = Link.One("User")
+                    Author = Link.OneFrom("User")
                 };
 
             Merge
@@ -121,7 +121,7 @@ namespace Xemo.Tests.Bench
                     new
                     {
                         Todo = "Succeed",
-                        Author = Link.One("User")
+                        Author = Link.OneFrom("User")
                     },
                     (_, right) => { result = right; return right; },
                     (_, _) => throw new Exception("one to many is not tested here.")

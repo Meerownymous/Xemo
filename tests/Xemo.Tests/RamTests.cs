@@ -1,33 +1,34 @@
 ﻿using Xunit;
 
-namespace Xemo.Tests
+namespace Xemo.Tests;
+
+public sealed class RamTests
 {
-    public sealed class RamTests
+    [Fact]
+    public void DeliversSchema()
     {
-        [Fact]
-        public void DeliversSchema()
-        {
-            Assert.Equal(
-                "{\"Success\":true,\"Name\":\"Beautifully schematic I am\"}",
-                new Ram().AllocateCluster(
+        var mem = new Ram();
+        mem.Cluster(
+            "unittest",
+            new { Success = true, Name = "Beautifully schematic I am" }
+        );
+        Assert.Equal(
+            "{\"Success\":true,\"Name\":\"Beautifully schematic I am\"}",
+            mem.Schema("unittest")
+        );
+    }
+    
+    [Fact]
+    public void AllocatesStandalone()
+    {
+        Assert.True(
+            new Ram()
+                .Vault(
                     "unittest",
                     new { Success = true, Name = "Beautifully schematic I am" }
-                ).Schema("unittest")
-            );
-        }
-        
-        [Fact]
-        public void AllocatesStandalone()
-        {
-            Assert.True(
-                new Ram().AllocateCocoon(
-                    "unittest",
-                    new { Success = true, Name = "Beautifully schematic I am" }
-                ).Cocoon("unittest")
+                )
                 .Sample(new { Success = false, Name = "" })
                 .Success
-            );
-        }
+        );
     }
 }
-
