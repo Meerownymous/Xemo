@@ -13,7 +13,7 @@
                     target,
                     solve1to1: (left, rightID) =>
                     {
-                        var result = mem.Cocoon(rightID.Kind(), rightID.ID()).Sample(left);
+                        var result = mem.Cluster(rightID.Kind()).Cocoon(rightID.ID()).Sample(left);
                         return result;
                     },
                     solve1toMany:(left, rightIDs) =>
@@ -23,7 +23,7 @@
                         for(int index = 0;index<targetArray.Length;index++)
                         {
                             targetArray.SetValue(
-                                mem.Cocoon(rightIDs[index].Kind(), rightIDs[index].ID()).Sample(itemSchema),
+                                mem.Cluster(rightIDs[index].Kind()).Cocoon(rightIDs[index].ID()).Sample(itemSchema),
                                 index
                             );
                         }

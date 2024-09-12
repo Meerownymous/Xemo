@@ -10,8 +10,7 @@
         /// Note that only properties are stored, while functions are omited.
         /// </summary>
         public static ICocoon AsCocoon<TContent>(this TContent content, string subject, IMem mem) =>
-            mem.Allocate(subject, content, errorIfExists: false)
-                .Cluster(subject)
+            mem.Cluster(subject, content, rejectExisting: false)
                 .Create(content);
 
         /// <summary>
@@ -20,8 +19,7 @@
         public static ICluster AsCluster<TSchema>(
             this TSchema schema, string kind, IMem mem
         ) =>
-            mem.Allocate(kind, schema)
-                .Cluster(kind);
+            mem.Cluster(kind, schema);
     }
 }
 

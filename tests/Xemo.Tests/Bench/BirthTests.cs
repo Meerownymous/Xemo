@@ -51,19 +51,18 @@ namespace Xemo.Tests.Bench
         }
 
         [Fact]
-        public void LinksSingleRelationByXemo()
+        public void LinksSingleRelationByCocoon()
         {
             var mem = new Ram();
             var schema =
                 new
                 {
                     Name = "",
-                    BestFriend = Link.One("User")
+                    BestFriend = Link.OneFrom("User")
                 };
 
             var pumba =
-                mem.Allocate("User", schema)
-                    .Cluster("User")
+                mem.Cluster("User", schema)
                     .Create(
                         new
                         {
@@ -94,12 +93,11 @@ namespace Xemo.Tests.Bench
                 new
                 {
                     Name = "",
-                    BestFriend = Link.One("User")
+                    BestFriend = Link.OneFrom("User")
                 };
 
             var pumba =
-                mem.Allocate("User", schema)
-                    .Cluster("User")
+                mem.Cluster("User", schema)
                     .Create(
                         new
                         {
@@ -130,9 +128,9 @@ namespace Xemo.Tests.Bench
                 new
                 {
                     Name = "",
-                    BestFriend = Link.One("User")
+                    BestFriend = Link.OneFrom("User")
                 };
-            mem.Allocate("User", schema);
+            mem.Cluster("User", schema);
 
             Assert.Throws<ArgumentException>(() =>
                 Birth
@@ -160,8 +158,7 @@ namespace Xemo.Tests.Bench
                 };
 
             var tick =
-                mem.Allocate("User", schema)
-                    .Cluster("User")
+                mem.Cluster("User", schema)
                     .Create(
                         new
                         {
@@ -193,7 +190,7 @@ namespace Xemo.Tests.Bench
         }
 
         [Fact]
-        public void LinksManyRelationByXemo()
+        public void LinksManyRelationByCocoon()
         {
             var mem = new Ram();
             var schema =
@@ -204,8 +201,7 @@ namespace Xemo.Tests.Bench
                 };
 
             var tick =
-                mem.Allocate("User", schema)
-                    .Cluster("User")
+                mem.Cluster("User", schema)
                     .Create(
                         new
                         {

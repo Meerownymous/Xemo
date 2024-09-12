@@ -20,14 +20,14 @@ public sealed class AllTodos(IMem memory) : ClusterEnvelope(
                 new { Subject = "", Due = DateTime.MinValue },
                 todo => (todo.Due > DateTime.Now, "Due date must be in the future.")
             ),
-            memory.Allocate("todo",
+            memory.Cluster("todo",
                 new
                 {
                     Done = false,
                     Due = DateTime.Now,
                     Subject = ""
                 }
-            ).Cluster("todo")
+            )
         )
 	)
 );

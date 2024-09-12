@@ -1,11 +1,12 @@
 ﻿using System.Collections.Concurrent;
+using Xemo.Cluster;
 using Xemo.Cocoon;
 using Xemo.Grip;
 using Xunit;
 
-namespace Xemo.Tests.Cocoon
+namespace Xemo.Tests.Cluster
 {
-    public sealed class RamCocoonTests
+    public sealed class RamClusterCocoonTests
     {
         [Fact]
         public void CreatesWithIDInSlice()
@@ -131,12 +132,13 @@ namespace Xemo.Tests.Cocoon
                 new
                 {
                     Name = "",
-                    Friend = Link.One("User")
+                    Friend = Link.OneFrom("User")
                 };
-            var mem = new Ram().Allocate("User", schema);
+            var mem = new Ram();
+            var users = mem.Cluster("User", schema);
 
-            var donald = mem.Cluster("User").Create(new { Name = "Donald" });
-            var daisy = mem.Cluster("User").Create(new { Name = "Daisy", Friend = donald });
+            var donald = users.Create(new { Name = "Donald" });
+            var daisy = users.Create(new { Name = "Daisy", Friend = donald });
 
             Assert.Equal(
                 "Donald",
@@ -156,13 +158,13 @@ namespace Xemo.Tests.Cocoon
                 new
                 {
                     Name = "",
-                    Friend = Link.One("User")
+                    Friend = Link.OneFrom("User")
                 };
-            var mem = new Ram().Allocate("User", schema);
-
-            var donald = mem.Cluster("User").Create(new { Name = "Donald" });
-            var daisy = mem.Cluster("User").Create(new { Name = "Daisy", Friend = donald });
-            var gustav = mem.Cluster("User").Create(new { Name = "Gustav" });
+            var mem = new Ram();
+            var users = mem.Cluster("User", schema);
+            var donald = users.Create(new { Name = "Donald" });
+            var daisy = users.Create(new { Name = "Daisy", Friend = donald });
+            var gustav = users.Create(new { Name = "Gustav" });
 
             daisy
                 .Mutate(
@@ -194,7 +196,7 @@ namespace Xemo.Tests.Cocoon
         public void RejectsIDChange()
         {
             Assert.Throws<InvalidOperationException>(() =>
-                new RamCocoon("User")
+                new RamClusterCocoon("User")
                     .Schema(
                         new
                         {
@@ -215,7 +217,7 @@ namespace Xemo.Tests.Cocoon
         public void MutatesInformation()
         {
             var info =
-                new RamCocoon("User").Schema(
+                new RamClusterCocoon("User").Schema(
                     new
                     {
                         FirstName = "Ramirez",
@@ -234,7 +236,7 @@ namespace Xemo.Tests.Cocoon
         public void PreservesInformationOnMutation()
         {
             var info =
-                new RamCocoon("User").Schema(
+                new RamClusterCocoon("User").Schema(
                     new
                     {
                         FirstName = "Ramirez",
@@ -253,7 +255,7 @@ namespace Xemo.Tests.Cocoon
         public void RemutatesInformation()
         {
             var info =
-                new RamCocoon("User").Schema(
+                new RamClusterCocoon("User").Schema(
                     new
                     {
                         FirstName = "Ramirez",
@@ -279,7 +281,7 @@ namespace Xemo.Tests.Cocoon
                     LastName = "Memorius"
                 };
             var storage = AnonymousTypeDictionary._(schema);
-            RamCocoon
+            RamClusterCocoon
                 .Make(new AsGrip("User", "1"), storage, schema)
                 .Mutate(new { FirstName = "Ulf", LastName = "Saveman" });
 
@@ -298,7 +300,7 @@ namespace Xemo.Tests.Cocoon
         {
             var users = new ConcurrentDictionary<string, object>();
             var xemo =
-                RamCocoon.Make(new AsGrip("User", "1"), users,
+                RamClusterCocoon.Make(new AsGrip("User", "1"), users,
                     new
                     {
                         FirstName = "Ramirez",

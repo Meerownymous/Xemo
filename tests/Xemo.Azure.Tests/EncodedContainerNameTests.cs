@@ -8,7 +8,7 @@ public sealed class EncodedContainerNameTests
     public void RemovesInvalidChars()
     {
         Assert.Equal(
-            "ABC-14qi1wxx",
+            "abc-14qi1wxx",
             new EncodedContainerName("ABC!@#$%^&*()_+=").AsString()
         );
     }
@@ -26,7 +26,7 @@ public sealed class EncodedContainerNameTests
     public void ReducesMultipleDashesToSingle()
     {
         Assert.Equal(
-            "A-B-1wraxci6",
+            "a-b-1wraxci6",
             new EncodedContainerName("A---B").AsString()
         );
     }

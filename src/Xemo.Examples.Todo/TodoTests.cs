@@ -7,8 +7,8 @@ namespace Xemo.Examples.Todo
 		[Fact]
 		public void DeliversInformation()
 		{
-			var mem =
-                new Ram().Allocate(
+			var mem = new Ram(); 
+			mem.Cluster(
 					"todo",
 					new
 					{
@@ -30,17 +30,17 @@ namespace Xemo.Examples.Todo
         [Fact]
         public void MutatesInformation()
         {
-            var mem =
-				new Ram().Allocate(
-					"todo",
-					new
-					{
-						Done = false,
-						Created = DateTime.Now,
-						Subject = "",
-						Author = ""
-					}
-				);
+	        var mem = new Ram();
+            mem.Cluster(
+				"todo",
+				new
+				{
+					Done = false,
+					Created = DateTime.Now,
+					Subject = "",
+					Author = ""
+				}
+			);
 
             var todo = new Todo("Succeed in Unittest", mem);
 			todo.Mutate(new { Done = true });

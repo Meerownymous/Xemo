@@ -48,7 +48,7 @@ public sealed class BlobSamplesTests
         cache[id1] = 
             CacheEntry._(
                 container.GetBlobClient(id1),
-                BlobCocoon.Make(
+                BlobClusterCocoon.Make(
                     new AsGrip(subject, id1), 
                     new DeadMem("testing"), 
                     cache,
@@ -59,7 +59,7 @@ public sealed class BlobSamplesTests
         cache[id2] = 
             CacheEntry._(
                 container.GetBlobClient(id2),
-                BlobCocoon.Make(
+                BlobClusterCocoon.Make(
                     new AsGrip(subject, id2), 
                     new DeadMem("testing"), 
                     cache,
@@ -112,7 +112,7 @@ public sealed class BlobSamplesTests
         cache[id1] = 
             CacheEntry._(
                 container.GetBlobClient(id1),
-                BlobCocoon.Make(
+                BlobClusterCocoon.Make(
                     new AsGrip(subject, id1), 
                     new DeadMem("testing"), 
                     cache,
@@ -123,7 +123,7 @@ public sealed class BlobSamplesTests
         cache[id2] = 
             CacheEntry._(
                 container.GetBlobClient(id2),
-                BlobCocoon.Make(
+                BlobClusterCocoon.Make(
                     new AsGrip(subject, id2), 
                     new DeadMem("testing"), 
                     cache,

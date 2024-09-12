@@ -8,7 +8,12 @@
         /// <summary>
         /// State of a single item of a specific type.
         /// </summary>
-        ICocoon Cocoon(string subject, string id);
+        ICocoon Vault(string name);
+        
+        /// <summary>
+        /// Allocates for the given subject and schema.
+        /// </summary>
+        ICocoon Vault<TSchema>(string subject, TSchema schema, bool rejectExisting = true);
 
         /// <summary>
         /// Cluster for a given subject.
@@ -18,7 +23,7 @@
         /// <summary>
         /// Allocates space for the given subject and schema.
         /// </summary>
-        IMem Allocate<TSchema>(string subject, TSchema schema, bool errorIfExists = true);
+        ICluster Cluster<TSchema>(string subject, TSchema schema, bool rejectExisting = true);
 
         /// <summary>
         /// Get a string description of the schema for a subject.

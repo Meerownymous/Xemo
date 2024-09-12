@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using Azure.Storage;
 using Azure.Storage.Blobs;
 using Newtonsoft.Json;
+using Xemo.Grip;
 
 namespace Xemo.Azure.Blob;
 
@@ -13,6 +14,7 @@ public sealed class BlobMemory(string blobStorageUri, string storageAccountName,
     IMem
 {
     private readonly ConcurrentDictionary<string, ICluster> clusters = new();
+    private readonly ConcurrentDictionary<string, ICocoon> standalones = new();
     private readonly ConcurrentDictionary<string, object> schemata = new();
 
     private readonly Lazy<BlobServiceClient> blobService = new(
@@ -23,8 +25,14 @@ public sealed class BlobMemory(string blobStorageUri, string storageAccountName,
             )
         )
     );
-    
-    public ICocoon Cocoon(string subject, string id) => Cluster(subject).Cocoon(id);
+
+    public ICocoon Vault(string id)
+    {
+        ICocoon standalone;
+        if (!this.standalones.TryGetValue(id, out standalone))
+            throw new ArgumentException($"Standalone cocoon '{id}' does not exist.");
+        return standalone;
+    }
 
     public ICluster Cluster(string subject)
     {
@@ -34,8 +42,20 @@ public sealed class BlobMemory(string blobStorageUri, string storageAccountName,
         return cluster;
     }
 
-    public IMem Allocate<TSchema>(string subject, TSchema schema, bool errorIfExists = true)
-    {
+    public ICocoon Vault<TSchema>(string id, TSchema schema, bool rejectExisting = false) =>
+        this.standalones.AddOrUpdate(id,
+            key =>
+                new BlobCocoon<TSchema>(
+                    new AsGrip("standalone", key),
+                    this,
+                    blobService.Value,
+                    schema
+                ),
+            (_, _) =>
+                throw new ArgumentException($"Cocoon '{id}' is already allocated.")
+        );
+
+    public ICluster Cluster<TSchema>(string subject, TSchema schema, bool rejectExisting = false) =>
         this.clusters.AddOrUpdate(subject,
             key =>
             {
@@ -50,15 +70,13 @@ public sealed class BlobMemory(string blobStorageUri, string storageAccountName,
             },
             (key, existing) =>
             {
-                if(errorIfExists)
+                if(rejectExisting)
                     throw new InvalidOperationException(
                         $"Memory for '{key}' has already been allocated."
                     );
                 return existing;
             }
         );
-        return this;
-    }
 
     public string Schema(string subject)
     {

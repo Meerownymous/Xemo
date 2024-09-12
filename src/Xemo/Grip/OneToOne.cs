@@ -9,7 +9,7 @@ namespace Xemo.Grip
         /// <summary>
         /// Link to another Xemo subject (eg User -> Address) in a schema.
         /// </summary>
-        public static IGrip One(string targetSubject) =>
+        public static IGrip OneFrom(string targetSubject) =>
             new OneToOne(targetSubject);
     }
 
