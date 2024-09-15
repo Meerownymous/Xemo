@@ -41,6 +41,23 @@ namespace Xemo.Tests.Bench
         }
         
         [Fact]
+        public void FillsDTOArray()
+        {
+            Assert.Equal(
+                9,
+                Merge
+                    .Target(new Example())
+                    .Post(
+                        new Example()
+                        {
+                            Number = 9
+                        }
+                    )
+                    .Number
+            );
+        }
+        
+        [Fact]
         public void RejectsDTOWithNoParameterLessConstructor()
         {
             AssertException.MessageStartsWith<ArgumentException>(
@@ -179,10 +196,7 @@ namespace Xemo.Tests.Bench
                 Merge.Target(
                     new Example()
                     {
-                        Nesteds =
-                        [
-                            new NestedExample { NestedNumber = 0 }
-                        ]
+                        Nesteds = []
                     })
                     .Post(
                         new Example

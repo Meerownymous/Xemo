@@ -82,7 +82,10 @@ namespace Xemo.Bench
             object result = null;
             if (target != null)
             {
-                var schema = (target as Array).GetValue(0);
+                var schema = (target as Array).Length > 0
+                    ? (target as Array).GetValue(0)
+                    //workaround: not anonymous but concrete array, which is empty, is the target.
+                    : MakeConcrete(target.GetType().GetElementType()); 
                 if (source != null && schema != null && source is Array)
                 {
                     var outputArray = Array.CreateInstance(resultType.GetElementType(), (source as Array).Length);
@@ -199,6 +202,13 @@ namespace Xemo.Bench
             First._(type.GetConstructors())
                 .Value()
                 .Invoke(values);
+        
+        private static object MakeConcrete(Type type)
+        {
+            var result = Instance(type);
+            
+            return result;
+        }
 
         private static object MakeConcrete(Type type, object[] values, PropertyInfo[] propInfos)
         {
