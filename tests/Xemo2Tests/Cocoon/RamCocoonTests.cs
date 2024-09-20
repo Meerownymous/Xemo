@@ -2,7 +2,7 @@
 using Xemo2.Cocoon;
 using Xunit;
 
-namespace Xemo2Tests;
+namespace Xemo2Tests.Cocoon;
 
 public sealed class RamCocoonTests
 {

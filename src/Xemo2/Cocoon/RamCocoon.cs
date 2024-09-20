@@ -1,5 +1,8 @@
 namespace Xemo2.Cocoon;
 
+/// <summary>
+/// Cocoon stored in RAM.
+/// </summary>
 public sealed class RamCocoon<TContent>(TContent content) 
     : ICocoon<TContent>
 {
@@ -22,8 +25,7 @@ public sealed class RamCocoon<TContent>(TContent content)
 
     public Task<TShape> Render<TShape>(IRendering<TContent, TShape> rendering) =>
         rendering.Render(content);
-
-
+    
     public Task Erase() => throw new InvalidOperationException("A standalone RAM cocoon cannot be erased.");
 }
 

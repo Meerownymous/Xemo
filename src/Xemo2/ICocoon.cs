@@ -34,4 +34,10 @@ public static class FluentExtensions
     {
         return await (await responseTask).Patch(patch);
     }
+    
+    public static async Task Erase<TContent>(
+        this Task<ICocoon<TContent>> responseTask)
+    {
+        await (await responseTask).Erase();
+    }
 }

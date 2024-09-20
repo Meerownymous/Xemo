@@ -6,6 +6,9 @@ using Tonga.Scalar;
 
 namespace Xemo2.Cluster;
 
+/// <summary>
+/// Cluster of cocoons stored in RAM. 
+/// </summary>
 public sealed class RamCluster<TContent>(
     Func<TContent, string> createID,
     ConcurrentDictionary<string,TContent> memory
@@ -17,10 +20,7 @@ public sealed class RamCluster<TContent>(
             yield return new RamClusterCocoon<TContent>(entry.Key, memory);
     }
 
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     public Task<ICocoon<TContent>> FirstMatch(IFact<TContent> fact)
     {
@@ -63,4 +63,19 @@ public sealed class RamCluster<TContent>(
 
     public Task<TShape> Render<TShape>(IRendering<ICluster<TContent>, TShape> rendering) =>
         rendering.Render(this);
+}
+
+public static class RamClusterExtensions
+{
+    public static ICluster<TContent> InRamCluster<TContent>(this TContent content) => 
+        new LazyCluster<TContent>(() =>
+            {
+                var cluster = 
+                    new RamCluster<TContent>(
+                        _ => Guid.NewGuid().ToString(), 
+                        new ConcurrentDictionary<string, TContent>()
+                    );
+                cluster.Include(content);
+                return cluster;
+            });
 }

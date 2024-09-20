@@ -22,6 +22,12 @@ public sealed class If<TContent> : IFact<TContent>
     }
 }
 
+public static class If
+{
+    public static If<TContent> True<TContent>(TContent schema, Func<TContent, bool> condition) => new(condition);
+    public static If<TContent> True<TContent>(Func<TContent, bool> condition) => new(condition);
+}
+
 public sealed class IfTests
 {
     [Fact]

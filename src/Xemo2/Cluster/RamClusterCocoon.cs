@@ -17,7 +17,6 @@ public sealed class RamClusterCocoon<TContent>(
     }
 
     public Task<ICocoon<TContent>> Patch(IPatch<TContent> patch) => this.Patch(patch.Patch);
-    public Task<bool> True(IFact<TContent> fact) => Task.FromResult(fact.IsTrue(memory[key]));
     public Task<TShape> Render<TShape>(Func<TContent, Task<TShape>> rendering) =>
         rendering(memory[key]);
     public Task<TShape> Render<TShape>(IRendering<TContent, TShape> rendering) => 
@@ -30,4 +29,10 @@ public sealed class RamClusterCocoon<TContent>(
         memory.TryRemove(key, out _);
         return Task.CompletedTask;
     }
+}
+
+public static class RamClusterCocoonExtensions
+{
+    public static RamClusterCocoon<TContent> InRamClusterCocoon<TContent>(this TContent content, string key, ConcurrentDictionary<string,TContent> memory) => 
+        new(key, memory);
 }
