@@ -6,6 +6,7 @@
     <Nullable>disable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Xemo2\Xemo2.csproj" />
     <ProjectReference Include="..\Xemo\Xemo.csproj" />
   </ItemGroup>
   <ItemGroup>

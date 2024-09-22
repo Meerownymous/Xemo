@@ -9,31 +9,30 @@ public sealed class RamClusterCocoon<TContent>(
 {
     public string ID() => id;
 
-    public Task<ICocoon<TContent>> Patch(IPatch<TContent> patch)
+    public async Task<ICocoon<TContent>> Patch(IPatch<TContent> patch)
     {
-        memory.AddOrUpdate(id,
+        await memory.AddOrUpdate(id,
             _ => throw new InvalidOperationException("No content to patch."),
             async (_, existing) => await patch.Patch(await existing)
         );
-        return Task.FromResult<ICocoon<TContent>>(this);
+        return this;
     }
 
-    public Task<TShape> Render<TShape>(IRendering<TContent, TShape> rendering) =>
-        Task.Run(() =>
-        {
-            TShape result = default;
-            memory.AddOrUpdate(
-                id,
-                (_) => throw new InvalidOperationException(
-                    $"Cannot render '{id}' - it does not exist. It might have been deleted."),
-                async (_, existing) =>
-                {
-                    result = rendering.Render(await existing).ConfigureAwait(false).GetAwaiter().GetResult();
-                    return await existing;
-                }
-            );
-            return result;
-        });
+    public async Task<TShape> Render<TShape>(IRendering<TContent, TShape> rendering)
+    {
+        TShape result = default;
+        await memory.AddOrUpdate(
+            id,
+            (_) => throw new InvalidOperationException(
+                $"Cannot render '{id}' - it does not exist. It might have been deleted."),
+            async (_, existing) =>
+            {
+                result = rendering.Render(await existing).ConfigureAwait(false).GetAwaiter().GetResult();
+                return await existing;
+            }
+        );
+        return result;
+    }
 
     public Task Erase()
     {
@@ -44,6 +43,8 @@ public sealed class RamClusterCocoon<TContent>(
 
 public static class RamClusterCocoonExtensions
 {
-    public static RamClusterCocoon<TContent> InRamClusterCocoon<TContent>(this TContent content, string key, ConcurrentDictionary<string,Task<TContent>> memory) => 
+    public static RamClusterCocoon<TContent> InRamClusterCocoon<TContent>(
+        this TContent content, string key, ConcurrentDictionary<string,Task<TContent>> memory
+    ) => 
         new(key, memory);
 }
