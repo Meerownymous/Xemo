@@ -3,30 +3,41 @@ using System.Collections.Concurrent;
 namespace Xemo2.Cluster;
 
 public sealed class RamClusterCocoon<TContent>(
-    string key,
+    string id,
     ConcurrentDictionary<string, TContent> memory
 ) : ICocoon<TContent>
 {
-    public Task<ICocoon<TContent>> Patch(Func<TContent, TContent> patch)
+    public string ID() => id;
+
+    public Task<ICocoon<TContent>> Patch(IPatch<TContent> patch)
     {
-        memory.AddOrUpdate(key,
+        memory.AddOrUpdate(id,
             _ => default,
-            (_, existing) => patch(existing)
+            (_, existing) => patch.Patch(existing)
         );
         return Task.FromResult<ICocoon<TContent>>(this);
     }
 
-    public Task<ICocoon<TContent>> Patch(IPatch<TContent> patch) => this.Patch(patch.Patch);
-    public Task<TShape> Render<TShape>(Func<TContent, Task<TShape>> rendering) =>
-        rendering(memory[key]);
-    public Task<TShape> Render<TShape>(IRendering<TContent, TShape> rendering) => 
-        this.Render(rendering.Render);
-    public Task<TShape> Render<TShape>(Func<TContent, TShape> rendering) =>
-        Task.FromResult(rendering(memory[key]));
+    public Task<TShape> Render<TShape>(IRendering<TContent, TShape> rendering) =>
+        Task.Run(() =>
+        {
+            TShape result = default;
+            memory.AddOrUpdate(
+                id,
+                (_) => throw new InvalidOperationException(
+                    $"Cannot render '{id}' - it does not exist. Maybe it has been deleted."),
+                (_, existing) =>
+                {
+                    result = rendering.Render(existing);
+                    return existing;
+                }
+            );
+            return result;
+        });
 
     public Task Erase()
     {
-        memory.TryRemove(key, out _);
+        memory.TryRemove(id, out _);
         return Task.CompletedTask;
     }
 }

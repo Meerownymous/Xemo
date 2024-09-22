@@ -62,7 +62,7 @@ public sealed class RamCluster<TContent>(
     }
 
     public Task<TShape> Render<TShape>(IRendering<ICluster<TContent>, TShape> rendering) =>
-        rendering.Render(this);
+        Task.Run(() => rendering.Render(this));
 }
 
 public static class RamClusterExtensions

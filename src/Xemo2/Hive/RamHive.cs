@@ -1,20 +1,20 @@
 using System.Collections.Concurrent;
+using Xemo2.Attachment;
 using Xemo2.Cocoon;
 
 namespace Xemo2.Hive;
 
-public sealed class RamHive() : IHive
+public sealed class RamHive : IHive
 {
     private readonly ConcurrentDictionary<string,object> vaults = new();
+    private readonly ConcurrentDictionary<string,object> clusters = new();
+    private readonly ConcurrentDictionary<string,Stream> attachments = new();
 
     public ICocoon<TContent> Vault<TContent>(string name)
     {
-        var result =
-            vaults.GetOrAdd(name,
-                (_, content) => content,
-                (new RamCocoon<TContent>(default) as ICocoon<TContent>)
-            );
-
+        object result;
+        if (!vaults.TryGetValue(name, out result))
+            throw new ArgumentException($"Vault '{name}' does not exist.");
         if (!result.GetType().GetInterfaces().Contains(typeof(ICocoon<TContent>)))
             throw new ArgumentException(
                 $"Vault '{name}' has been stored with a different content type: "
@@ -23,24 +23,42 @@ public sealed class RamHive() : IHive
         return result as ICocoon<TContent>;
     }
 
+    public IHive WithVault<TContent>(string name, TContent content)
+    {
+        vaults.AddOrUpdate(
+            name, 
+            new RamCocoon<TContent>(content, () => name), 
+            (_, _) => throw new InvalidOperationException($"Vault '{name}' already exists.")
+        );
+        return this;
+    }
 
     public ICluster<TContent> Cluster<TContent>(string name)
     {
-        throw new NotImplementedException();
+        if (clusters.TryGetValue(name, out var cluster))
+        {
+            if (!cluster.GetType().GetInterfaces().Contains(typeof(ICluster<TContent>)))
+                throw new ArgumentException(
+                    $"Cluster '{name}' has been created with a different content type: "
+                    + $"Cluster is '{cluster.GetType().Name}' "
+                    + $"while you requested '{typeof(ICluster<TContent>).Name}'.");
+        }
+        else
+        {
+            throw new ArgumentException($"Cluster '{name}' has not been registered.");
+        }
+        return (ICluster<TContent>)cluster;
     }
 
-    public IAttachment Attachment<TContent>(Func<ICocoon<TContent>, string> link)
+    public IHive WithCluster<TContent>(string name, ICluster<TContent> cluster)
     {
-        throw new NotImplementedException();
+        if (!clusters.TryAdd(name, cluster))
+            throw new InvalidOperationException($"Cluster '{name}' has already been registered.");
+        return this;
     }
 
-    public IAttachment Attachment<TContent>(ILink<TContent> link)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<TShape> Render<TShape>(IRendering<IHive, TShape> rendering)
-    {
-        throw new NotImplementedException();
-    }
+    public IAttachment Attachment<TContent>(ICocoon<TContent> carrier) =>
+        new RamAttachment(
+            carrier.ID(), this.attachments
+        );
 }
