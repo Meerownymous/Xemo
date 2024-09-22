@@ -1,9 +1,8 @@
 ﻿using Xemo2;
 using Xemo2.Cluster;
-using Xemo2.Cocoon;
 using Xunit;
 
-namespace Xemo2Tests.Cocoon;
+namespace Xemo2Tests.Cluster;
 
 public sealed class RamClusterCocoonTests
 {
@@ -16,7 +15,7 @@ public sealed class RamClusterCocoonTests
                 Name = "Test Doe",
                 Modified = false
             };
-        var memory = ConcurrentDictionary.Construct(content).Value;
+        var memory = ConcurrentDictionary.Construct(Task.FromResult(content)).Value;
         Assert.True(
             await content
             .InRamClusterCocoon(memory.Keys.First(), memory)
@@ -34,7 +33,7 @@ public sealed class RamClusterCocoonTests
                 Name = "Test Doe",
                 Modified = false
             };
-        var memory = ConcurrentDictionary.Construct(content).Value;
+        var memory = ConcurrentDictionary.Construct(Task.FromResult(content)).Value;
         await new
             {
                 Name = "Test Doe",
@@ -54,10 +53,10 @@ public sealed class RamClusterCocoonTests
                 Name = "Test Doe",
                 Modified = false
             };
-        var memory = ConcurrentDictionary.Construct(content);
+        var memory = ConcurrentDictionary.Construct(Task.FromResult(content)).Value;
         Assert.True(
             await content
-                .InRamClusterCocoon(memory.Value.Keys.First(), memory.Value)
+                .InRamClusterCocoon(memory.Keys.First(), memory)
                 .Render(p => p.Name.Contains("Doe"))
         );
     }

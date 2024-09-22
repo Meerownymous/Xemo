@@ -11,14 +11,14 @@ public sealed class RamCocoon<TContent>(TContent content, Func<string> construct
 
     public string ID() => id.Value;
 
-    public Task<ICocoon<TContent>> Patch(IPatch<TContent> patch)
+    public async Task<ICocoon<TContent>> Patch(IPatch<TContent> patch)
     {
-        content = patch.Patch(content);
-        return Task.FromResult<ICocoon<TContent>>(this);
+        content = await patch.Patch(content);
+        return this;
     }
 
     public Task<TShape> Render<TShape>(IRendering<TContent, TShape> rendering) =>
-        Task.FromResult(rendering.Render(content));
+        rendering.Render(content);
     
     public Task Erase() => throw new InvalidOperationException("A standalone RAM cocoon cannot be erased.");
 }

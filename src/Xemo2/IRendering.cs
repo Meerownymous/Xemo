@@ -1,6 +1,6 @@
 namespace Xemo2;
 
-public interface IRendering<TContent, TShape>
+public interface IRendering<in TContent, TShape>
 {
-    TShape Render(TContent content);
+    Task<TShape> Render(TContent content);
 }

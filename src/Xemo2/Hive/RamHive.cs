@@ -8,7 +8,7 @@ public sealed class RamHive : IHive
 {
     private readonly ConcurrentDictionary<string,object> vaults = new();
     private readonly ConcurrentDictionary<string,object> clusters = new();
-    private readonly ConcurrentDictionary<string,Stream> attachments = new();
+    private readonly ConcurrentDictionary<string,Task<Stream>> attachments = new();
 
     public ICocoon<TContent> Vault<TContent>(string name)
     {

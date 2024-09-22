@@ -14,10 +14,10 @@ public interface ICocoon<TContent>
 public static class CocoonExtensions
 {
     public static Task<TShape> Render<TContent, TShape>(
-        this ICocoon<TContent> cocoon, Func<TContent, TShape> patch
+        this ICocoon<TContent> cocoon, Func<TContent, TShape> render
     ) =>
         cocoon.Render(
-            new AsRendering<TContent, TShape>(patch)
+            new AsRendering<TContent, TShape>(content => Task.FromResult(render(content)))
         );
     
     public static Task<ICocoon<TContent>> Patch<TContent>(this ICocoon<TContent> cocoon, Func<TContent, TContent> patch) =>

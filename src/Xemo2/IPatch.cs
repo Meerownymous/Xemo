@@ -2,5 +2,5 @@ namespace Xemo2;
 
 public interface IPatch<TContent>
 {
-    TContent Patch(TContent content);
+    Task<TContent> Patch(TContent content);
 }

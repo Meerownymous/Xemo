@@ -11,7 +11,7 @@ namespace Xemo2.Cluster;
 /// </summary>
 public sealed class RamCluster<TContent>(
     Func<TContent, string> createID,
-    ConcurrentDictionary<string,TContent> memory
+    ConcurrentDictionary<string,Task<TContent>> memory
 ) : ICluster<TContent>
 {
     public IEnumerator<ICocoon<TContent>> GetEnumerator()
@@ -22,38 +22,43 @@ public sealed class RamCluster<TContent>(
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public Task<ICocoon<TContent>> FirstMatch(IFact<TContent> fact)
+    public async Task<ICocoon<TContent>> FirstMatch(IFact<TContent> fact)
     {
-        var match =
-            First._(
-                Filtered._(
-                    pair => fact.IsTrue(pair.Value),
-                    memory
-                ),
-                new ArgumentException("No match for the given fact was found.")
-            ).Value();
-        return Task.FromResult<ICocoon<TContent>>(
-            new RamClusterCocoon<TContent>(match.Key, memory)
-        );
+        ICocoon<TContent> result = null;
+        bool found = false;
+        foreach (var pair in memory)
+        {
+            var cocoon = await pair.Value;
+            if (fact.IsTrue(await pair.Value))
+            {
+                result = new RamClusterCocoon<TContent>(pair.Key, memory);
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+            throw new ArgumentException("No matching cocoon found");
+        return result;
     }
 
-    public Task<IEnumerable<ICocoon<TContent>>> Matches(IFact<TContent> fact) =>
-        Task.FromResult<IEnumerable<ICocoon<TContent>>>(
-            Mapped._(
-                passed => new RamClusterCocoon<TContent>(passed.Key, memory),
-                Filtered._(
-                    pair => fact.IsTrue(pair.Value),
-                    memory
-                )
-            )
-        );
+    public async Task<IEnumerable<ICocoon<TContent>>> Matches(IFact<TContent> fact)
+    {
+        IList<ICocoon<TContent>> result = new List<ICocoon<TContent>>();
+        foreach (var pair in memory)
+        {
+            if(fact.IsTrue(await pair.Value))
+                result.Add(new RamClusterCocoon<TContent>(pair.Key, memory));
+        }
+        return result;
+    }
 
     public Task<ICocoon<TContent>> Include(TContent content)
     {
         var id = createID(content);
         memory.AddOrUpdate(
             id,
-            _ => content,
+            _ => Task.FromResult(content),
             (_, _) => throw new InvalidOperationException($"Content already exists: {JsonConvert.SerializeObject(content)}")
         );
         return Task.FromResult<ICocoon<TContent>>(
@@ -73,7 +78,7 @@ public static class RamClusterExtensions
                 var cluster = 
                     new RamCluster<TContent>(
                         _ => Guid.NewGuid().ToString(), 
-                        new ConcurrentDictionary<string, TContent>()
+                        new ConcurrentDictionary<string, Task<TContent>>()
                     );
                 cluster.Include(content);
                 return cluster;
