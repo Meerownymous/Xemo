@@ -5,5 +5,5 @@ namespace Xemo2.Patch;
 /// </summary>
 public sealed class AsPatch<TContent>(Func<TContent, TContent> patch) : IPatch<TContent>
 {
-    public Task<TContent> Patch(TContent content) => Task.Run(() => patch(content));
+    public async Task<TContent> Patch(TContent content) => await Task.Run(() => patch(content));
 }

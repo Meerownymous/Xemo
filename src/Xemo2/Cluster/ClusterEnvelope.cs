@@ -11,7 +11,7 @@ public sealed class ClusterEnvelope<TContent>(ICluster<TContent> origin) : IClus
     IEnumerator IEnumerable.GetEnumerator() => origin.GetEnumerator();
     public Task<IEnumerable<ICocoon<TContent>>> Matches(IFact<TContent> fact) => origin.Matches(fact);
     public Task<ICocoon<TContent>> FirstMatch(IFact<TContent> fact) => origin.FirstMatch(fact);
-    public Task<ICocoon<TContent>> Include(TContent content) => origin.Include(content);
+    public Task<ICocoon<TContent>> Include(string identifier, TContent content) => origin.Include(identifier, content);
     public Task<TShape> Render<TShape>(IRendering<ICluster<TContent>, TShape> rendering) => 
         origin.Render(rendering);
 }

@@ -49,21 +49,21 @@ public sealed class RamHiveTests
     {
         Assert.Equal(
             "Jumi",
-            await new RamHive()
-                .WithCluster("names", "Jumi".InRamCluster())
-                .Cluster<string>("names")
+            await (await new RamHive()
+                .WithCluster<string>("names")
+                .Cluster<string>("names"))
                 .First()
                 .Render(name => name)
         );
     }
     
     [Fact]
-    public void RejectsExistingCluster()
+    public async Task RejectsExistingCluster()
     {
-        Assert.Throws<InvalidOperationException>(() =>
-            new RamHive()
-                .WithCluster("names", "Jumi".InRamCluster())
-                .WithCluster("names", "Amar".InRamCluster())
+        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await new RamHive()
+                .WithCluster<string>("names")
+                .WithCluster<string>("names")
         );
     }
     
@@ -80,12 +80,10 @@ public sealed class RamHiveTests
     public async Task DeliversAttachment()
     {
         var hive = 
-            new RamHive()
+            await new RamHive()
                 .WithVault("settings", new string[0]);
         var attachment =
-            await hive.Attachment(
-                hive.Vault<string[]>("settings")
-            ).Patch(_ => new AsInput("Yes").Stream());
+            await hive.Attachment("settings").Patch(_ => new AsInput("Yes").Stream());
             
         Assert.Equal(
             "Yes",
@@ -97,12 +95,10 @@ public sealed class RamHiveTests
     public async Task PatchesAttachment()
     {
         var hive = 
-            new RamHive()
+            await new RamHive()
                 .WithVault("settings", new string[0]);
         var attachment =
-            await hive.Attachment(
-                hive.Vault<string[]>("settings")
-            ).Patch(_ => new AsInput("Yes").Stream());
+            await hive.Attachment("settings").Patch(_ => new AsInput("Yes").Stream());
             
         Assert.Equal(
             "Yes",

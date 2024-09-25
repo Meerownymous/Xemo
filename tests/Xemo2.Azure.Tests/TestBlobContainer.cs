@@ -5,35 +5,37 @@ using Xemo.Azure;
 namespace Xemo2.AzureTests;
 
 /// <summary>
-/// Creates a blob container and deletes it on disposal.
+///     Creates a blob container and deletes it on disposal.
 /// </summary>
-public sealed class TestBlobContainer: IScalar<BlobContainerClient>, IDisposable
+public sealed class TestBlobContainer : IScalar<BlobContainerClient>, IDisposable
 {
     private readonly Lazy<BlobContainerClient> container;
 
     /// <summary>
-    /// Creates a blob container and deletes it on disposal.
+    ///     Creates a blob container and deletes it on disposal.
     /// </summary>
     public TestBlobContainer(IScalar<BlobServiceClient> blobService) : this(
-        () => Guid.NewGuid().ToString(), 
+        () => Guid.NewGuid().ToString(),
         blobService
     )
-    { }
+    {
+    }
 
     /// <summary>
-    /// Creates a blob container and deletes it on disposal.
+    ///     Creates a blob container and deletes it on disposal.
     /// </summary>
     public TestBlobContainer(string containerName, IScalar<BlobServiceClient> blobService) : this(
         () => containerName, blobService
     )
-    { }
-    
+    {
+    }
+
     /// <summary>
-    /// Creates a blob container and deletes it on disposal.
+    ///     Creates a blob container and deletes it on disposal.
     /// </summary>
     public TestBlobContainer(Func<string> containerName, IScalar<BlobServiceClient> blobService)
     {
-        this.container = new Lazy<BlobContainerClient>(() =>
+        container = new Lazy<BlobContainerClient>(() =>
         {
             var name = new EncodedContainerName(containerName()).AsString();
             var cont = blobService.Value().GetBlobContainerClient(name);
@@ -42,6 +44,13 @@ public sealed class TestBlobContainer: IScalar<BlobContainerClient>, IDisposable
         });
     }
 
-    public BlobContainerClient Value() => this.container.Value;
-    public void Dispose() => this.container.Value.Delete();
+    public void Dispose()
+    {
+        container.Value.Delete();
+    }
+
+    public BlobContainerClient Value()
+    {
+        return container.Value;
+    }
 }

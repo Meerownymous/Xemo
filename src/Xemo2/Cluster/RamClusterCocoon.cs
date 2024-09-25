@@ -4,7 +4,7 @@ namespace Xemo2.Cluster;
 
 public sealed class RamClusterCocoon<TContent>(
     string id,
-    ConcurrentDictionary<string, Task<TContent>> memory
+    ConcurrentDictionary<string, ValueTask<TContent>> memory
 ) : ICocoon<TContent>
 {
     public string ID() => id;
@@ -44,7 +44,7 @@ public sealed class RamClusterCocoon<TContent>(
 public static class RamClusterCocoonExtensions
 {
     public static RamClusterCocoon<TContent> InRamClusterCocoon<TContent>(
-        this TContent content, string key, ConcurrentDictionary<string,Task<TContent>> memory
+        this TContent content, string key, ConcurrentDictionary<string,ValueTask<TContent>> memory
     ) => 
         new(key, memory);
 }

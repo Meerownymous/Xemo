@@ -7,11 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Xemo2\Xemo2.csproj" />
+        <ProjectReference Include="..\Xemo2\Xemo2.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Azure.Storage.Blobs" Version="12.21.1" />
+        <PackageReference Include="Azure.Storage.Blobs" Version="12.21.1"/>
     </ItemGroup>
 
 </Project>

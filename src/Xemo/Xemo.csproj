@@ -1,30 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>disable</Nullable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Tonga" Version="0.9.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="Cluster\" />
-    <None Remove="Bench\" />
-    <None Remove="Cluster\PropertyValue.config" />
-    <None Remove="Tonga\" />
-    <None Remove="Cluster\Probe\" />
-    <None Remove="Cocoon\" />
-    <None Remove="Grip\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Bench\" />
-    <Folder Include="Tonga\" />
-    <Folder Include="Grip\" />
-  </ItemGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <NoWarn>CS8604,CS8603,CS8602,CS8601,CS8618</NoWarn>
-  </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Tonga" Version="0.9.0"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+    </ItemGroup>
+    <ItemGroup>
+        <None Remove="Cluster\"/>
+        <None Remove="Bench\"/>
+        <None Remove="Cluster\PropertyValue.config"/>
+        <None Remove="Tonga\"/>
+        <None Remove="Cluster\Probe\"/>
+        <None Remove="Cocoon\"/>
+        <None Remove="Grip\"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Bench\"/>
+        <Folder Include="Tonga\"/>
+        <Folder Include="Grip\"/>
+    </ItemGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <NoWarn>CS8604,CS8603,CS8602,CS8601,CS8618</NoWarn>
+    </PropertyGroup>
 </Project>

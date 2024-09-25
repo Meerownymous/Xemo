@@ -11,7 +11,7 @@ public interface ICocoon<TContent>
     Task Erase();
 }
 
-public static class CocoonExtensions
+public static class CocoonSmarts
 {
     public static Task<TShape> Render<TContent, TShape>(
         this ICocoon<TContent> cocoon, Func<TContent, TShape> render
@@ -20,14 +20,11 @@ public static class CocoonExtensions
             new AsRendering<TContent, TShape>(content => Task.FromResult(render(content)))
         );
     
-    public static Task<ICocoon<TContent>> Patch<TContent>(this ICocoon<TContent> cocoon, Func<TContent, TContent> patch) =>
-        cocoon.Patch(
+    public static async Task<ICocoon<TContent>> Patch<TContent>(this ICocoon<TContent> cocoon, Func<TContent, TContent> patch) =>
+        await cocoon.Patch(
             new AsPatch<TContent>(patch)
         );
-}
-
-public static class FluentExtensions
-{
+    
     public static async Task<TShape> Render<TContent, TShape>(
         this Task<ICocoon<TContent>> responseTask, IRendering<TContent, TShape> rendering)
     {
@@ -40,8 +37,26 @@ public static class FluentExtensions
         return await (await responseTask).Render(rendering);
     }
     
+    public static async Task<TShape> Render<TContent, TShape>(
+        this ValueTask<ICocoon<TContent>> responseTask, Func<TContent, TShape> rendering)
+    {
+        return await (await responseTask).Render(rendering);
+    }
+    
     public static async Task<ICocoon<TContent>> Patch<TContent>(
         this Task<ICocoon<TContent>> responseTask, IPatch<TContent> patch)
+    {
+        return await (await responseTask).Patch(patch);
+    }
+    
+    public static async ValueTask<ICocoon<TContent>> Patch<TContent>(
+        this ValueTask<ICocoon<TContent>> responseTask, IPatch<TContent> patch)
+    {
+        return await (await responseTask).Patch(patch);
+    }
+    
+    public static async ValueTask<ICocoon<TContent>> Patch<TContent>(
+        this ValueTask<ICocoon<TContent>> responseTask, Func<TContent, TContent> patch)
     {
         return await (await responseTask).Patch(patch);
     }

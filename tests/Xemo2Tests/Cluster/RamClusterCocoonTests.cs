@@ -15,7 +15,7 @@ public sealed class RamClusterCocoonTests
                 Name = "Test Doe",
                 Modified = false
             };
-        var memory = ConcurrentDictionary.Construct(Task.FromResult(content)).Value;
+        var memory = ConcurrentDictionary.Construct(ValueTask.FromResult(content)).Value;
         Assert.True(
             await content
             .InRamClusterCocoon(memory.Keys.First(), memory)
@@ -33,7 +33,7 @@ public sealed class RamClusterCocoonTests
                 Name = "Test Doe",
                 Modified = false
             };
-        var memory = ConcurrentDictionary.Construct(Task.FromResult(content)).Value;
+        var memory = ConcurrentDictionary.Construct(ValueTask.FromResult(content)).Value;
         await new
             {
                 Name = "Test Doe",
@@ -53,7 +53,7 @@ public sealed class RamClusterCocoonTests
                 Name = "Test Doe",
                 Modified = false
             };
-        var memory = ConcurrentDictionary.Construct(Task.FromResult(content)).Value;
+        var memory = ConcurrentDictionary.Construct(ValueTask.FromResult(content)).Value;
         Assert.True(
             await content
                 .InRamClusterCocoon(memory.Keys.First(), memory)

@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Concurrent;
+using System.Linq.Expressions;
 using Newtonsoft.Json;
 using Tonga.Enumerable;
 using Tonga.Scalar;
+using Xemo2.Fact;
 
 namespace Xemo2.Cluster;
 
@@ -10,8 +12,7 @@ namespace Xemo2.Cluster;
 /// Cluster of cocoons stored in RAM. 
 /// </summary>
 public sealed class RamCluster<TContent>(
-    Func<TContent, string> createID,
-    ConcurrentDictionary<string,Task<TContent>> memory
+    ConcurrentDictionary<string,ValueTask<TContent>> memory
 ) : ICluster<TContent>
 {
     public IEnumerator<ICocoon<TContent>> GetEnumerator()
@@ -28,8 +29,9 @@ public sealed class RamCluster<TContent>(
         bool found = false;
         foreach (var pair in memory)
         {
-            var cocoon = await pair.Value;
-            if (fact.IsTrue(await pair.Value))
+            if (new AssertSimple<TContent>(fact)
+                .IsTrue(await pair.Value)
+            )
             {
                 result = new RamClusterCocoon<TContent>(pair.Key, memory);
                 found = true;
@@ -44,6 +46,7 @@ public sealed class RamCluster<TContent>(
 
     public async Task<IEnumerable<ICocoon<TContent>>> Matches(IFact<TContent> fact)
     {
+        fact = new AssertSimple<TContent>(fact);
         IList<ICocoon<TContent>> result = new List<ICocoon<TContent>>();
         foreach (var pair in memory)
         {
@@ -53,34 +56,35 @@ public sealed class RamCluster<TContent>(
         return result;
     }
 
-    public Task<ICocoon<TContent>> Include(TContent content)
+    public Task<ICocoon<TContent>> Include(string identifier, TContent content)
     {
-        var id = createID(content);
         memory.AddOrUpdate(
-            id,
-            _ => Task.FromResult(content),
+            identifier,
+            _ => new ValueTask<TContent>(content),
             (_, _) => throw new InvalidOperationException($"Content already exists: {JsonConvert.SerializeObject(content)}")
         );
         return Task.FromResult<ICocoon<TContent>>(
-            new RamClusterCocoon<TContent>(id, memory)
+            new RamClusterCocoon<TContent>(identifier, memory)
         );
     }
-
-    public Task<TShape> Render<TShape>(IRendering<ICluster<TContent>, TShape> rendering) =>
-        Task.Run(() => rendering.Render(this));
 }
 
 public static class RamClusterExtensions
 {
-    public static ICluster<TContent> InRamCluster<TContent>(this TContent content) => 
+    public static ICluster<TContent> InRamCluster<TContent>(this TContent content) =>
+        InRamCluster(content, () => Guid.NewGuid().ToString());
+    
+    public static ICluster<TContent> InRamCluster<TContent>(this TContent content, string name) =>
+        InRamCluster(content, () => name);
+    
+    public static ICluster<TContent> InRamCluster<TContent>(this TContent content, Func<string> name) => 
         new LazyCluster<TContent>(() =>
             {
                 var cluster = 
                     new RamCluster<TContent>(
-                        _ => Guid.NewGuid().ToString(), 
-                        new ConcurrentDictionary<string, Task<TContent>>()
+                        new ConcurrentDictionary<string, ValueTask<TContent>>()
                     );
-                cluster.Include(content);
+                cluster.Include(name(), content);
                 return cluster;
             });
 }

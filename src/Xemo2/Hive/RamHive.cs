@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using Xemo2.Attachment;
+using Xemo2.Cluster;
 using Xemo2.Cocoon;
 
 namespace Xemo2.Hive;
@@ -23,14 +24,14 @@ public sealed class RamHive : IHive
         return result as ICocoon<TContent>;
     }
 
-    public IHive WithVault<TContent>(string name, TContent content)
+    public ValueTask<IHive> WithVault<TContent>(string name, TContent content)
     {
         vaults.AddOrUpdate(
             name, 
             new RamCocoon<TContent>(content, () => name), 
             (_, _) => throw new InvalidOperationException($"Vault '{name}' already exists.")
         );
-        return this;
+        return new ValueTask<IHive>(this);
     }
 
     public ICluster<TContent> Cluster<TContent>(string name)
@@ -50,15 +51,15 @@ public sealed class RamHive : IHive
         return (ICluster<TContent>)cluster;
     }
 
-    public IHive WithCluster<TContent>(string name, ICluster<TContent> cluster)
+    public ValueTask<IHive> WithCluster<TContent>(string name)
     {
-        if (!clusters.TryAdd(name, cluster))
+        if (!clusters.TryAdd(name, new RamCluster<TContent>(new ConcurrentDictionary<string, ValueTask<TContent>>())))
             throw new InvalidOperationException($"Cluster '{name}' has already been registered.");
-        return this;
+        return new ValueTask<IHive>(this);
     }
 
-    public IAttachment Attachment<TContent>(ICocoon<TContent> carrier) =>
+    public IAttachment Attachment(string carrier) =>
         new RamAttachment(
-            carrier.ID(), this.attachments
+            carrier, this.attachments
         );
 }

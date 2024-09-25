@@ -9,7 +9,7 @@ public sealed class LazyCluster<TContent>(Func<ICluster<TContent>> construct) : 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     public Task<ICocoon<TContent>> FirstMatch(IFact<TContent> fact) => cluster.Value.FirstMatch(fact);
     public Task<IEnumerable<ICocoon<TContent>>> Matches(IFact<TContent> fact) => cluster.Value.Matches(fact);
-    public Task<ICocoon<TContent>> Include(TContent content) => cluster.Value.Include(content);
+    public Task<ICocoon<TContent>> Include(string identifier, TContent content) => cluster.Value.Include(identifier, content);
     public Task<TShape> Render<TShape>(IRendering<ICluster<TContent>, TShape> rendering) => 
         cluster.Value.Render(rendering);
 }

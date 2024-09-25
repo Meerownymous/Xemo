@@ -2,19 +2,20 @@ using System.Text;
 using Azure.Storage.Blobs;
 using Newtonsoft.Json;
 using Tonga.IO;
+using Tonga.Map;
 using Tonga.Text;
+using Xemo.Azure;
 
 namespace Xemo2.Azure;
 
-public sealed class BlobCocoon<TContent>(Func<string> id, BlobContainerClient blobContainer) : ICocoon<TContent>
+public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TContent>
 {
-    private readonly Lazy<string> id = new(id);
+    private readonly Lazy<string> id = new(() => new DecodedBlobName(blobClient.Name).AsString());
+    
     public string ID() => id.Value;
 
     public async Task<ICocoon<TContent>> Patch(IPatch<TContent> patch)
     {
-        await blobContainer.CreateIfNotExistsAsync();
-        var blobClient = blobContainer.GetBlobClient(id.Value);
         TContent current = default;
         if (await blobClient.ExistsAsync())
         {
@@ -28,16 +29,20 @@ public sealed class BlobCocoon<TContent>(Func<string> id, BlobContainerClient bl
         }
 
         TContent patched = await patch.Patch(current);
-        if (!patched.Equals(current))
-        {
-            await Upload(patched, blobClient);
-        }
+
+        Console.WriteLine($"Patching to {patched}");
+        // if (!patched.Equals(current))
+        // {
+        await Upload(patched, blobClient);
+        
+        Console.WriteLine($"Updating tags from {patched}");
+        await UpdateTags(this.id.Value, patched, blobClient);
+        // }
         return this;
     }
 
     public async Task<TShape> Render<TShape>(IRendering<TContent, TShape> rendering)
     {
-        var blobClient = blobContainer.GetBlobClient(id.Value);
         if (!await blobClient.ExistsAsync())
             throw new InvalidOperationException($"'{id.Value}' Has no content.");
         
@@ -53,28 +58,43 @@ public sealed class BlobCocoon<TContent>(Func<string> id, BlobContainerClient bl
         
     }
 
-    public Task Erase()
+    public async Task Erase() => await blobClient.DeleteAsync();
+
+    private static async Task UpdateTags(string id, TContent content, BlobClient blobClient)
     {
-        throw new NotImplementedException();
-    }
-    
-    private static async Task Upload(TContent newContent, BlobClient blobClient) =>
-        await blobClient.UploadAsync(
-            new MemoryStream(
-                Encoding.UTF8.GetBytes(
-                    JsonConvert.SerializeObject(newContent)
+        var response = 
+            await blobClient.SetTagsAsync(
+                new AsDictionary<string, string>(
+                    new ContentAsTags<TContent>(content)
+                        .With(AsPair._("_id", id))
                 )
-            ),
-            overwrite: true
-        );
+            );
+        Console.WriteLine(response.ToString());
+    }
+
+    private static async Task Upload(TContent newContent, BlobClient blobClient)
+    {
+        var response =
+            await blobClient.UploadAsync(
+                new MemoryStream(
+                    Encoding.UTF8.GetBytes(
+                        JsonConvert.SerializeObject(newContent)
+                    )
+                ),
+                overwrite: true
+            );
+        Console.WriteLine(response.ToString());
+    }
 }
 
-public static class BlobCocoonExtensions
+public static class BlobClusterCocoonExtensions
 {
-    public static Lazy<Task<BlobCocoon<TContent>>> InBlobCocoon<TContent>(this TContent content, BlobContainerClient containerClient) => 
+    public static Lazy<Task<BlobCocoon<TContent>>> InBlobClusterCocoon<TContent>(
+        this TContent content, BlobClient blobClient
+    ) => 
         new(() => Task.Run(async () => 
         {
-            var result = new BlobCocoon<TContent>(() => Guid.NewGuid().ToString(), containerClient);
+            var result = new BlobCocoon<TContent>(blobClient);
             await result.Patch(_ => content);
             return result;
         }));

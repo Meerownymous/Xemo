@@ -1,21 +1,20 @@
+using System.Text;
 using Tonga.Text;
 
-namespace Xemo.Azure;
+namespace Xemo2.Azure;
 
 /// <summary>
 /// A name encoded so that it can be used as azure blob name.
 /// </summary>
 public sealed class EncodedBlobName(string origin) : TextEnvelope(
-    AsText._(() => Encoded(origin))
-)
-{
-    private static string Encoded(string blobName)
+    AsText._(() =>
     {
-        string encodedName = Uri.EscapeDataString(blobName);
-        if (encodedName.EndsWith("/") || encodedName.EndsWith("."))
+        byte[] bytes = Encoding.UTF8.GetBytes(origin);
+        StringBuilder hexString = new StringBuilder(bytes.Length * 2);
+        foreach (byte b in bytes)
         {
-            encodedName = encodedName.TrimEnd('/', '.');
+            hexString.Append(b.ToString("x2"));  // Convert byte to hex (two digits)
         }
-        return encodedName;
-    }    
-}
+        return hexString.ToString();
+    })
+);

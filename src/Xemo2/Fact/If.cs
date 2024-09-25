@@ -6,26 +6,22 @@ namespace Xemo2.Fact;
 
 public sealed class If<TContent> : IFact<TContent>
 {
-    private readonly Func<TContent, bool> condition;
+    private readonly Expression<Func<TContent, bool>> condition;
 
-    public If(Func<TContent,bool> condition)
+    public If(Expression<Func<TContent,bool>> condition)
     {
         this.condition = condition;
     }
-    public bool IsTrue(TContent content)=> this.condition(content);
+    
+    public bool IsTrue(TContent content)=> this.condition.Compile().Invoke(content);
 
-    public Expression<Func<TContent, bool>> AsExpression()
-    {
-        var parameter = Expression.Parameter(typeof(TContent), "x");
-        var body = Expression.Invoke(Expression.Constant(this.condition), parameter);
-        return Expression.Lambda<Func<TContent, bool>>(body, parameter);
-    }
+    public Expression<Func<TContent, bool>> AsExpression() => condition;
 }
 
 public static class If
 {
-    public static If<TContent> True<TContent>(TContent schema, Func<TContent, bool> condition) => new(condition);
-    public static If<TContent> True<TContent>(Func<TContent, bool> condition) => new(condition);
+    public static If<TContent> True<TContent>(TContent schema, Expression<Func<TContent, bool>> condition) => new(condition);
+    public static If<TContent> True<TContent>(Expression<Func<TContent, bool>> condition) => new(condition);
 }
 
 public sealed class IfTests

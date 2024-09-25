@@ -23,6 +23,7 @@ public sealed class RamClusterTests
                 Age = int.MaxValue
             }.InRamCluster();
         await cluster.Include(
+            "123",
             new
             {
                 Name = "Jane Doe",
@@ -55,7 +56,7 @@ public sealed class RamClusterTests
 
         Assert.Single(
             await cluster.Matches(
-                If.True(schema, p => p.Name.Contains("John Doe"))
+                If.True(schema, p => p.Name == "John Doe")
             )
         );
     }

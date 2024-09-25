@@ -1,23 +1,22 @@
 using Azure.Storage;
 using Azure.Storage.Blobs;
 using Tonga;
-using Xemo.Azure.Tests;
 
 namespace Xemo2.AzureTests;
 
 /// <summary>
-/// Creates a blob container and deletes it on disposal.
+///     Creates a blob container and deletes it on disposal.
 /// </summary>
-public sealed class TestBlobServiceClient : IScalar<BlobServiceClient>
+public sealed class TestBlobServiceClient : IScalar<BlobServiceClient>, IDisposable
 {
     private readonly Lazy<BlobServiceClient> service;
-    
+
     /// <summary>
-    /// Creates a blob container and deletes it on disposal.
+    ///     Creates a blob container and deletes it on disposal.
     /// </summary>
     public TestBlobServiceClient()
     {
-        this.service = 
+        service =
             new Lazy<BlobServiceClient>(() =>
                 new BlobServiceClient(
                     new Uri(new Secret("blobStorageUri").AsString()),
@@ -26,8 +25,19 @@ public sealed class TestBlobServiceClient : IScalar<BlobServiceClient>
                         new Secret("storageAccountSecret").AsString()
                     )
                 )
-        );
+            );
     }
 
-    public BlobServiceClient Value() => this.service.Value;
+    public BlobServiceClient Value()
+    {
+        return service.Value;
+    }
+
+    public void Dispose()
+    {
+        foreach (var blobContainer in this.service.Value.GetBlobContainers())
+        {
+            this.service.Value.DeleteBlobContainer(blobContainer.Name);
+        }
+    }
 }
