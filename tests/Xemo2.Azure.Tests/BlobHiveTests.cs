@@ -18,7 +18,7 @@ public sealed class BlobHiveTests
                 {
                     MagicNumber = 123
                 }
-                .InVault(Guid.NewGuid().ToString(), new BlobHive(blobServiceClient.Value(), Guid.NewGuid().ToString()))
+                .InVault("vault-" + Guid.NewGuid(), new BlobHive(blobServiceClient.Value(), Guid.NewGuid().ToString()))
                 .Render(s => s.MagicNumber)
         );
     }

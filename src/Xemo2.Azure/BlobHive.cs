@@ -10,6 +10,10 @@ public sealed class BlobHive(
 ) : IHive
 {
     private readonly Lazy<BlobServiceClient> blobService = new(azureBlobService);
+    private readonly Lazy<BlobContainerClient> blobContainer = new(() =>
+        azureBlobService()
+            .GetBlobContainerClient(new EncodedContainerName(vaultIdentifier).AsString())
+        );
 
     public BlobHive(
         BlobServiceClient blobServiceClient, 
@@ -22,26 +26,18 @@ public sealed class BlobHive(
 
     public ICocoon<TContent> Vault<TContent>(string name)
     {
-        var containerClient =
-            blobService
-                .Value
-                .GetBlobContainerClient(vaultIdentifier);
-            containerClient.CreateIfNotExists();
-            var blobClient = containerClient.GetBlobClient(new EncodedBlobName(name).AsString()); 
-            if (!blobClient.Exists())
-                throw new ArgumentException($"Vault '{name}' does not exist");
+        blobContainer.Value.CreateIfNotExists();
+        var blobClient = blobContainer.Value.GetBlobClient(new EncodedBlobName(name).AsString()); 
+        if (!blobClient.Exists())
+            throw new ArgumentException($"Vault '{name}' does not exist");
         return 
             new BlobCocoon<TContent>(blobClient);
     }   
 
     public async ValueTask<IHive> WithVault<TContent>(string name, TContent content)
     {
-        var containerClient =
-            blobService
-                .Value
-                .GetBlobContainerClient(new EncodedContainerName(vaultIdentifier).AsString());
-        await containerClient.CreateIfNotExistsAsync();
-        var blobClient = containerClient.GetBlobClient(new EncodedBlobName(name).AsString()); 
+        await blobContainer.Value.CreateIfNotExistsAsync();
+        var blobClient = blobContainer.Value.GetBlobClient(new EncodedBlobName(name).AsString()); 
         if (await blobClient.ExistsAsync())
             throw new InvalidOperationException($"Vault '{name}' already exists.");
         

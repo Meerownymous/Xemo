@@ -17,6 +17,7 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
     public async Task<ICocoon<TContent>> Patch(IPatch<TContent> patch)
     {
         TContent current = default;
+        var before = current;
         if (await blobClient.ExistsAsync())
         {
             current =
@@ -27,17 +28,13 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
                     ).AsString()
                 );
         }
-
         TContent patched = await patch.Patch(current);
-
-        Console.WriteLine($"Patching to {patched}");
-        // if (!patched.Equals(current))
-        // {
-        await Upload(patched, blobClient);
         
-        Console.WriteLine($"Updating tags from {patched}");
-        await UpdateTags(this.id.Value, patched, blobClient);
-        // }
+        if(before != null && !before.Equals(patched) || before == null)
+        {
+            await Upload(patched, blobClient);
+            await UpdateTags(this.id.Value, patched, blobClient);
+        }
         return this;
     }
 
@@ -62,13 +59,12 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
 
     private static async Task UpdateTags(string id, TContent content, BlobClient blobClient)
     {
-        var response = 
-            await blobClient.SetTagsAsync(
-                new AsDictionary<string, string>(
-                    new ContentAsTags<TContent>(content)
-                        .With(AsPair._("_id", id))
-                )
-            );
+        await blobClient.SetTagsAsync(
+            new AsDictionary<string, string>(
+                new ContentAsTags<TContent>(content)
+                    .With(AsPair._("_id", id))
+            )
+        );
     }
 
     private static async Task Upload(TContent newContent, BlobClient blobClient) =>
