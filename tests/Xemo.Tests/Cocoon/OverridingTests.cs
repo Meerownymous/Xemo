@@ -2,29 +2,26 @@
 using Xemo.Cocoon;
 using Xunit;
 
-namespace Xemo.Tests.Cocoon
+namespace Xemo.Tests.Cocoon;
+
+public sealed class OverridingTests
 {
-
-    public sealed class OverridingTests
+    [Fact]
+    public void OverridesContents()
     {
-        [Fact]
-        public void OverridesContents()
-        {
-            var schema = new { Title = "", Watched = false };
+        var schema = new { Title = "", Watched = false };
 
-            Assert.True(
-                Overriding
-                    ._(() => new { Watched = true },
-                        new RamClusterCocoon("Movie")
+        Assert.True(
+            Overriding
+                ._(() => new { Watched = true },
+                    new RamClusterCocoon("Movie")
                         .Schema(schema)
                         .Mutate(
                             new { Title = "Back to the future" }
                         )
-                    )
-                    .Sample(schema)
-                    .Watched
-            );
-        }
+                )
+                .Sample(schema)
+                .Watched
+        );
     }
 }
-

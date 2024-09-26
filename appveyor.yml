@@ -13,5 +13,5 @@ skip_branch_with_pr: true
 nuget:
   account_feed: false
 build_script:
-- ps: .\build.ps1
+  - ps: .\build.ps1
 test: off

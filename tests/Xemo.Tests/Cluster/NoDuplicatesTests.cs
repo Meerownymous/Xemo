@@ -10,47 +10,47 @@ public sealed class NoDuplicatesTests
     {
         var book =
             new { Title = "The tale of anonymous clusters", Author = "Cody Codeson" };
-        
-        var books = 
+
+        var books =
             NoDuplicates._(
-                new{ Title = "", Author = "" },
+                new { Title = "", Author = "" },
                 RamCluster.Allocate("books", new { Title = "", ISBN = "", Author = "" })
             );
         books.Create(book);
 
         AssertException.MessageContains<InvalidOperationException>(
             $"An entry with this content already exists: {book}",
-            () => books.Create(book)    
+            () => books.Create(book)
         );
     }
-    
+
     [Fact]
     public void OptionallyIgnoresDuplicate()
     {
         var book =
             new { Title = "The tale of anonymous clusters", Author = "Cody Codeson" };
-        
-        var books = 
+
+        var books =
             NoDuplicates._(
-                new{ Title = "", Author = "" },
+                new { Title = "", Author = "" },
                 RamCluster.Allocate("books", new { Title = "", ISBN = "", Author = "" }),
-                throwOnDuplicate: false
+                false
             );
         books.Create(book);
         books.Create(book);
 
         Assert.Single(books);
     }
-    
+
     [Fact]
     public void AllowsCreationOfNonDuplicates()
     {
         var book =
             new { Title = "The tale of anonymous clusters", Author = "Cody Codeson" };
-        
-        var books = 
+
+        var books =
             NoDuplicates._(
-                new{ Title = "", Author = "" },
+                new { Title = "", Author = "" },
                 RamCluster.Allocate("books", new { Title = "", ISBN = "", Author = "" })
             );
         books.Create(new { Title = "The tale of anonymous clusters", Author = "Cody Codeson" });
@@ -58,13 +58,13 @@ public sealed class NoDuplicatesTests
 
         Assert.Equal(2, books.Count());
     }
-    
+
     [Fact]
     public void ChecksOnlyRelevantContent()
     {
-        var books = 
+        var books =
             NoDuplicates._(
-                new{ Title = "", Author = "" },
+                new { Title = "", Author = "" },
                 RamCluster.Allocate("books", new { Title = "", ISBN = "", Author = "" })
             );
         books.Create(new { ISBN = "1-A", Title = "The tale of anonymous clusters", Author = "Cody Codeson" });
