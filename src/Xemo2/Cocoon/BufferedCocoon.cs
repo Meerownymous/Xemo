@@ -7,7 +7,7 @@ namespace Xemo2.Cocoon;
 /// </summary>
 public sealed class BufferedCocoon<TContent>(
     ICocoon<TContent> origin, 
-    ConcurrentDictionary<string,ValueTask<TContent>> buffer,
+    ConcurrentDictionary<string,ValueTask<object>> buffer,
     Action onDelete
 ) : ICocoon<TContent>
 {
@@ -15,7 +15,7 @@ public sealed class BufferedCocoon<TContent>(
 
     public BufferedCocoon(
         ICocoon<TContent> origin, 
-        ConcurrentDictionary<string,ValueTask<TContent>> buffer
+        ConcurrentDictionary<string,ValueTask<object>> buffer
     ) : this(origin, buffer, () => { })
     { }
     
@@ -33,7 +33,7 @@ public sealed class BufferedCocoon<TContent>(
             },
             async (_, existing) =>
             {
-                var patched = await patch.Patch(await existing);
+                var patched = await patch.Patch((TContent)await existing);
                 await origin.Patch(_ => patched);
                 return patched;
             }
@@ -44,7 +44,7 @@ public sealed class BufferedCocoon<TContent>(
     public async ValueTask<TShape> Render<TShape>(IRendering<TContent, TShape> rendering)
     {
         TContent content = 
-            await buffer.GetOrAdd(
+            (TContent)await buffer.GetOrAdd(
                 id.Value,
                 async _ => await origin.Render(c => c)
             );

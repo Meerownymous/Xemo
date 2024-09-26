@@ -14,7 +14,7 @@ public sealed class BufferedCluster<TContent>(
     Guid isBufferedIndicator,
     ICluster<TContent> origin,
     ConcurrentDictionary<string,BufferedCocoon<TContent>> cocoonBuffer,
-    ConcurrentDictionary<string,ValueTask<TContent>> contentBuffer
+    ConcurrentDictionary<string,ValueTask<object>> contentBuffer
 ) : ICluster<TContent>
 {
     private readonly Lazy<string> isBufferedIndicator = new(isBufferedIndicator.ToString);

@@ -10,7 +10,7 @@ public sealed class BufferedCocoonTests
     [Fact]
     public async Task Buffers()
     {
-        var buffer = new ConcurrentDictionary<string, ValueTask<string>>();
+        var buffer = new ConcurrentDictionary<string, ValueTask<object>>();
         var bufferedCocoon =
             new BufferedCocoon<string>(
                 new RamCocoon<string>("123", "Secret Ingredients"),
@@ -27,14 +27,14 @@ public sealed class BufferedCocoonTests
     [Fact]
     public async Task RendersFromBuffer()
     {
-        var buffer = new ConcurrentDictionary<string, ValueTask<string>>();
+        var buffer = new ConcurrentDictionary<string, ValueTask<object>>();
         var bufferedCocoon =
             new BufferedCocoon<string>(
                 new RamCocoon<string>("123", "Secret Ingredients"),
                 buffer
             );
         await bufferedCocoon.Render(c => c);
-        buffer["123"] = ValueTask.FromResult("Buffered Ingredients");
+        buffer["123"] = new ValueTask<object>("Buffered Ingredients");
 
         Assert.Equal(
             "Buffered Ingredients",
@@ -45,7 +45,7 @@ public sealed class BufferedCocoonTests
     [Fact]
     public async Task PatchesBuffer()
     {
-        var buffer = new ConcurrentDictionary<string, ValueTask<string>>();
+        var buffer = new ConcurrentDictionary<string, ValueTask<object>>();
         var bufferedCocoon =
             new BufferedCocoon<string>(
                 new RamCocoon<string>("123", "Secret Ingredients"),
@@ -63,7 +63,7 @@ public sealed class BufferedCocoonTests
     [Fact]
     public async Task PatchesOriginCocoon()
     {
-        var buffer = new ConcurrentDictionary<string, ValueTask<string>>();
+        var buffer = new ConcurrentDictionary<string, ValueTask<object>>();
         var cocoon = new RamCocoon<string>("123", "Secret Ingredients");
         var bufferedCocoon =
             new BufferedCocoon<string>(
@@ -81,7 +81,7 @@ public sealed class BufferedCocoonTests
     [Fact]
     public async Task ErasesFromBuffer()
     {
-        var buffer = new ConcurrentDictionary<string, ValueTask<string>>();
+        var buffer = new ConcurrentDictionary<string, ValueTask<object>>();
         var cocoon = new RamCocoon<string>("123", "Secret Ingredients");
         var bufferedCocoon =
             new BufferedCocoon<string>(

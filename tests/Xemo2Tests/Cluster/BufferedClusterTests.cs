@@ -12,7 +12,7 @@ public sealed class BufferedClusterTests
     [Fact]
     public async Task BuffersCocoonEnumeration()
     {
-        var contentBuffer = new ConcurrentDictionary<string, ValueTask<string>>();
+        var contentBuffer = new ConcurrentDictionary<string, ValueTask<object>>();
         var origin = new RamCluster<string>();
         var buffered =
             new BufferedCluster<string>(
@@ -42,7 +42,7 @@ public sealed class BufferedClusterTests
     [Fact]
     public async Task BuffersContentWhenRendering()
     {
-        var contentBuffer = new ConcurrentDictionary<string, ValueTask<string>>();
+        var contentBuffer = new ConcurrentDictionary<string, ValueTask<object>>();
         var origin = new RamCluster<string>();
         var buffered =
             new BufferedCluster<string>(
@@ -76,7 +76,7 @@ public sealed class BufferedClusterTests
     [Fact]
     public async Task BuffersContentWhenIncluding()
     {
-        var contentBuffer = new ConcurrentDictionary<string, ValueTask<string>>();
+        var contentBuffer = new ConcurrentDictionary<string, ValueTask<object>>();
         var origin = new RamCluster<string>();
         var buffered =
             new BufferedCluster<string>(
@@ -85,9 +85,9 @@ public sealed class BufferedClusterTests
                 new ConcurrentDictionary<string, BufferedCocoon<string>>(),
                 contentBuffer
             );
-        var a = await buffered.Include("1", "Item A");
-        var b = await buffered.Include("2", "Item B");
-        var c = await buffered.Include("3", "Item C");
+        await buffered.Include("1", "Item A");
+        await buffered.Include("2", "Item B");
+        await buffered.Include("3", "Item C");
 
         foreach (var ramCocoon in origin)
             await ramCocoon.Erase();
@@ -106,7 +106,7 @@ public sealed class BufferedClusterTests
     [Fact]
     public async Task ErasesFromBufferedCluster()
     {
-        var contentBuffer = new ConcurrentDictionary<string, ValueTask<string>>();
+        var contentBuffer = new ConcurrentDictionary<string, ValueTask<object>>();
         var origin = new RamCluster<string>();
         var buffered =
             new BufferedCluster<string>(
@@ -115,13 +115,35 @@ public sealed class BufferedClusterTests
                 new ConcurrentDictionary<string, BufferedCocoon<string>>(),
                 contentBuffer
             );
-        var a = await buffered.Include("1", "Item A");
-        var b = await buffered.Include("2", "Item B");
-        var c = await buffered.Include("3", "Item C");
+        await buffered.Include("1", "Item A");
+        await buffered.Include("2", "Item B");
+        await buffered.Include("3", "Item C");
 
         foreach (var cocoon in buffered)
             await cocoon.Erase();
 
         Assert.Empty(buffered);
+    }
+    
+    [Fact]
+    public async Task ErasesFromContentBuffer()
+    {
+        var contentBuffer = new ConcurrentDictionary<string, ValueTask<object>>();
+        var origin = new RamCluster<string>();
+        var buffered =
+            new BufferedCluster<string>(
+                Guid.NewGuid(),
+                origin,
+                new ConcurrentDictionary<string, BufferedCocoon<string>>(),
+                contentBuffer
+            );
+        await buffered.Include("1", "Item A");
+        await buffered.Include("2", "Item B");
+        await buffered.Include("3", "Item C");
+
+        foreach (var cocoon in buffered)
+            await cocoon.Erase();
+
+        Assert.Empty(contentBuffer.Keys);
     }
 }

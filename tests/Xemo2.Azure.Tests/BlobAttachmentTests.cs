@@ -36,7 +36,7 @@ public sealed class BlobAttachmentTests
     [Fact]
     public async Task LoadsAttachment()
     {
-        using var service = new TestBlobServiceClient();
+        var service = new TestBlobServiceClient();
         using var container = new TestBlobContainer(service);
         var blobClient =
             container
