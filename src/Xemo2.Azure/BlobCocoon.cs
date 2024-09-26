@@ -69,22 +69,17 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
                         .With(AsPair._("_id", id))
                 )
             );
-        Console.WriteLine(response.ToString());
     }
 
-    private static async Task Upload(TContent newContent, BlobClient blobClient)
-    {
-        var response =
-            await blobClient.UploadAsync(
-                new MemoryStream(
-                    Encoding.UTF8.GetBytes(
-                        JsonConvert.SerializeObject(newContent)
-                    )
-                ),
-                overwrite: true
-            );
-        Console.WriteLine(response.ToString());
-    }
+    private static async Task Upload(TContent newContent, BlobClient blobClient) =>
+        await blobClient.UploadAsync(
+            new MemoryStream(
+                Encoding.UTF8.GetBytes(
+                    JsonConvert.SerializeObject(newContent)
+                )
+            ),
+            overwrite: true
+        );
 }
 
 public static class BlobClusterCocoonExtensions

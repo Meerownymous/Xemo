@@ -3,12 +3,20 @@ using Xemo.Azure;
 
 namespace Xemo2.Azure;
 
-public sealed class BlobHive(Func<BlobServiceClient> azureBlobService, string vaultIdentifier = "vaults") : IHive
+public sealed class BlobHive(
+    Func<BlobServiceClient> azureBlobService, 
+    string vaultIdentifier = "vaults", 
+    string attachmentIdentifier = "attachments"
+) : IHive
 {
     private readonly Lazy<BlobServiceClient> blobService = new(azureBlobService);
 
-    public BlobHive(BlobServiceClient blobServiceClient, string vaultIdentifier = "vaults") : this(
-        () => blobServiceClient, vaultIdentifier
+    public BlobHive(
+        BlobServiceClient blobServiceClient, 
+        string vaultIdentifier = "vaults",
+        string attachmentIdentifier = "attachments"
+    ) : this(
+        () => blobServiceClient, vaultIdentifier, attachmentIdentifier
     )
     { }
 
@@ -31,7 +39,7 @@ public sealed class BlobHive(Func<BlobServiceClient> azureBlobService, string va
         var containerClient =
             blobService
                 .Value
-                .GetBlobContainerClient(vaultIdentifier);
+                .GetBlobContainerClient(new EncodedContainerName(vaultIdentifier).AsString());
         await containerClient.CreateIfNotExistsAsync();
         var blobClient = containerClient.GetBlobClient(new EncodedBlobName(name).AsString()); 
         if (await blobClient.ExistsAsync())
@@ -66,6 +74,13 @@ public sealed class BlobHive(Func<BlobServiceClient> azureBlobService, string va
 
     public IAttachment Attachment(string link)
     {
-        throw new NotImplementedException();
+        var containerClient =
+            blobService
+                .Value
+                .GetBlobContainerClient(new EncodedContainerName(attachmentIdentifier).AsString());
+        containerClient.CreateIfNotExists();
+        var blobClient = containerClient.GetBlobClient(new EncodedBlobName(link).AsString()); 
+
+        return new BlobAttachment(blobClient);
     }
 }

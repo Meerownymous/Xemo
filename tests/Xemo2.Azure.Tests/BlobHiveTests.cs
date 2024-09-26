@@ -1,3 +1,5 @@
+using Tonga.IO;
+using Tonga.Text;
 using Xemo2.Azure;
 using Xunit;
 
@@ -80,6 +82,24 @@ public sealed class BlobHiveTests
                     MagicNumber = 123
                 }
                 .InCluster(clusterName, hive)
+        );
+    }
+    
+    [Fact] 
+    public async Task DeliversAttachment()
+    {
+        using var blobServiceClient = new TestBlobServiceClient();
+        var hive = 
+            new BlobHive(
+                blobServiceClient.Value(), 
+                vaultIdentifier: Guid.NewGuid().ToString(), 
+                attachmentIdentifier: Guid.NewGuid().ToString()
+            );
+        await hive.Attachment("cocoon-123-mood").Patch(_ => new AsInput(":)").Stream());
+
+        Assert.Equal(
+            ":)",
+            await hive.Attachment("cocoon-123-mood").Render(s => AsText._(s).AsString())
         );
     }
 }
