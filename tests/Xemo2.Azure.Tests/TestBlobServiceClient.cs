@@ -9,13 +9,15 @@ namespace Xemo2.AzureTests;
 /// </summary>
 public sealed class TestBlobServiceClient : IScalar<BlobServiceClient>, IDisposable
 {
+    private readonly string deleteIdentifier;
     private readonly Lazy<BlobServiceClient> service;
 
     /// <summary>
     ///     Creates a blob container and deletes it on disposal.
     /// </summary>
-    public TestBlobServiceClient()
+    public TestBlobServiceClient(string deleteIdentifier = "")
     {
+        this.deleteIdentifier = deleteIdentifier;
         service =
             new Lazy<BlobServiceClient>(() =>
                 new BlobServiceClient(
@@ -35,15 +37,18 @@ public sealed class TestBlobServiceClient : IScalar<BlobServiceClient>, IDisposa
 
     public void Dispose()
     {
-        foreach (var blobContainer in this.service.Value.GetBlobContainers())
+        foreach (var blobContainer in service.Value.GetBlobContainers())
         {
-            try
+            if (blobContainer.Name.StartsWith(this.deleteIdentifier))
             {
-                this.service.Value.DeleteBlobContainer(blobContainer.Name);
-            }
-            catch (Exception)
-            {
-                // ignored
+                try
+                {
+                    service.Value.DeleteBlobContainer(blobContainer.Name);
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine($"Failed to delete blob container {blobContainer.Name}");
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
 using Tonga.IO;
 using Tonga.Text;
+using Xemo.Azure;
 using Xemo2.Azure;
 using Xunit;
 
@@ -10,7 +11,8 @@ public sealed class BlobHiveTests
     [Fact]
     public async Task AddsVault()
     {
-        using var blobServiceClient = new TestBlobServiceClient();
+        var prefix = new EncodedContainerName(Guid.NewGuid().ToString()).AsString().Substring(0,8);
+        var blobServiceClient = new TestBlobServiceClient(prefix);
         Assert.Equal(
             123,
             await
@@ -18,7 +20,10 @@ public sealed class BlobHiveTests
                 {
                     MagicNumber = 123
                 }
-                .InVault("vault-" + Guid.NewGuid(), new BlobHive(blobServiceClient.Value(), Guid.NewGuid().ToString()))
+                .InVault(
+                    "vault-" + Guid.NewGuid(), 
+                    new BlobHive(blobServiceClient.Value(), prefix)
+                )
                 .Render(s => s.MagicNumber)
         );
     }
@@ -26,8 +31,9 @@ public sealed class BlobHiveTests
     [Fact] 
     public async Task RejectsDoubleVaultAdd()
     {
-        using var blobServiceClient = new TestBlobServiceClient();
-        var hive = new BlobHive(blobServiceClient.Value());
+        var prefix = new EncodedContainerName(Guid.NewGuid().ToString()).AsString().Substring(0,8);
+        var blobServiceClient = new TestBlobServiceClient();
+        var hive = new BlobHive(blobServiceClient.Value(), prefix);
         var vaultName = Guid.NewGuid().ToString();
         await
             new
@@ -48,7 +54,9 @@ public sealed class BlobHiveTests
     [Fact] 
     public async Task AddsCluster()
     {
-        using var blobServiceClient = new TestBlobServiceClient();
+        var prefix = new EncodedContainerName(Guid.NewGuid().ToString()).AsString().Substring(0,8);
+        using var blobServiceClient = new TestBlobServiceClient(prefix);
+        
         Assert.Equal(
             123,
             await (await
@@ -56,7 +64,7 @@ public sealed class BlobHiveTests
                     {
                         MagicNumber = 123
                     }
-                    .InCluster(Guid.NewGuid().ToString(), new BlobHive(blobServiceClient.Value()))
+                    .InCluster(Guid.NewGuid().ToString(), new BlobHive(blobServiceClient.Value(), prefix))
             )
             .First()
             .Render(s => s.MagicNumber)
@@ -66,8 +74,9 @@ public sealed class BlobHiveTests
     [Fact] 
     public async Task RejectsDoubleClusterAdd()
     {
+        var prefix = new EncodedContainerName(Guid.NewGuid().ToString()).AsString().Substring(0,8);
         using var blobServiceClient = new TestBlobServiceClient();
-        var hive = new BlobHive(blobServiceClient.Value());
+        var hive = new BlobHive(blobServiceClient.Value(), prefix);
         var clusterName = Guid.NewGuid().ToString();
         await
             new
@@ -88,13 +97,9 @@ public sealed class BlobHiveTests
     [Fact] 
     public async Task DeliversAttachment()
     {
-        using var blobServiceClient = new TestBlobServiceClient();
-        var hive = 
-            new BlobHive(
-                blobServiceClient.Value(), 
-                vaultIdentifier: Guid.NewGuid().ToString(), 
-                attachmentIdentifier: Guid.NewGuid().ToString()
-            );
+        var prefix = new EncodedContainerName(Guid.NewGuid().ToString()).AsString().Substring(0,8);
+        var blobServiceClient = new TestBlobServiceClient(prefix);
+        var hive = new BlobHive(blobServiceClient.Value(), prefix);
         await hive.Attachment("cocoon-123-mood").Patch(_ => new AsInput(":)").Stream());
 
         Assert.Equal(
