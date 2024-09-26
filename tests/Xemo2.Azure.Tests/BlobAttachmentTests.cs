@@ -38,6 +38,7 @@ public sealed class BlobAttachmentTests
     {
         using var service = new TestBlobServiceClient();
         using var container = new TestBlobContainer(service);
+        await container.Value().CreateIfNotExistsAsync();
         var blobClient =
             container
                 .Value()
