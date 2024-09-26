@@ -39,7 +39,7 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public async Task<ICocoon<TContent>> FirstMatch(IFact<TContent> fact)
+    public async ValueTask<ICocoon<TContent>> FirstMatch(IFact<TContent> fact)
     {
         await foreach (
             var blob in
@@ -56,8 +56,8 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
         throw new ArgumentException($"No cocoon matching '{fact.AsExpression()}' exists.");
     }
 
-    public Task<IEnumerable<ICocoon<TContent>>> Matches(IFact<TContent> fact) =>
-        Task.FromResult(
+    public ValueTask<IEnumerable<ICocoon<TContent>>> Matches(IFact<TContent> fact) =>
+        ValueTask.FromResult(
             Mapped._(
                 blob =>
                     new BlobCocoon<TContent>(
@@ -71,14 +71,14 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
             )
         );
 
-    public async Task<ICocoon<TContent>> Include(string identifier, TContent content)
+    public async ValueTask<ICocoon<TContent>> Include(string identifier, TContent content)
     {
         return await new BlobCocoon<TContent>(
             containerClient.Value.GetBlobClient(new EncodedBlobName(identifier).AsString())
         ).Patch(_ => content);
     }
 
-    public Task<TShape> Render<TShape>(IRendering<ICluster<TContent>, TShape> rendering) =>
+    public ValueTask<TShape> Render<TShape>(IRendering<ICluster<TContent>, TShape> rendering) =>
         rendering.Render(this);
 }
 
@@ -96,12 +96,12 @@ public static class BlobClusterSmarts
         });
     }
 
-    public static Task<ICocoon<TContent>> FirstMatch<TContent>(
+    public static ValueTask<ICocoon<TContent>> FirstMatch<TContent>(
         this ICluster<TContent> cluster,
         Expression<Func<TContent, bool>> fact
     ) => cluster.FirstMatch(If.True(fact));
 
-    public static Task<IEnumerable<ICocoon<TContent>>> Matches<TContent>(
+    public static ValueTask<IEnumerable<ICocoon<TContent>>> Matches<TContent>(
         this ICluster<TContent> cluster,
         Expression<Func<TContent, bool>> fact
     )

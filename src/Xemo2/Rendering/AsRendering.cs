@@ -6,5 +6,5 @@ namespace Xemo2.Rendering;
 public sealed class AsRendering<TContent, TShape>(Func<TContent, Task<TShape>> render) : 
     IRendering<TContent, TShape>
 {
-    public Task<TShape> Render(TContent content) => render(content);
+    public ValueTask<TShape> Render(TContent content) => new(render(content));
 }

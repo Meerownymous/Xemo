@@ -28,7 +28,7 @@ public sealed class RamHive : IHive
     {
         vaults.AddOrUpdate(
             name, 
-            new RamCocoon<TContent>(content, () => name), 
+            new RamCocoon<TContent>(name, content), 
             (_, _) => throw new InvalidOperationException($"Vault '{name}' already exists.")
         );
         return new ValueTask<IHive>(this);

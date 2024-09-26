@@ -24,8 +24,8 @@ public sealed class RamCocoonTests
     [Fact]
     public async Task RefusesErasing()
     {
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            new
+        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await new
                 {
                     Name = "Test Doe",
                     Modified = false

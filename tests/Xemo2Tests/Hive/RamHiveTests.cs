@@ -51,9 +51,9 @@ public sealed class RamHiveTests
             "Jumi",
             await (await new RamHive()
                 .WithCluster<string>("names")
-                .Cluster<string>("names"))
-                .First()
-                .Render(name => name)
+                .Cluster<string>("names")
+            ).Include("1", "Jumi")
+            .Render(name => name)
         );
     }
     

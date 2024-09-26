@@ -9,7 +9,7 @@ public sealed class RamClusterCocoon<TContent>(
 {
     public string ID() => id;
 
-    public async Task<ICocoon<TContent>> Patch(IPatch<TContent> patch)
+    public async ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch)
     {
         await memory.AddOrUpdate(id,
             _ => throw new InvalidOperationException("No content to patch."),
@@ -18,7 +18,7 @@ public sealed class RamClusterCocoon<TContent>(
         return this;
     }
 
-    public async Task<TShape> Render<TShape>(IRendering<TContent, TShape> rendering)
+    public async ValueTask<TShape> Render<TShape>(IRendering<TContent, TShape> rendering)
     {
         TShape result = default;
         await memory.AddOrUpdate(
@@ -34,10 +34,10 @@ public sealed class RamClusterCocoon<TContent>(
         return result;
     }
 
-    public Task Erase()
+    public ValueTask Erase()
     {
         memory.TryRemove(id, out _);
-        return Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 }
 

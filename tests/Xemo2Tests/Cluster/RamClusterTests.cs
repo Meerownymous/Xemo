@@ -100,9 +100,9 @@ public sealed class RamClusterTests
                 Age = int.MaxValue
             }.InRamCluster();
         
-        await cluster.FirstMatch(
+        await (await cluster.FirstMatch(
             If.True(schema, p => p.Name == "John Doe")
-        ).Erase();
+        )).Erase();
 
         Assert.Empty(
             cluster

@@ -15,6 +15,9 @@ public sealed class RamCluster<TContent>(
     ConcurrentDictionary<string,ValueTask<TContent>> memory
 ) : ICluster<TContent>
 {
+    public RamCluster() : this(new ConcurrentDictionary<string,ValueTask<TContent>>())
+    { }
+    
     public IEnumerator<ICocoon<TContent>> GetEnumerator()
     {
         foreach (var entry in memory)
@@ -23,7 +26,7 @@ public sealed class RamCluster<TContent>(
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public async Task<ICocoon<TContent>> FirstMatch(IFact<TContent> fact)
+    public async ValueTask<ICocoon<TContent>> FirstMatch(IFact<TContent> fact)
     {
         ICocoon<TContent> result = null;
         bool found = false;
@@ -44,7 +47,7 @@ public sealed class RamCluster<TContent>(
         return result;
     }
 
-    public async Task<IEnumerable<ICocoon<TContent>>> Matches(IFact<TContent> fact)
+    public async ValueTask<IEnumerable<ICocoon<TContent>>> Matches(IFact<TContent> fact)
     {
         fact = new AssertSimple<TContent>(fact);
         IList<ICocoon<TContent>> result = new List<ICocoon<TContent>>();
@@ -56,14 +59,14 @@ public sealed class RamCluster<TContent>(
         return result;
     }
 
-    public Task<ICocoon<TContent>> Include(string identifier, TContent content)
+    public ValueTask<ICocoon<TContent>> Include(string identifier, TContent content)
     {
         memory.AddOrUpdate(
             identifier,
             _ => new ValueTask<TContent>(content),
-            (_, _) => throw new InvalidOperationException($"Content already exists: {JsonConvert.SerializeObject(content)}")
+            (_, _) => throw new InvalidOperationException($"Content '{identifier}' already exists: {JsonConvert.SerializeObject(content)}")
         );
-        return Task.FromResult<ICocoon<TContent>>(
+        return ValueTask.FromResult<ICocoon<TContent>>(
             new RamClusterCocoon<TContent>(identifier, memory)
         );
     }

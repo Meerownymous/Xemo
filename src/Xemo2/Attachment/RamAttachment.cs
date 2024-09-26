@@ -4,11 +4,11 @@ namespace Xemo2.Attachment;
 
 public sealed class RamAttachment(string id, ConcurrentDictionary<string, Task<Stream>> memory) : IAttachment
 {
-    public async Task<TFormat> Render<TFormat>(IRendering<Stream, TFormat> rendering)
+    public async ValueTask<TFormat> Render<TFormat>(IRendering<Stream, TFormat> rendering)
     {
         TFormat result = default;
         await memory.AddOrUpdate(
-            id, 
+            id,
             async _ =>
             {
                 var content = new MemoryStream();
@@ -22,17 +22,17 @@ public sealed class RamAttachment(string id, ConcurrentDictionary<string, Task<S
             });
         return result;
     }
-        
 
-    public Task<IAttachment> Patch(IPatch<Stream> patch) =>
-        Task.Run<IAttachment>(() =>
-            {
-                memory.AddOrUpdate(
-                    id,
-                    async _ => await patch.Patch(new MemoryStream()),
-                    async (_, existing) => await patch.Patch(await existing)
-                );
-                return this;
-            }
-        );
+
+    public async ValueTask<IAttachment> Patch(IPatch<Stream> patch)
+    {
+        await
+            memory.AddOrUpdate(
+                id,
+                async _ => await patch.Patch(new MemoryStream()),
+                async (_, existing) => await patch.Patch(await existing)
+            );
+            return this;
+    }
+
 }

@@ -14,7 +14,7 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
     
     public string ID() => id.Value;
 
-    public async Task<ICocoon<TContent>> Patch(IPatch<TContent> patch)
+    public async ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch)
     {
         TContent current = default;
         if (await blobClient.ExistsAsync())
@@ -41,7 +41,7 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
         return this;
     }
 
-    public async Task<TShape> Render<TShape>(IRendering<TContent, TShape> rendering)
+    public async ValueTask<TShape> Render<TShape>(IRendering<TContent, TShape> rendering)
     {
         if (!await blobClient.ExistsAsync())
             throw new InvalidOperationException($"'{id.Value}' Has no content.");
@@ -58,7 +58,7 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
         
     }
 
-    public async Task Erase() => await blobClient.DeleteAsync();
+    public async ValueTask Erase() => await blobClient.DeleteAsync();
 
     private static async Task UpdateTags(string id, TContent content, BlobClient blobClient)
     {
