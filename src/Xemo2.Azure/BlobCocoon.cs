@@ -17,6 +17,7 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
     public async ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch)
     {
         TContent current = default;
+        var before = current;
         if (await blobClient.ExistsAsync())
         {
             current =
@@ -27,17 +28,13 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
                     ).AsString()
                 );
         }
-
         TContent patched = await patch.Patch(current);
-
-        Console.WriteLine($"Patching to {patched}");
-        // if (!patched.Equals(current))
-        // {
-        await Upload(patched, blobClient);
         
-        Console.WriteLine($"Updating tags from {patched}");
-        await UpdateTags(this.id.Value, patched, blobClient);
-        // }
+        if(before != null && !before.Equals(patched) || before == null)
+        {
+            await Upload(patched);
+            await UpdateTags(this.id.Value, patched);
+        }
         return this;
     }
 
@@ -60,18 +57,17 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
 
     public async ValueTask Erase() => await blobClient.DeleteAsync();
 
-    private static async Task UpdateTags(string id, TContent content, BlobClient blobClient)
+    private async Task UpdateTags(string id, TContent content)
     {
-        var response = 
-            await blobClient.SetTagsAsync(
-                new AsDictionary<string, string>(
-                    new ContentAsTags<TContent>(content)
-                        .With(AsPair._("_id", id))
-                )
-            );
+        await blobClient.SetTagsAsync(
+            new AsDictionary<string, string>(
+                new ContentAsTags<TContent>(content)
+                    .With(AsPair._("_id", id))
+            )
+        );
     }
 
-    private static async Task Upload(TContent newContent, BlobClient blobClient) =>
+    private async Task Upload(TContent newContent) =>
         await blobClient.UploadAsync(
             new MemoryStream(
                 Encoding.UTF8.GetBytes(

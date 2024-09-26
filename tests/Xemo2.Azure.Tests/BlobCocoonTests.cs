@@ -17,13 +17,14 @@ namespace Xemo2.AzureTests
             
             var service = new TestBlobServiceClient();
             using var container = new TestBlobContainer(service);
+            var blobName = Guid.NewGuid().ToString();
             Assert.Equal(
                 "Yves",
                 await (await schema
                         .InBlobClusterCocoon(
                             container.Value()
                                 .GetBlobClient(
-                                    new EncodedBlobName("123").AsString()
+                                    new EncodedBlobName(blobName).AsString()
                                 )
                             ).Value
                     ).Render(content => content.FirstName)

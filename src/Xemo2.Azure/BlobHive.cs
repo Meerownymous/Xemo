@@ -4,44 +4,39 @@ using Xemo.Azure;
 namespace Xemo2.Azure;
 
 public sealed class BlobHive(
-    Func<BlobServiceClient> azureBlobService, 
-    string vaultIdentifier = "vaults", 
-    string attachmentIdentifier = "attachments"
+    Func<BlobServiceClient> azureBlobService,
+    string containerPrefix = ""
 ) : IHive
 {
     private readonly Lazy<BlobServiceClient> blobService = new(azureBlobService);
+    private readonly Lazy<BlobContainerClient> vaultContainer = new(() =>
+        azureBlobService()
+            .GetBlobContainerClient(new EncodedContainerName(containerPrefix + "vaults").AsString())
+        );
 
     public BlobHive(
         BlobServiceClient blobServiceClient, 
-        string vaultIdentifier = "vaults",
-        string attachmentIdentifier = "attachments"
+        string prefix
     ) : this(
-        () => blobServiceClient, vaultIdentifier, attachmentIdentifier
+        () => blobServiceClient,
+        prefix
     )
     { }
 
     public ICocoon<TContent> Vault<TContent>(string name)
     {
-        var containerClient =
-            blobService
-                .Value
-                .GetBlobContainerClient(vaultIdentifier);
-            containerClient.CreateIfNotExists();
-            var blobClient = containerClient.GetBlobClient(new EncodedBlobName(name).AsString()); 
-            if (!blobClient.Exists())
-                throw new ArgumentException($"Vault '{name}' does not exist");
+        vaultContainer.Value.CreateIfNotExists();
+        var blobClient = vaultContainer.Value.GetBlobClient(new EncodedBlobName(name).AsString()); 
+        if (!blobClient.Exists())
+            throw new ArgumentException($"Vault '{name}' does not exist");
         return 
             new BlobCocoon<TContent>(blobClient);
     }   
 
     public async ValueTask<IHive> WithVault<TContent>(string name, TContent content)
     {
-        var containerClient =
-            blobService
-                .Value
-                .GetBlobContainerClient(new EncodedContainerName(vaultIdentifier).AsString());
-        await containerClient.CreateIfNotExistsAsync();
-        var blobClient = containerClient.GetBlobClient(new EncodedBlobName(name).AsString()); 
+        await vaultContainer.Value.CreateIfNotExistsAsync();
+        var blobClient = vaultContainer.Value.GetBlobClient(new EncodedBlobName(name).AsString()); 
         if (await blobClient.ExistsAsync())
             throw new InvalidOperationException($"Vault '{name}' already exists.");
         
@@ -54,7 +49,7 @@ public sealed class BlobHive(
         var containerClient =
             blobService
                 .Value
-                .GetBlobContainerClient(new EncodedContainerName(name).AsString());
+                .GetBlobContainerClient(containerPrefix + new EncodedContainerName(name).AsString());
         if (!containerClient.Exists())
             throw new ArgumentException($"Cluster '{name}' does not exist.");
         return new BlobCluster<TContent>(containerClient);
@@ -65,7 +60,7 @@ public sealed class BlobHive(
         var containerClient =
             blobService
                 .Value
-                .GetBlobContainerClient(new EncodedContainerName(name).AsString());
+                .GetBlobContainerClient(containerPrefix + new EncodedContainerName(name).AsString());
         if (await containerClient.ExistsAsync())
             throw new InvalidOperationException($"Cluster '{name}' already exists.");
         await containerClient.CreateIfNotExistsAsync();
@@ -77,7 +72,7 @@ public sealed class BlobHive(
         var containerClient =
             blobService
                 .Value
-                .GetBlobContainerClient(new EncodedContainerName(attachmentIdentifier).AsString());
+                .GetBlobContainerClient(containerPrefix + new EncodedContainerName("attachments").AsString());
         containerClient.CreateIfNotExists();
         var blobClient = containerClient.GetBlobClient(new EncodedBlobName(link).AsString()); 
 
