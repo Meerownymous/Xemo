@@ -32,8 +32,8 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
         
         if(before != null && !before.Equals(patched) || before == null)
         {
-            await Upload(patched, blobClient);
-            await UpdateTags(this.id.Value, patched, blobClient);
+            await Upload(patched);
+            await UpdateTags(this.id.Value, patched);
         }
         return this;
     }
@@ -57,7 +57,7 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
 
     public async Task Erase() => await blobClient.DeleteAsync();
 
-    private static async Task UpdateTags(string id, TContent content, BlobClient blobClient)
+    private async Task UpdateTags(string id, TContent content)
     {
         await blobClient.SetTagsAsync(
             new AsDictionary<string, string>(
@@ -67,7 +67,7 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
         );
     }
 
-    private static async Task Upload(TContent newContent, BlobClient blobClient) =>
+    private async Task Upload(TContent newContent) =>
         await blobClient.UploadAsync(
             new MemoryStream(
                 Encoding.UTF8.GetBytes(
