@@ -37,7 +37,14 @@ public sealed class TestBlobServiceClient : IScalar<BlobServiceClient>, IDisposa
     {
         foreach (var blobContainer in this.service.Value.GetBlobContainers())
         {
-            this.service.Value.DeleteBlobContainer(blobContainer.Name);
+            try
+            {
+                this.service.Value.DeleteBlobContainer(blobContainer.Name);
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
         }
     }
 }
