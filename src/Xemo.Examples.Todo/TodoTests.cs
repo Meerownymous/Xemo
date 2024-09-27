@@ -1,52 +1,50 @@
-﻿using Xunit;
+﻿using Xemo.Hive;
+using Xunit;
 
 namespace Xemo.Examples.Todo
 {
 	public sealed class TodoTests
 	{
 		[Fact]
-		public void DeliversInformation()
+		public async Task DeliversInformation()
 		{
-			var mem = new Ram(); 
-			mem.Cluster(
-					"todo",
-					new
+			var mem = new RamHive(); 
+			await mem.Cluster<TodoRecord>("todos")
+				.Include(
+					"1",
+					new TodoRecord
 					{
 						Done = false,
-						Created = DateTime.Now,
-						Subject = "",
-						Author = ""
+						Due = DateTime.Now,
+						Subject = ""
 					}
 				);
 
             Assert.Equal(
 				"Succeed in Unittest",
-				new Todo("Succeed in Unittest", mem)
-					.Sample(new { Subject = "" })
-					.Subject
+				await new Todo("Succeed in Unittest", mem).Value.Render(todo => todo.Subject)
 			);
 		}
 
         [Fact]
-        public void MutatesInformation()
+        public async Task MutatesInformation()
         {
-	        var mem = new Ram();
-            mem.Cluster(
-				"todo",
-				new
-				{
-					Done = false,
-					Created = DateTime.Now,
-					Subject = "",
-					Author = ""
-				}
-			);
+	        var mem = new RamHive();
+            await mem.Cluster<TodoRecord>("todo")
+	            .Include(
+		            "1",
+					new TodoRecord
+		            {
+			            Done = false,
+			            Due = DateTime.Now,
+			            Subject = "Succeed"
+		            }
+				);
 
-            var todo = new Todo("Succeed in Unittest", mem);
-			todo.Mutate(new { Done = true });
+            var todo = new Todo("Succeed", mem);
+			await todo.Value.Patch(record => record with { Done = true });
             Assert.True(
-				todo.Sample(new { Done = false })
-					.Done
+				await todo.Value.Render(record => record.Done)
 			);
         }
     }

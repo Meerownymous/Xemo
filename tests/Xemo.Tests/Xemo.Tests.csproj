@@ -5,9 +5,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
     </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-        <NoWarn>CS8604,CS8602</NoWarn>
-    </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0"/>
         <PackageReference Include="xunit" Version="2.8.1"/>
@@ -28,20 +25,7 @@
         <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.22.7"/>
     </ItemGroup>
     <ItemGroup>
-        <None Remove="Cluster\"/>
-        <None Remove="Bench\"/>
-        <None Remove="Cluster\PropertyValueTests.config"/>
-        <None Remove="Tonga\"/>
-        <None Remove="Tonga\Text\"/>
-        <None Remove="Cluster\Probe\"/>
-        <None Remove="Debug\"/>
+        <ProjectReference Include="..\..\src\Xemo\Xemo.csproj" />
     </ItemGroup>
-    <ItemGroup>
-        <Folder Include="Tonga\"/>
-        <Folder Include="Tonga\Text\"/>
-        <Folder Include="Cluster\Probe\"/>
-    </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\..\src\Xemo\Xemo.csproj"/>
-    </ItemGroup>
+
 </Project>

@@ -1,39 +1,17 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 
-namespace Xemo.Cluster
+namespace Xemo.Cluster;
+
+/// <summary>
+/// Envelope for clusters. 
+/// </summary>
+public abstract class ClusterEnvelope<TContent>(ICluster<TContent> origin) : ICluster<TContent>
 {
-    /// <summary>
-    /// Envelope for clusters.
-    /// </summary>
-	public abstract class ClusterEnvelope(ICluster core) : ICluster
-	{
-        /// <summary>
-        /// Envelope for clusters.
-        /// </summary>
-        public ClusterEnvelope(Func<ICluster> core) : this(
-            new Lazy(core)
-        )
-        { }
-
-        public string Subject() => core.Subject();
-
-        public ICocoon Cocoon(string id) => core.Cocoon(id);
-
-        public IEnumerator<ICocoon> GetEnumerator() =>
-            core.GetEnumerator();
-
-        public ISamples<TSample> Samples<TSample>(TSample sample) =>
-            core.Samples(sample);
-
-        public ICocoon Create<TNew>(TNew input, bool overrideExisting = true) =>
-            core.Create(input, overrideExisting);
-
-        public ICluster Removed(params ICocoon[] gone) =>
-            core.Removed(gone);
-
-        IEnumerator IEnumerable.GetEnumerator() =>
-            core.GetEnumerator();
-    }
+    public IEnumerator<ICocoon<TContent>> GetEnumerator() => origin.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => origin.GetEnumerator();
+    public ValueTask<IEnumerable<ICocoon<TContent>>> Matches(IFact<TContent> fact) => origin.Matches(fact);
+    public ValueTask<ICocoon<TContent>> FirstMatch(IFact<TContent> fact) => origin.FirstMatch(fact);
+    public ValueTask<ICocoon<TContent>> Include(string identifier, TContent content) => origin.Include(identifier, content);
+    public ValueTask<TShape> Render<TShape>(IRendering<ICluster<TContent>, TShape> rendering) => 
+        origin.Render(rendering);
 }
-

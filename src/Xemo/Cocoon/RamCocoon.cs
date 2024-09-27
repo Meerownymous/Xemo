@@ -1,77 +1,38 @@
-﻿using System.Collections.Concurrent;
-using Xemo.Bench;
-using Xemo.Cluster;
-using Xemo.Grip;
+using Xemo;
 
 namespace Xemo.Cocoon;
 
-    /// <summary>
-    /// Information stored in RAM.
-    /// </summary>
-    public static class RamCocoon
+/// <summary>
+/// Cocoon stored in RAM.
+/// </summary>
+public sealed class RamCocoon<TContent>(Func<string> id, TContent content) 
+    : ICocoon<TContent>
+{
+    private TContent content = content;
+    private readonly Lazy<string> id = new(id);
+
+    public RamCocoon(string id, TContent content) : this(() => id, content)
+    { }
+
+    public string ID() => id.Value;
+
+    public async ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch)
     {
-        public static RamCocoon<TSchema> Make<TSchema>(string id, TSchema schema) =>
-            new (id, schema);
-        
-        public static RamCocoon<TSchema> Make<TSchema>(string id, IMem relations, TSchema schema) =>
-            new (id, relations, schema);
+        content = await patch.Patch(content);
+        return this;
     }
 
-    /// <summary>
-    /// Information stored in RAM.
-    /// </summary>
-    public sealed class RamCocoon<TContent>(
-        string id,
-        IMem mem,
-        TContent schema = default
-    ) : ICocoon
-    {
-        private readonly TContent[] storage = [schema];
-        private readonly IGrip grip = new AsGrip("standalone", id);
-            
-        /// <summary>
-        /// Information stored in RAM.
-        /// </summary>
-        public RamCocoon(
-            string id,
-            TContent schema
-        ) : this(
-            id,
-            new DeadMem("This cocoon has not been setup to support relations."),
-            schema
-        )
-        { }
+    public ValueTask<TShape> Render<TShape>(IRendering<TContent, TShape> rendering) =>
+        rendering.Render(content);
+    
+    public ValueTask Erase() => throw new InvalidOperationException("A standalone RAM cocoon cannot be erased.");
+}
 
-        public IGrip Grip() => grip;
-
-        public TSlice Sample<TSlice>(TSlice wanted)
-        {
-            if (!this.HasSchema())
-                throw new InvalidOperationException("Define a schema prior to sampling.");
-            TContent current = storage[0];
-            return DeepMerge.Schema(wanted, mem).Post(current);
-        }
-
-        public ICocoon Schema<TSchema>(TSchema schema) =>
-            throw new InvalidOperationException("Schema has already been defined.");
-
-        public ICocoon Mutate<TSlice>(TSlice mutation)
-        {
-            if (!this.HasSchema())
-                throw new InvalidOperationException("Define a schema prior to mutation.");
-            lock (storage)
-            {
-                var newState = Patch.Target(storage[0], mem).Post(mutation);
-                var newID = new PropertyValue("ID", newState, () => string.Empty).AsString();
-                if (newID != string.Empty
-                    && newID != new PropertyValue("ID", storage[0]).AsString()
-                )
-                throw new InvalidOperationException("ID change is not supported.");
-                storage[0] = newState;
-            }
-            return this;
-        }
-
-        private bool HasSchema() =>
-            schema != null && !schema.Equals(default(TContent));
-    }
+public static class RamCocoonExtensions
+{
+    public static RamCocoon<TContent> InRamCocoon<TContent>(this TContent content) => 
+        new(() => Guid.NewGuid().ToString(), content);
+    
+    public static RamCocoon<TContent> InRamCocoon<TContent>(this TContent content, string id) => 
+        new(id, content);
+}

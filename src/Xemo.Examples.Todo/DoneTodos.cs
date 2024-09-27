@@ -1,22 +1,15 @@
-﻿using Tonga.Enumerable;
-using Xemo.Cluster.Probe;
-
-namespace Xemo.Examples.Todo
+﻿namespace Xemo.Examples.Todo
 {
     /// <summary>
     /// Todos which are done.
     /// </summary>
-    public sealed class DoneTodos : EnumerableEnvelope<ICocoon>
+    public sealed class DoneTodos : Lazy<ValueTask<IEnumerable<ICocoon<TodoRecord>>>>
 	{
         /// <summary>
         /// Todos which are done.
         /// </summary>
-        public DoneTodos(ICluster all) : base(AsEnumerable._(() =>
-			AsCocoons._(
-				all.Samples(new { Done = false })
-					.Filtered(todo => todo.Done)
-				)
-			)
+        public DoneTodos(ICluster<TodoRecord> all) : base(
+			all.Matches(todo => todo.Done)
 		)
 		{ }
 	}

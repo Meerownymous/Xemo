@@ -1,33 +1,23 @@
 ﻿using Xemo.Cluster;
-using Xemo.Cocoon;
-using Lazy = Xemo.Cluster.Lazy;
 
 namespace Xemo.Examples.Todo;
+
+public record TodoRecord
+{
+    public DateTime Due{ get; init;}
+    public string Subject { get; init; }
+    public bool Done { get; init; }
+}
 
 /// <summary>
 /// All todos which exist.
 /// </summary>
-public sealed class AllTodos(IMem memory) : ClusterEnvelope(
-    new Lazy(() =>
-        SpawnGuarded._(
-            new
-            {
-                Done = false,
-                Due = DateTime.Now,
-                Subject = ""
-            },
-            Validated.That(
-                new { Subject = "", Due = DateTime.MinValue },
-                todo => (todo.Due > DateTime.Now, "Due date must be in the future.")
-            ),
-            memory.Cluster("todo",
-                new
-                {
-                    Done = false,
-                    Due = DateTime.Now,
-                    Subject = ""
-                }
-            )
-        )
-	)
+public sealed class AllTodos(IHive memory) : Lazy<Task<ClusterEnvelope<TodoRecord>>>(
+    new LazyCluster<TodoRecord>(async () =>
+    {
+        return
+            await 
+                memory.WithCluster<TodoRecord>("todos")
+                    .Cluster<TodoRecord>("Todos");
+    })
 );

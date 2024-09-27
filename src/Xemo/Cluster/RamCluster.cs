@@ -1,161 +1,93 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Concurrent;
-using Tonga;
-using Tonga.Text;
-using Xemo.Grip;
-using Xemo.Bench;
-using Xemo.Cluster.Probe;
-using Xemo.Cocoon;
+using System.Linq.Expressions;
+using Newtonsoft.Json;
+using Tonga.Enumerable;
+using Tonga.Scalar;
+using Xemo.Fact;
 
-namespace Xemo.Cluster
+namespace Xemo.Cluster;
+
+/// <summary>
+/// Cluster of cocoons stored in RAM. 
+/// </summary>
+public sealed class RamCluster<TContent>(
+    ConcurrentDictionary<string,ValueTask<TContent>> memory
+) : ICluster<TContent>
 {
-    /// <summary>
-    /// Cluster of information stored in Ram.
-    /// </summary>
-    public static class RamCluster
+    public RamCluster() : this(new ConcurrentDictionary<string,ValueTask<TContent>>())
+    { }
+    
+    public IEnumerator<ICocoon<TContent>> GetEnumerator()
     {
-        /// <summary>
-        /// Cluster of information stored in Ram.
-        /// </summary>
-        public static RamCluster<TSchema> Allocate<TSchema>(TSchema schema) =>
-            new(
-                new DeadMem("This cluster is isolated and has its own memory."),
-                new AsText(() => Guid.NewGuid().ToString()),
-                new ConcurrentDictionary<string, TSchema>(),
-                schema
-            );
-        
-        /// <summary>
-        /// Cluster of information stored in Ram.
-        /// </summary>
-        public static RamCluster<TSchema> Allocate<TSchema>(string subject, TSchema schema) =>
-            new(
-                new DeadMem("This cluster is isolated and has its own memory."),
-                new AsText(subject),
-                new ConcurrentDictionary<string, TSchema>(),
-                schema
-            );
-
-        /// <summary>
-        /// Cluster of information stored in Ram.
-        /// </summary>
-        public static RamCluster<TSchema> Allocate<TSchema>(IMem home, string subject, TSchema schema) =>
-            new(home, new AsText(subject), new ConcurrentDictionary<string, TSchema>(), schema);
+        foreach (var entry in memory)
+            yield return new RamClusterCocoon<TContent>(entry.Key, memory);
     }
 
-    /// <summary>
-    /// Cluster of information stored in Ram.
-    /// </summary>
-    public sealed class RamCluster<TContent>(
-        IMem mem, 
-        IText subject, 
-        ConcurrentDictionary<string, TContent> storage, 
-        TContent schema
-    ) : ICluster
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public async ValueTask<ICocoon<TContent>> FirstMatch(IFact<TContent> fact)
     {
-        private Lazy<string> subject = new(() => subject.AsString());
-        
-        private readonly Lazy<List<string>> index =
-            new(() =>
+        ICocoon<TContent> result = null;
+        bool found = false;
+        foreach (var pair in memory)
+        {
+            if (new AssertSimple<TContent>(fact)
+                .IsTrue(await pair.Value)
+            )
             {
-                var index = new List<string>(storage.Keys);
-                index.Sort();
-                return index;
-            });
-
-        /// <summary>
-        /// Cluster of information stored in Ram.
-        /// </summary>
-        public RamCluster() : this(
-            new DeadMem("This cluster is isolated."),
-            new Blank(),
-            new ConcurrentDictionary<string, TContent>(),
-            default
-        )
-        { }
-        
-        public RamCluster(
-            IMem mem, 
-            string subject, 
-            ConcurrentDictionary<string, TContent> storage, 
-            TContent schema
-        ) : this(
-            mem,
-            new AsText(subject),
-            storage, 
-            schema
-        )
-        { }
-
-        public IEnumerator<ICocoon> GetEnumerator()
-        {
-            foreach (var key in index.Value)
-                yield return new RamClusterCocoon<TContent>(
-                    new AsGrip(subject.Value, key),
-                    storage,
-                    mem,
-                    schema
-                );
-        }
-
-        public string Subject() => subject.Value;
-
-        public ICocoon Cocoon(string id)
-        {
-            if (!storage.ContainsKey(id))
-                throw new ArgumentException($"{subject} '{id}' does not exist.");
-            return new RamClusterCocoon<TContent>(new AsGrip(subject.Value, id), storage, mem, schema);
-        }
-
-        public ISamples<TShape> Samples<TShape>(TShape blueprint) =>
-            new RamSamples<TContent, TShape>(storage, subject.Value, schema, blueprint);
-
-        public ICluster Removed(params ICocoon[] gone)
-        {
-            foreach (var xemo in gone)
-            {
-                lock (this.index)
-                {
-                    if (storage.TryRemove(xemo.Grip().ID(), out _))
-                        this.index.Value.Remove(xemo.Grip().ID());
-                }
+                result = new RamClusterCocoon<TContent>(pair.Key, memory);
+                found = true;
+                break;
             }
-            return this;
         }
 
-        public ICocoon Create<TNew>(TNew input, bool overrideExisting = false)
+        if (!found)
+            throw new ArgumentException("No matching cocoon found");
+        return result;
+    }
+
+    public async ValueTask<IEnumerable<ICocoon<TContent>>> Matches(IFact<TContent> fact)
+    {
+        fact = new AssertSimple<TContent>(fact);
+        IList<ICocoon<TContent>> result = new List<ICocoon<TContent>>();
+        foreach (var pair in memory)
         {
-            var id = new PropertyValue("ID", input, fallBack: () => Guid.NewGuid()).AsString();
-            storage.AddOrUpdate(
-                id,
-                (key) =>
-                {
-                    var newItem =
-                        Birth.Schema(schema, mem)
-                            .Post(input);
-                    
-                    this.index.Value.Add(key);
-                    return newItem;
-                },
-                (key, existing) =>
-                {
-                    if (!overrideExisting)
-                        throw new InvalidOperationException(
-                            $"Cannot create item. ID '{key}' is expected to not exist, but it does: {existing}."
-                        );
-                    return Merge.Target(schema).Post(input);
-                }
-            );
-            return
-                new RamClusterCocoon<TContent>(
-                    new AsGrip(subject.Value, id),
-                    storage,
-                    mem,
-                    schema
-                );
+            if(fact.IsTrue(await pair.Value))
+                result.Add(new RamClusterCocoon<TContent>(pair.Key, memory));
         }
+        return result;
+    }
 
-        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+    public ValueTask<ICocoon<TContent>> Include(string identifier, TContent content)
+    {
+        memory.AddOrUpdate(
+            identifier,
+            _ => new ValueTask<TContent>(content),
+            (_, _) => throw new InvalidOperationException($"Content '{identifier}' already exists: {JsonConvert.SerializeObject(content)}")
+        );
+        return ValueTask.FromResult<ICocoon<TContent>>(
+            new RamClusterCocoon<TContent>(identifier, memory)
+        );
     }
 }
 
+public static class RamClusterExtensions
+{
+    public static ICluster<TContent> InRamCluster<TContent>(this TContent content) =>
+        InRamCluster(content, () => Guid.NewGuid().ToString());
+    
+    public static ICluster<TContent> InRamCluster<TContent>(this TContent content, string name) =>
+        InRamCluster(content, () => name);
+    
+    public static ICluster<TContent> InRamCluster<TContent>(this TContent content, Func<string> name) => 
+        new LazyCluster<TContent>(() =>
+            {
+                var cluster = 
+                    new RamCluster<TContent>(
+                        new ConcurrentDictionary<string, ValueTask<TContent>>()
+                    );
+                cluster.Include(name(), content);
+                return cluster;
+            });
+}

@@ -4,27 +4,22 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
+        <RootNamespace>Xemo</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="System.Linq.Dynamic.Core" Version="1.4.5"/>
         <PackageReference Include="Tonga" Version="0.9.0"/>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+        <PackageReference Include="xunit.assert" Version="2.8.1"/>
+        <PackageReference Include="xunit.extensibility.core" Version="2.8.1"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0"/>
+        <PackageReference Include="xunit" Version="2.8.1"/>
+        <PackageReference Include="xunit.console" Version="2.8.1"/>
+        <PackageReference Include="xunit.extensibility.core" Version="2.8.1"/>
+        <PackageReference Include="xunit.extensibility.execution" Version="2.8.1"/>
+        <PackageReference Include="xunit.runner.console" Version="2.8.1">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
-    <ItemGroup>
-        <None Remove="Cluster\"/>
-        <None Remove="Bench\"/>
-        <None Remove="Cluster\PropertyValue.config"/>
-        <None Remove="Tonga\"/>
-        <None Remove="Cluster\Probe\"/>
-        <None Remove="Cocoon\"/>
-        <None Remove="Grip\"/>
-    </ItemGroup>
-    <ItemGroup>
-        <Folder Include="Bench\"/>
-        <Folder Include="Tonga\"/>
-        <Folder Include="Grip\"/>
-    </ItemGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-        <NoWarn>CS8604,CS8603,CS8602,CS8601,CS8618</NoWarn>
-    </PropertyGroup>
+
 </Project>

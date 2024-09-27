@@ -1,9 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
+        <RootNamespace>Xemo.Azure.Tests</RootNamespace>
     </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0"/>
         <PackageReference Include="xunit" Version="2.8.1"/>
@@ -20,12 +23,10 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Snapshooter.Xunit" Version="0.14.1"/>
     </ItemGroup>
+
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Xemo.Azure\Xemo.Azure.csproj"/>
+        <ProjectReference Include="..\..\src\Xemo.Azure\Xemo.Azure.csproj" />
     </ItemGroup>
-    <ItemGroup>
-        <None Remove="Bench\"/>
-    </ItemGroup>
+
 </Project>

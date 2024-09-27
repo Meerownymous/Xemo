@@ -1,39 +1,75 @@
-﻿namespace Xemo
+using Xemo.Patch;
+using Xemo.Rendering;
+
+namespace Xemo;
+
+public interface ICocoon<TContent>
 {
-	/// <summary>
-	/// A piece of data which is based on a schema.
-	/// Pass any slice of data - either with settable properties or an
-	/// anonymous object - to <see cref="Sample{TSlice}(TSlice)"/> and it
-	/// will be filled with available data.
-	///
-	/// The same way you can mutate this by using
-	/// <see cref="Mutate{TSlice}(TSlice)"/>.
-	/// </summary>
-	public interface ICocoon
-	{
-		/// <summary>
-		/// ID Card which uniquely identifies this Xemo.
-		/// Typically, there is a subject assigned to a xemo, which is
-		/// part of the IDCard, as well as a unique ID.
-		/// </summary>
-		IGrip Grip();
+    string ID();
+    ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch);
+    ValueTask<TShape> Render<TShape>(IRendering<TContent, TShape> rendering);
+    ValueTask Erase();
+}
 
-		/// <summary>
-		/// Fill properties of the given slice with data available inside this
-		/// <see cref="ICocoon"/>.
-		/// </summary>
-		TSample Sample<TSample>(TSample wanted);
-
-		/// <summary>
-		/// Set the schema for this <see cref="ICocoon"/>. Properties of this schema
-		/// define the properties that can be obtained via
-		/// <see cref="Sample{TSlice}(TSlice)"/> or modified via <see cref="Mutate{TSlice}(TSlice)"/>
-		/// </summary>
-        ICocoon Schema<TSchema>(TSchema schema);
-
-		/// <summary>
-		/// Mutate contents by property values of the given slice.
-		/// </summary>
-		ICocoon Mutate<TPatch>(TPatch mutation);
-	}
+public static class CocoonSmarts
+{
+    public static ValueTask<TShape> Render<TContent, TShape>(
+        this ICocoon<TContent> cocoon, Func<TContent, TShape> render
+    ) =>
+        cocoon.Render(
+            new AsRendering<TContent, TShape>(content => Task.FromResult(render(content)))
+        );
+    
+    public static async ValueTask<ICocoon<TContent>> Patch<TContent>(this ICocoon<TContent> cocoon, Func<TContent, TContent> patch) =>
+        await cocoon.Patch(
+            new AsPatch<TContent>(patch)
+        );
+    
+    public static async ValueTask<TShape> Render<TContent, TShape>(
+        this Task<ICocoon<TContent>> responseTask, IRendering<TContent, TShape> rendering)
+    {
+        return await (await responseTask).Render(rendering);
+    }
+    
+    public static async ValueTask<TShape> Render<TContent, TShape>(
+        this Task<ICocoon<TContent>> responseTask, Func<TContent, TShape> rendering)
+    {
+        return await (await responseTask).Render(rendering);
+    }
+    
+    public static async ValueTask<TShape> Render<TContent, TShape>(
+        this ValueTask<ICocoon<TContent>> responseTask, Func<TContent, TShape> rendering)
+    {
+        return await (await responseTask).Render(rendering);
+    }
+    
+    public static async ValueTask<ICocoon<TContent>> Patch<TContent>(
+        this Task<ICocoon<TContent>> responseTask, IPatch<TContent> patch)
+    {
+        return await (await responseTask).Patch(patch);
+    }
+    
+    public static async ValueTask<ICocoon<TContent>> Patch<TContent>(
+        this ValueTask<ICocoon<TContent>> responseTask, IPatch<TContent> patch)
+    {
+        return await (await responseTask).Patch(patch);
+    }
+    
+    public static async ValueTask<ICocoon<TContent>> Patch<TContent>(
+        this ValueTask<ICocoon<TContent>> responseTask, Func<TContent, TContent> patch)
+    {
+        return await (await responseTask).Patch(patch);
+    }
+    
+    public static async ValueTask<ICocoon<TContent>> Patch<TContent>(
+        this Task<ICocoon<TContent>> responseTask, Func<TContent, TContent> patch)
+    {
+        return await (await responseTask).Patch(patch);
+    }
+    
+    public static async ValueTask Erase<TContent>(
+        this Task<ICocoon<TContent>> responseTask)
+    {
+        await (await responseTask).Erase();
+    }
 }

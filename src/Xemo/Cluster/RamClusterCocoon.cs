@@ -1,159 +1,50 @@
-﻿using System.Collections.Concurrent;
-using Xemo.Bench;
-using Xemo.Grip;
+using System.Collections.Concurrent;
 
 namespace Xemo.Cluster;
 
-    /// <summary>
-    /// Information stored in RAM.
-    /// </summary>
-    public sealed class RamClusterCocoon : ICocoon
+public sealed class RamClusterCocoon<TContent>(
+    string id,
+    ConcurrentDictionary<string, ValueTask<TContent>> memory
+) : ICocoon<TContent>
+{
+    public string ID() => id;
+
+    public async ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch)
     {
-        private readonly IGrip grip;
-
-        /// <summary>
-        /// Information stored in RAM.
-        /// Before using, you need to define a schema, calling
-        /// Schema(propertyObject).
-        /// </summary>
-        public RamClusterCocoon(string subject) : this(
-            new LazyGrip(() => Guid.NewGuid().ToString(), () => subject)
-        )
-        {
-        }
-
-        /// <summary>
-        /// Information stored in RAM.
-        /// Before using, you need to define a schema, calling
-        /// Schema(propertyObject).
-        /// </summary>
-        public RamClusterCocoon(string subject, string id) : this(new AsGrip(subject, id))
-        {
-        }
-
-        /// <summary>
-        /// Information stored in RAM.
-        /// Before using, you need to define a schema, calling
-        /// Schema(propertyObject).
-        /// </summary>
-        public RamClusterCocoon(IGrip id)
-        {
-            this.grip = id;
-        }
-
-        public TSlice Sample<TSlice>(TSlice wanted) =>
-            throw new InvalidOperationException("Define a schema first.");
-
-        public IGrip Grip() => this.grip;
-
-        public ICocoon Mutate<TSlice>(TSlice mutation) =>
-            throw new InvalidOperationException("Define a schema first.");
-
-        public ICocoon Schema<TSchema>(TSchema schema) =>
-            new RamClusterCocoon<TSchema>(this.grip, new ConcurrentDictionary<string, TSchema>(), schema);
-
-        public static RamClusterCocoon<TSchema> Make<TSchema>(IGrip id, ConcurrentDictionary<string, TSchema> storage,
-            TSchema schema) =>
-            new(id, storage, schema);
+        await memory.AddOrUpdate(id,
+            _ => throw new InvalidOperationException("No content to patch."),
+            async (_, existing) => await patch.Patch(await existing)
+        );
+        return this;
     }
 
-    /// <summary>
-    /// Information stored in RAM.
-    /// </summary>
-    public sealed class RamClusterCocoon<TContent>(
-        IGrip grip,
-        ConcurrentDictionary<string, TContent> storage,
-        IMem mem,
-        TContent schema = default) : ICocoon
+    public async ValueTask<TShape> Render<TShape>(IRendering<TContent, TShape> rendering)
     {
-        /// <summary>
-        /// Information stored in RAM.
-        /// </summary>
-        public RamClusterCocoon() : this(new BlankGrip())
-        {
-        }
-
-        /// <summary>
-        /// Information stored in RAM.
-        /// </summary>
-        public RamClusterCocoon(IGrip id) : this(
+        TShape result = default;
+        await memory.AddOrUpdate(
             id,
-            new ConcurrentDictionary<string, TContent>()
-        )
-        {
-        }
-
-        /// <summary>
-        /// Information stored in RAM.
-        /// </summary>
-        public RamClusterCocoon(
-            IGrip id,
-            ConcurrentDictionary<string, TContent> storage,
-            TContent schema
-        ) : this(
-            id,
-            storage,
-            new DeadMem("This Xemo has not been setup to support relations."),
-            schema
-        )
-        {
-        }
-
-        /// <summary>
-        /// Information stored in RAM.
-        /// </summary>
-        public RamClusterCocoon(
-            IGrip id,
-            ConcurrentDictionary<string, TContent> storage
-        ) : this(
-            id,
-            storage,
-            new DeadMem("This Xemo has not been setup to support relations.")
-        )
-        {
-        }
-
-        public IGrip Grip() => grip;
-
-        public TSlice Sample<TSlice>(TSlice wanted)
-        {
-            if (!this.HasSchema())
-                throw new InvalidOperationException("Define a schema prior to filling.");
-            TContent current = storage.GetValueOrDefault(grip.ID(), schema);
-            return DeepMerge.Schema(wanted, mem).Post(current);
-        }
-
-        public ICocoon Schema<TSchema>(TSchema schema) =>
-            throw new InvalidOperationException("Schema has already been defined.");
-
-        public ICocoon Mutate<TSlice>(TSlice mutation)
-        {
-            if (!this.HasSchema())
-                throw new InvalidOperationException("Define a schema prior to mutation.");
-            storage.AddOrUpdate(
-                grip.ID(),
-                _ =>
-                {
-                    var newState = Patch.Target(schema, mem).Post(mutation);
-                    var newID = new PropertyValue("ID", newState, string.Empty).AsString();
-                    if (newID != string.Empty && newID != grip.ID())
-                        throw new InvalidOperationException("ID change is not supported.");
-                    return newState;
-                },
-                (_, existing) =>
-                {
-                    var newState = Patch.Target(existing, mem).Post(mutation);
-                    var newID = new PropertyValue("ID", newState, () => string.Empty).AsString();
-                    if (newID != string.Empty
-                        && newID != new PropertyValue("ID", existing).AsString()
-                       )
-                        throw new InvalidOperationException("ID change is not supported.");
-                    return newState;
-                }
-            );
-            return this;
-        }
-
-        private bool HasSchema() =>
-            schema != null && !schema.Equals(default(TContent));
+            (_) => throw new InvalidOperationException(
+                $"Cannot render '{id}' - it does not exist. It might have been deleted."),
+            async (_, existing) =>
+            {
+                result = rendering.Render(await existing).ConfigureAwait(false).GetAwaiter().GetResult();
+                return await existing;
+            }
+        );
+        return result;
     }
+
+    public ValueTask Erase()
+    {
+        memory.TryRemove(id, out _);
+        return ValueTask.CompletedTask;
+    }
+}
+
+public static class RamClusterCocoonExtensions
+{
+    public static RamClusterCocoon<TContent> InRamClusterCocoon<TContent>(
+        this TContent content, string key, ConcurrentDictionary<string,ValueTask<TContent>> memory
+    ) => 
+        new(key, memory);
+}

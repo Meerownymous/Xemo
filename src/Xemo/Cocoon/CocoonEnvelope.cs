@@ -1,25 +1,9 @@
-﻿namespace Xemo.Cocoon
+namespace Xemo.Cocoon;
+
+public abstract class CocoonEnvelope<TContent>(ICocoon<TContent> guts) : ICocoon<TContent>
 {
-    /// <summary>
-    /// Envelope for Information.
-    /// </summary>
-    public abstract class CocoonEnvelope(ICocoon core) : ICocoon
-	{
-        /// <summary>
-        /// Envelope for Information.
-        /// </summary>
-        public CocoonEnvelope(Func<ICocoon> core) : this(
-            new Lazy(core)
-        )
-        { }
-
-        public IGrip Grip() => core.Grip();
-
-        public TSlice Sample<TSlice>(TSlice wanted) => core.Sample(wanted);
-
-        public ICocoon Mutate<TSlice>(TSlice mutation) => core.Mutate(mutation);
-
-        public ICocoon Schema<TMask>(TMask mask) => core.Schema(mask);
-    }
+    public string ID() => guts.ID();
+    public ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch) => guts.Patch(patch);
+    public ValueTask<TShape> Render<TShape>(IRendering<TContent, TShape> rendering) => guts.Render(rendering);
+    public ValueTask Erase() => guts.Erase();
 }
-

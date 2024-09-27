@@ -5,16 +5,14 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
     </PropertyGroup>
+
     <ItemGroup>
-        <ProjectReference Include="..\Xemo2\Xemo2.csproj"/>
         <ProjectReference Include="..\Xemo\Xemo.csproj"/>
+        <ProjectReference Include="..\Xemo\Xemo.csproj" />
     </ItemGroup>
-    <ItemGroup>
-        <None Remove="Cocoon\"/>
-        <None Remove="Bench\"/>
-    </ItemGroup>
+
     <ItemGroup>
         <PackageReference Include="Azure.Storage.Blobs" Version="12.21.1"/>
-        <PackageReference Include="Moq" Version="4.20.70"/>
     </ItemGroup>
+
 </Project>

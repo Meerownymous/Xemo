@@ -25,6 +25,6 @@
         <PackageReference Include="NModbus" Version="3.0.81"/>
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\Xemo\Xemo.csproj"/>
+      <ProjectReference Include="..\Xemo\Xemo.csproj" />
     </ItemGroup>
 </Project>

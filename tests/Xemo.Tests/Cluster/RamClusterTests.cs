@@ -1,102 +1,110 @@
-﻿
-using Tonga.Scalar;
 using Xemo.Cluster;
+using Xemo.Fact;
 using Xunit;
-using First = Xemo.Cocoon.First;
 
-namespace Xemo.Tests.Cluster
+namespace Xemo.Tests.Cluster;
+
+public sealed class RamClusterTests
 {
-	public sealed class RamClusterTests
-	{
-		[Fact]
-		public void ReducesByMatchFunction()
-		{
-            var users = RamCluster.Allocate("Person", new { ID = 0, Name = "", Age = 0 });
-            users.Create(new { ID = 2, Name = "Jay", Age = 13 });
-            users.Create(new { ID = 1, Name = "Bob", Age = 49 });
-
-            Assert.Equal(
-                13,
-                First.Sample(
-                    users.Samples(new { Name = "", Age = 0 })
-                        .Filtered(info => info.Name == "Jay")
-                ).Age
-			);
-		}
-
-        [Fact]
-        public void Creates()
+    [Fact]
+    public async Task IncludesItem()
+    {
+        var schema = new
         {
-            var users = RamCluster.Allocate("Person", new { ID = 0, Name = "", Age = 0 });
-            users.Create(new { Name = "Dobert", Age = 1 });
-            Assert.Equal(
-                1,
-                First.Sample(
-                    users.Samples(new { Name = "", Age = 0 })
-                        .Filtered(u => u.Name == "Dobert")
-                ).Age
-            );
-        }
-        
-        [Fact]
-        public void RejectsOverriding()
-        {
-            var users = RamCluster.Allocate("Person", new { ID = 0, Name = "", Age = 0 });
-            users.Create(new { ID = 1, Name = "Dobert", Age = 2 });
-            Assert.Throws<InvalidOperationException>(() =>
-                users.Create(new { ID = 1, Name = "Dobert", Age = 1 }, overrideExisting: false)
-            );
-        }
-        
-        [Fact]
-        public void AllowsOverridingOnDemand()
-        {
-            var users = RamCluster.Allocate("Person", new { ID = 0, Name = "", Age = 0 });
-            users.Create(new { ID = 1, Name = "Dobert", Age = 2 });
-            users.Create(new { ID = 1, Name = "Dobert", Age = 1 }, overrideExisting: true);
+            Name = "",
+            Age = int.MinValue
+        };
             
-            Assert.Equal(
-                1,
-                First.Sample(
-                    users.Samples(new { Name = "", Age = 0 })
-                        .Filtered(u => u.Name == "Dobert")
-                ).Age
-            );
-        }
+        var cluster =
+            new
+            {
+                Name = "John Doe",
+                Age = int.MaxValue
+            }.InRamCluster();
+        await cluster.Include(
+            "123",
+            new
+            {
+                Name = "Jane Doe",
+                Age = int.MaxValue
+            }
+        );
 
-        [Fact]
-        public void AutoGeneratesID()
+        Assert.Single(
+            await cluster.Matches(
+                If.True(schema, p => p.Name == "Jane Doe")
+            )
+        );
+    }
+    
+    [Fact]
+    public async Task Matches()
+    {
+        var schema = new
         {
-            Assert.NotEmpty(
-                RamCluster
-                    .Allocate("Person", new { Name = "" })
-                    .Create(new { Name = "Dobert" })
-                    .Grip()
-                    .ID()
-            );
-        }
+            Name = "",
+            Age = int.MinValue
+        };
+            
+        var cluster =
+            new
+            {
+                Name = "John Doe",
+                Age = int.MaxValue
+            }.InRamCluster();
 
-        [Fact]
-        public void DeliversID()
+        Assert.Single(
+            await cluster.Matches(
+                If.True(schema, p => p.Name == "John Doe")
+            )
+        );
+    }
+    
+    [Fact]
+    public async Task FindsFirstMatch()
+    {
+        var schema = new
         {
-            Assert.Equal(
-                "1",
-                RamCluster
-                    .Allocate("Person", new { ID = 0, Name = ""})
-                    .Create(new { ID = "1", Name = "Dobert" })
-                .Grip().ID()
-            );
-        }
+            Name = "",
+            Age = int.MinValue
+        };
+            
+        var cluster =
+            new
+            {
+                Name = "John Doe",
+                Age = int.MaxValue
+            }.InRamCluster();
 
-        [Fact]
-        public void Removes()
+        Assert.Equal(
+            "John Doe",
+            await cluster.FirstMatch(
+                If.True(schema, p => p.Name == "John Doe")
+            ).Render(m => m.Name));
+    }
+    
+    [Fact]
+    public async Task Erases()
+    {
+        var schema = new
         {
-            var personalities = RamCluster.Allocate("Personality", new { ID = 0, Name = "", Age = 0 });
-            var dobert = personalities.Create(new { ID = "22", Name = "Dobert", Age = 1 });
-            Assert.NotEqual(
-                Length._(personalities).Value(),
-                Length._(personalities.Removed(dobert)).Value()
-            );
-        }
+            Name = "",
+            Age = int.MinValue
+        };
+            
+        var cluster =
+            new
+            {
+                Name = "John Doe",
+                Age = int.MaxValue
+            }.InRamCluster();
+        
+        await (await cluster.FirstMatch(
+            If.True(schema, p => p.Name == "John Doe")
+        )).Erase();
+
+        Assert.Empty(
+            cluster
+        );
     }
 }

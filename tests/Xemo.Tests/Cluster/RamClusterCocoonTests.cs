@@ -1,318 +1,62 @@
-﻿using System.Collections.Concurrent;
-using Xemo.Cluster;
-using Xemo.Cocoon;
-using Xemo.Grip;
+﻿using Xemo.Cluster;
 using Xunit;
 
-namespace Xemo.Tests.Cluster
+namespace Xemo.Tests.Cluster;
+
+public sealed class RamClusterCocoonTests
 {
-    public sealed class RamClusterCocoonTests
+    [Fact]
+    public async Task Modifies()
     {
-        [Fact]
-        public void CreatesWithIDInSlice()
-        {
-            Assert.Equal(
-                "1",
-                new
-                {
-                    ID = "1",
-                    FirstName = "Ramirez",
-                    LastName = "Memorius"
-                }.AsCocoon("User", new Ram()).Grip().ID()
-            );
-        }
-
-        [Fact]
-        public void AutoGeneratesIDWhenMissingInSlice()
-        {
-            Assert.True(
-                Guid.TryParse(
-                    new
-                    {
-                        FirstName = "Ramirez",
-                        LastName = "Memorius"
-                    }.AsCocoon("User", new Ram())
-                    .Grip()
-                    .ID(),
-                    out _
-                )
-            );
-        }
-
-        [Fact]
-        public void FillsInformation()
-        {
-            var schema =
-                new
-                {
-                    FirstName = "",
-                    LastName = ""
-                };
-
-            Assert.Equal(
-                "Ramirez",
-                schema.AsCluster("User", new Ram())
-                    .Create(
-                        new
-                        {
-                            FirstName = "Stephano",
-                            LastName = "Memorius"
-                        }
-                    )
-                    .Mutate(new { FirstName = "Ramirez" })
-                    .Sample(schema)
-                    .FirstName
-            );
-        }
-
-        [Fact]
-        public void FillsPrimitiveArray()
-        {
-            var schema =
-                new
-                {
-                    FirstName = "",
-                    LastName = "",
-                    Skills = new string[0]
-                };
-
-            Assert.Equal(
-                "Dive",
-                schema.AsCluster("User", new Ram())
-                    .Create(
-                        new
-                        {
-                            FirstName = "Stephano",
-                            LastName = "Memorius",
-                            Skills = new[] { "Dive", "Sail" }
-                        }
-                    )
-                    .Sample(new
-                    {
-                        Skills = new string[0]
-                    })
-                    .Skills[0]
-            );
-        }
-
-        [Fact]
-        public void FillsAnonymousArray()
-        {
-            var schema =
-                new
-                {
-                    FirstName = "",
-                    LastName = "",
-                    Skills = new []{ new { SkillName = "" } }
-                };
-
-            Assert.Equal(
-                "Dive",
-                schema.AsCluster("User", new Ram())
-                    .Create(
-                        new
-                        {
-                            FirstName = "Stephano",
-                            LastName = "Memorius",
-                            Skills = new[] { new { SkillName = "Dive" } }
-                        }
-                    )
-                    .Sample(new
-                    {
-                        Skills = new[] { new { SkillName = "" } }
-                    })
-                    .Skills[0].SkillName
-            );
-        }
-
-        [Fact]
-        public void Solves1to1Relation()
-        {
-            var schema =
-                new
-                {
-                    Name = "",
-                    Friend = Link.OneFrom("User")
-                };
-            var mem = new Ram();
-            var users = mem.Cluster("User", schema);
-
-            var donald = users.Create(new { Name = "Donald" });
-            var daisy = users.Create(new { Name = "Daisy", Friend = donald });
-
-            Assert.Equal(
-                "Donald",
-                daisy.Sample(
-                    new
-                    {
-                        Friend = new { Name = "" }
-                    }
-                ).Friend.Name
-            );
-        }
-
-        [Fact]
-        public void Mutates1to1Relation()
-        {
-            var schema =
-                new
-                {
-                    Name = "",
-                    Friend = Link.OneFrom("User")
-                };
-            var mem = new Ram();
-            var users = mem.Cluster("User", schema);
-            var donald = users.Create(new { Name = "Donald" });
-            var daisy = users.Create(new { Name = "Daisy", Friend = donald });
-            var gustav = users.Create(new { Name = "Gustav" });
-
-            daisy
-                .Mutate(
-                    new
-                    {
-                        Friend = gustav
-                    }
-                );
-
-            Assert.Equal(
-                "Gustav",
-                daisy
-                    .Mutate(
-                        new
-                        {
-                            Friend = gustav
-                        }
-                    )
-                    .Sample(
-                        new
-                        {
-                            Friend = new { Name = "" }
-                        }
-                    ).Friend.Name
-            );
-        }
-
-        [Fact]
-        public void RejectsIDChange()
-        {
-            Assert.Throws<InvalidOperationException>(() =>
-                new RamClusterCocoon("User")
-                    .Schema(
-                        new
-                        {
-                            ID = "",
-                            FirstName = "Ramirez",
-                            LastName = "Memorius"
-                        }
-                    ).Mutate(
-                        new
-                        {
-                            ID = "100"
-                        }
-                    )
-            );
-        }
-
-        [Fact]
-        public void MutatesInformation()
-        {
-            var info =
-                new RamClusterCocoon("User").Schema(
-                    new
-                    {
-                        FirstName = "Ramirez",
-                        LastName = "Memorius"
-                    }
-                );
-            info.Mutate(new { LastName = "Saveman" });
-
-            Assert.Equal(
-                "Saveman",
-                info.Sample(new { LastName = "" }).LastName
-            );
-        }
-
-        [Fact]
-        public void PreservesInformationOnMutation()
-        {
-            var info =
-                new RamClusterCocoon("User").Schema(
-                    new
-                    {
-                        FirstName = "Ramirez",
-                        LastName = "Memorius"
-                    }
-                );
-            info.Mutate(new { LastName = "Saveman" });
-
-            Assert.Equal(
-                "Ramirez",
-                info.Sample(new { FirstName = "" }).FirstName
-            );
-        }
-
-        [Fact]
-        public void RemutatesInformation()
-        {
-            var info =
-                new RamClusterCocoon("User").Schema(
-                    new
-                    {
-                        FirstName = "Ramirez",
-                        LastName = "Memorius"
-                    }
-                );
-            info.Mutate(new { LastName = "Middleman" })
-                .Mutate(new { LastName = "Saveman" });
-
-            Assert.Equal(
-                "Saveman",
-                info.Sample(new { LastName = "" }).LastName
-            );
-        }
-
-        [Fact]
-        public void StoresInGivenStorage()
-        {
-            var schema =
-                new
-                {
-                    FirstName = "Defaultus",
-                    LastName = "Memorius"
-                };
-            var storage = AnonymousTypeDictionary._(schema);
-            RamClusterCocoon
-                .Make(new AsGrip("User", "1"), storage, schema)
-                .Mutate(new { FirstName = "Ulf", LastName = "Saveman" });
-
-            Assert.Equal(
-                new
-                {
-                    FirstName = "Ulf",
-                    LastName = "Saveman"
-                },
-                storage["1"]
-            );
-        }
-
-        [Fact]
-        public void ToleratesConcurrency()
-        {
-            var users = new ConcurrentDictionary<string, object>();
-            var xemo =
-                RamClusterCocoon.Make(new AsGrip("User", "1"), users,
-                    new
-                    {
-                        FirstName = "Ramirez",
-                        LastName = "Memorius"
-                    }
-                );
-
-            Parallel.For(0, 256, (i) =>
+        var content =
+            new
             {
-                var newName = i.ToString();
-                xemo.Mutate(new { LastName = newName });
-            });
-        }
+                Name = "Test Doe",
+                Modified = false
+            };
+        var memory = ConcurrentDictionary.Construct(ValueTask.FromResult(content)).Value;
+        Assert.True(
+            await content
+            .InRamClusterCocoon(memory.Keys.First(), memory)
+            .Patch(p => p with { Modified = true })
+            .Render(c => c.Modified)
+        );
+    }
+    
+    [Fact]
+    public async Task ErasesFromMemory()
+    {
+        var content =
+            new
+            {
+                Name = "Test Doe",
+                Modified = false
+            };
+        var memory = ConcurrentDictionary.Construct(ValueTask.FromResult(content)).Value;
+        await new
+            {
+                Name = "Test Doe",
+                Modified = false
+            }
+            .InRamClusterCocoon(memory.Keys.First(), memory)
+            .Erase();
+        Assert.Empty(memory);
+    }
+
+    [Fact]
+    public async Task Renders()
+    {
+        var content =
+            new
+            {
+                Name = "Test Doe",
+                Modified = false
+            };
+        var memory = ConcurrentDictionary.Construct(ValueTask.FromResult(content)).Value;
+        Assert.True(
+            await content
+                .InRamClusterCocoon(memory.Keys.First(), memory)
+                .Render(p => p.Name.Contains("Doe"))
+        );
     }
 }

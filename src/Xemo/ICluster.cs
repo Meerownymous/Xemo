@@ -1,31 +1,36 @@
-﻿namespace Xemo
+using System.Linq.Expressions;
+using Xemo.Fact;
+
+namespace Xemo;
+
+public interface ICluster<TContent> : IEnumerable<ICocoon<TContent>>
 {
-	/// <summary>
-	/// A cluster which groups information.
-	/// </summary>
-	public interface ICluster : IEnumerable<ICocoon>
-	{
-		String Subject();
-		
-		/// <summary>
-		/// Single item in this cluster.
-		/// </summary>
-        ICocoon Cocoon(string id);
+    ValueTask<ICocoon<TContent>> FirstMatch(IFact<TContent> fact);
+    ValueTask<IEnumerable<ICocoon<TContent>>> Matches(IFact<TContent> fact);
+    ValueTask<ICocoon<TContent>> Include(string identifier, TContent content);
+}
 
-		/// <summary>
-		/// Samples from this cluster in the given example shape.
-		/// </summary>
-		ISamples<TSample> Samples<TSample>(TSample shape);
+public static class ClusterSmarts
+{
+    public static ValueTask<TShape> Render<TContent, TShape>(
+        this ICluster<TContent> cluster,
+        IRendering<ICluster<TContent>, TShape> rendering) =>
+        rendering.Render(cluster);
+    
+    public static async Task<IEnumerable<TResult>> Mapped<TContent, TResult>(
+        this ICluster<TContent> source, Func<ICocoon<TContent>, Task<TResult>> mapping)
+    {
+        var tasks = global::Tonga.Enumerable.Mapped._(mapping,source);
+        return await Task.WhenAll(tasks);      // Wait for all tasks to complete
+    }
+    
+    public static ValueTask<ICocoon<TContent>> FirstMatch<TContent>(
+        this ICluster<TContent> cluster,
+        Expression<Func<TContent, bool>> matching
+    ) => cluster.FirstMatch(If.True(matching));
 
-		/// <summary>
-		/// Create new information in this cluster from the given plan.
-		/// </summary>
-		ICocoon Create<TNew>(TNew plan, bool overrideExisting = true);
-
-        /// <summary>
-        /// Remove information from this cluster which matches the given filter
-		/// after filling the blueprint.
-        /// </summary>
-        ICluster Removed(params ICocoon[] gone);
-	}
+    public static ValueTask<IEnumerable<ICocoon<TContent>>> Matches<TContent>(
+        this ICluster<TContent> cluster,
+        Expression<Func<TContent, bool>> matching
+    ) => cluster.Matches(If.True(matching));
 }

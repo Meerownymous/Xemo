@@ -1,58 +1,55 @@
-﻿using System;
-using System.Collections.Concurrent;
-using Tonga.Scalar;
+﻿using Tonga.Scalar;
 using Xunit;
+using Xemo.Hive;
 
 namespace Xemo.Examples.Todo
 {
     public sealed class AllTodosTests
     {
         [Fact]
-        public void ListsTodos()
+        public async Task ListsTodos()
         {
-            var todos = new AllTodos(new Ram());
-            todos.Create(new { Subject = "List me", Due = DateTime.Now + new TimeSpan(24,0,0,0) });
-            Assert.Equal(
-                "List me",
-                First._(todos).Value()
-                    .Sample(new { Subject = "" })
-                    .Subject
-            );
-        }
-
-        [Fact]
-        public void CreatesTodo()
-        {
-            var todos = new AllTodos(new Ram());
-            todos.Create(
-                new
+            var todos = new AllTodos(new RamHive());
+            await todos.Include(
+                "1",
+                new TodoRecord
                 {
-                    Subject = "Complete me",
-                    Due = DateTime.Now + new TimeSpan(24, 0, 0, 0)
+                    Subject = "List me", 
+                    Due = DateTime.Now + new TimeSpan(24,0,0,0)
                 }
             );
+            
+            await todos.Include(
+                "2",
+                new TodoRecord
+                {
+                    Subject = "List me too", 
+                    Due = DateTime.Now + new TimeSpan(24,0,0,0)
+                }
+            );
+            
             Assert.Equal(
-                "Complete me",
-                First._(todos).Value()
-                    .Sample(new { Subject = "", Due = DateTime.MinValue })
-                    .Subject
+                ["List me", "List me too"],
+                await todos.Mapped(async todo => await todo.Render(c => c.Subject))
             );
         }
 
         [Fact]
-        public void RejectsWrongDueDate()
+        public async Task CreatesTodo()
         {
-            AssertException.MessageContains<ArgumentException>(
-                "Due date must be in the future",
-                () =>
-                new AllTodos(new Ram())
-                    .Create(
-                        new
-                        {
-                            Subject = "Succeed",
-                            Due = DateTime.Now - new TimeSpan(24, 0, 0, 0)
-                        }
-                    )
+            var todos = new AllTodos(new RamHive());
+            await todos.Include(
+                "1",
+                new TodoRecord()
+                {
+                    Subject = "Complete me", 
+                    Due = DateTime.Now + new TimeSpan(24,0,0,0)
+                }
+            );
+            
+            Assert.Equal(
+                "Complete me",
+                (await First._(todos).Value().Render(c => c)).Subject
             );
         }
     }
