@@ -8,7 +8,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Xemo\Xemo.csproj"/>
-        <ProjectReference Include="..\Xemo\Xemo.csproj" />
     </ItemGroup>
 
     <ItemGroup>

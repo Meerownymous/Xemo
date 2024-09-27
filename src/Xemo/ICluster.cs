@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Xemo.Fact;
 
 namespace Xemo;
@@ -14,23 +17,31 @@ public static class ClusterSmarts
 {
     public static ValueTask<TShape> Render<TContent, TShape>(
         this ICluster<TContent> cluster,
-        IRendering<ICluster<TContent>, TShape> rendering) =>
-        rendering.Render(cluster);
-    
+        IRendering<ICluster<TContent>, TShape> rendering)
+    {
+        return rendering.Render(cluster);
+    }
+
     public static async Task<IEnumerable<TResult>> Mapped<TContent, TResult>(
         this ICluster<TContent> source, Func<ICocoon<TContent>, Task<TResult>> mapping)
     {
-        var tasks = global::Tonga.Enumerable.Mapped._(mapping,source);
-        return await Task.WhenAll(tasks);      // Wait for all tasks to complete
+        var tasks = global::Tonga.Enumerable.Mapped._(mapping, source);
+        return await Task.WhenAll(tasks); // Wait for all tasks to complete
     }
-    
+
     public static ValueTask<ICocoon<TContent>> FirstMatch<TContent>(
         this ICluster<TContent> cluster,
         Expression<Func<TContent, bool>> matching
-    ) => cluster.FirstMatch(If.True(matching));
+    )
+    {
+        return cluster.FirstMatch(If.True(matching));
+    }
 
     public static ValueTask<IEnumerable<ICocoon<TContent>>> Matches<TContent>(
         this ICluster<TContent> cluster,
         Expression<Func<TContent, bool>> matching
-    ) => cluster.Matches(If.True(matching));
+    )
+    {
+        return cluster.Matches(If.True(matching));
+    }
 }

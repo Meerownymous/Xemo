@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace Xemo.Cluster;
 
@@ -7,7 +9,10 @@ public sealed class RamClusterCocoon<TContent>(
     ConcurrentDictionary<string, ValueTask<TContent>> memory
 ) : ICocoon<TContent>
 {
-    public string ID() => id;
+    public string ID()
+    {
+        return id;
+    }
 
     public async ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch)
     {
@@ -23,7 +28,7 @@ public sealed class RamClusterCocoon<TContent>(
         TShape result = default;
         await memory.AddOrUpdate(
             id,
-            (_) => throw new InvalidOperationException(
+            _ => throw new InvalidOperationException(
                 $"Cannot render '{id}' - it does not exist. It might have been deleted."),
             async (_, existing) =>
             {
@@ -44,7 +49,9 @@ public sealed class RamClusterCocoon<TContent>(
 public static class RamClusterCocoonExtensions
 {
     public static RamClusterCocoon<TContent> InRamClusterCocoon<TContent>(
-        this TContent content, string key, ConcurrentDictionary<string,ValueTask<TContent>> memory
-    ) => 
-        new(key, memory);
+        this TContent content, string key, ConcurrentDictionary<string, ValueTask<TContent>> memory
+    )
+    {
+        return new RamClusterCocoon<TContent>(key, memory);
+    }
 }

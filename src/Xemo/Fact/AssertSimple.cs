@@ -1,3 +1,4 @@
+using System;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -14,8 +15,11 @@ public sealed class AssertSimple<TContent>(IFact<TContent> origin) : IFact<TCont
         return origin.IsTrue(content);
     }
 
-    public Expression<Func<TContent, bool>> AsExpression() => origin.AsExpression();
-    
+    public Expression<Func<TContent, bool>> AsExpression()
+    {
+        return origin.AsExpression();
+    }
+
     private static bool IsSimpleExpression(Expression<Func<TContent, bool>> expression)
     {
         return IsSimple(expression.Body);
@@ -24,30 +28,22 @@ public sealed class AssertSimple<TContent>(IFact<TContent> origin) : IFact<TCont
     private static bool IsSimple(Expression expression)
     {
         if (expression is BinaryExpression binaryExpression)
-        {
             // Check if both sides of the binary expression are simple
-            return IsSimple(binaryExpression.Left) && IsSimple(binaryExpression.Right) && IsSimpleBinaryOperator(binaryExpression.NodeType);
-        }
-        else if (expression is MemberExpression memberExpression)
-        {
+            return IsSimple(binaryExpression.Left) && IsSimple(binaryExpression.Right) &&
+                   IsSimpleBinaryOperator(binaryExpression.NodeType);
+        if (expression is MemberExpression memberExpression)
             // Ensure the member expression refers to a property or field, not a method
-            return memberExpression.Member.MemberType == MemberTypes.Property || memberExpression.Member.MemberType == MemberTypes.Field;
-        }
-        else if (expression is ConstantExpression)
-        {
+            return memberExpression.Member.MemberType == MemberTypes.Property ||
+                   memberExpression.Member.MemberType == MemberTypes.Field;
+        if (expression is ConstantExpression)
             // Constant expressions (e.g., "30" or "John") are simple
             return true;
-        }
-        else if (expression is UnaryExpression unaryExpression)
-        {
+        if (expression is UnaryExpression unaryExpression)
             // Handle unary expressions like "Not" (e.g., !someCondition)
             return IsSimple(unaryExpression.Operand);
-        }
-        else if (expression is ParameterExpression)
-        {
+        if (expression is ParameterExpression)
             // Parameter (e.g., "c" in "c => c.Age") is simple
             return true;
-        }
 
         // Anything else is considered complex (e.g., method calls like StartsWith)
         return false;

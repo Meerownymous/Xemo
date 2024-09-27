@@ -1,5 +1,7 @@
-namespace Xemo;
+using System;
 using System.Linq.Expressions;
+
+namespace Xemo;
 
 public interface IFact<TContent>
 {

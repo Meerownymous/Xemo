@@ -25,7 +25,7 @@
         <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.22.7"/>
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Xemo\Xemo.csproj" />
+        <ProjectReference Include="..\..\src\Xemo\Xemo.csproj"/>
     </ItemGroup>
 
 </Project>

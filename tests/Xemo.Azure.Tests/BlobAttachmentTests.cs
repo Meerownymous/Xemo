@@ -19,7 +19,7 @@ public sealed class BlobAttachmentTests
                         new EncodedBlobName("attachment-" + Guid.NewGuid()).AsString()
                     )
             );
-        await 
+        await
             attachment.Patch(
                 _ => new AsInput("I am attached!").Stream()
             );
@@ -31,7 +31,7 @@ public sealed class BlobAttachmentTests
             )
         );
     }
-    
+
     [Fact]
     public async Task LoadsAttachment()
     {

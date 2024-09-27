@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+using System.Threading.Tasks;
 using Xemo.Patch;
 using Xemo.Rendering;
 
@@ -11,13 +14,17 @@ public interface IAttachment
 
 public static class AttachmentExtensions
 {
-    public static ValueTask<IAttachment> Patch(this IAttachment attachment, Func<Stream, Stream> patch) =>
-        attachment.Patch(new AsPatch<Stream>(patch));
-    
-    public static ValueTask<TFormat> Render<TFormat>(this IAttachment attachment, Func<Stream, TFormat> rendering) =>
-        attachment.Render(
+    public static ValueTask<IAttachment> Patch(this IAttachment attachment, Func<Stream, Stream> patch)
+    {
+        return attachment.Patch(new AsPatch<Stream>(patch));
+    }
+
+    public static ValueTask<TFormat> Render<TFormat>(this IAttachment attachment, Func<Stream, TFormat> rendering)
+    {
+        return attachment.Render(
             new AsRendering<Stream, TFormat>(
                 content => Task.Run(() => rendering(content))
             )
         );
+    }
 }

@@ -1,21 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Cake.Common;
 using Cake.Common.Build;
 using Cake.Common.IO;
+using Cake.Common.Tools.DotNet;
+using Cake.Common.Tools.DotNet.Build;
+using Cake.Common.Tools.DotNet.MSBuild;
+using Cake.Common.Tools.DotNet.Pack;
+using Cake.Common.Tools.DotNet.Test;
+using Cake.Common.Tools.NuGet;
+using Cake.Common.Tools.NuGet.Push;
 using Cake.Core;
 using Cake.Core.Diagnostics;
 using Cake.Core.IO;
 using Cake.Frosting;
-using Cake.Common.Tools.NuGet;
-using Cake.Common.Tools.DotNet;
-using Cake.Common.Tools.DotNet.Build;
-using Cake.Common.Tools.DotNet.Test;
-using Cake.Common.Tools.DotNet.MSBuild;
-using Cake.Common.Tools.DotNet.Pack;
-using Cake.Common;
-using Cake.Common.Tools.NuGet.Push;
-using Cake.Common.Tools.NuGet.Sources;
 
 public static class Program
 {
@@ -32,23 +28,23 @@ public static class Settings
     public static string ModuleName = "Xemo";
     public static string Version = "0.1.0";
     public static string Configuration = "Release";
-    public static string NugetReleaseToken = String.Empty;
+    public static string NugetReleaseToken = string.Empty;
     public static string NugetSource = "https://api.nuget.org/v3/index.json";
 
-    public static FilePath SolutionPath = new FilePath($"../{Settings.ModuleName}.sln");
-    public static DirectoryPath ModulePath = new DirectoryPath("../src");
-    public static DirectoryPath TestModulePath = new DirectoryPath("../tests");
-    public static DirectoryPath ArtifactPath = new DirectoryPath("../artifacts");
+    public static FilePath SolutionPath = new($"../{ModuleName}.sln");
+    public static DirectoryPath ModulePath = new("../src");
+    public static DirectoryPath TestModulePath = new("../tests");
+    public static DirectoryPath ArtifactPath = new("../artifacts");
 }
 
 public class BuildContext : FrostingContext
 {
-    public bool Delay { get; set; }
-
     public BuildContext(ICakeContext context) : base(context)
     {
         Delay = context.Arguments.HasArgument("delay");
     }
+
+    public bool Delay { get; set; }
 }
 
 [TaskName("Version")]
@@ -71,14 +67,13 @@ public sealed class CleanTask : FrostingTask<BuildContext>
     {
         context.CleanDirectories(Settings.ArtifactPath.FullPath);
         foreach (var module in context.GetSubDirectories(Settings.ModulePath))
-        {
             context.CleanDirectories(
-                new List<string> {
+                new List<string>
+                {
                     $"{module}/bin",
                     $"{module}/obj"
                 }
             );
-        }
     }
 }
 
@@ -100,16 +95,16 @@ public sealed class BuildTask : FrostingTask<BuildContext>
     public override void Run(BuildContext context)
     {
         var settings =
-        new DotNetBuildSettings()
-        {
-            Configuration = Settings.Configuration,
-            NoRestore = true,
-            MSBuildSettings = new DotNetMSBuildSettings().SetVersionPrefix(Settings.Version)
-        };
+            new DotNetBuildSettings
+            {
+                Configuration = Settings.Configuration,
+                NoRestore = true,
+                MSBuildSettings = new DotNetMSBuildSettings().SetVersionPrefix(Settings.Version)
+            };
 
         foreach (var module in
-            context.GetSubDirectories(Settings.ModulePath)
-        )
+                 context.GetSubDirectories(Settings.ModulePath)
+                )
         {
             var name = module.GetDirectoryName();
             context.Log.Information($"Building {name}");
@@ -128,11 +123,11 @@ public sealed class TestTask : FrostingTask<BuildContext>
     public override void Run(BuildContext context)
     {
         var settings =
-        new DotNetTestSettings()
-        {
-            Configuration = Settings.Configuration,
-            NoRestore = true
-        };
+            new DotNetTestSettings
+            {
+                Configuration = Settings.Configuration,
+                NoRestore = true
+            };
 
         foreach (var test in context.GetSubDirectories(Settings.TestModulePath))
         {
@@ -153,14 +148,15 @@ public sealed class NugetBuildTask : FrostingTask<BuildContext>
     {
         context.Log.Information($"Building NuGet Package for Version {Settings.Version}");
 
-        var settings = new DotNetPackSettings()
+        var settings = new DotNetPackSettings
         {
             Configuration = Settings.Configuration,
             OutputDirectory = Settings.ArtifactPath,
-            NoRestore = true,
+            NoRestore = false,
             IncludeSymbols = true
         };
-        settings.ArgumentCustomization = args => args.Append("--include-symbols").Append("-p:SymbolPackageFormat=snupkg");
+        settings.ArgumentCustomization =
+            args => args.Append("--include-symbols").Append("-p:SymbolPackageFormat=snupkg");
         settings.MSBuildSettings =
             new DotNetMSBuildSettings()
                 .SetVersionPrefix(Settings.Version);
@@ -168,6 +164,7 @@ public sealed class NugetBuildTask : FrostingTask<BuildContext>
         foreach (var module in context.GetSubDirectories(Settings.ModulePath))
         {
             var name = module.GetDirectoryName();
+            Console.WriteLine($"Packing nuget {module}");
             context.DotNetPack(
                 module.ToString(),
                 settings
@@ -186,9 +183,7 @@ public sealed class NugetCredentialsTask : FrostingTask<BuildContext>
         {
             Settings.NugetReleaseToken = context.EnvironmentVariable("NUGET_TOKEN");
             if (string.IsNullOrEmpty(Settings.NugetReleaseToken))
-            {
                 throw new Exception("Environment variable 'NUGET_TOKEN' is not set");
-            }
         }
     }
 }
@@ -202,20 +197,18 @@ public sealed class NugetReleaseTask : FrostingTask<BuildContext>
         if (context.AppVeyor().IsRunningOnAppVeyor
             &&
             context.AppVeyor().Environment.Repository.Tag.IsTag
-        )
+           )
         {
             var nugets = context.GetFiles($"{Settings.ArtifactPath}/*.nupkg");
             foreach (var package in nugets)
-            {
                 context.NuGetPush(
-                package,
+                    package,
                     new NuGetPushSettings
                     {
                         Source = Settings.NugetSource,
                         ApiKey = Settings.NugetReleaseToken
                     }
                 );
-            }
         }
     }
 }

@@ -18,9 +18,8 @@ public sealed class BufferedAttachmentTests
             "Je suis un attachement",
             await new BufferedAttachment(origin).Render(c => new AsText(c).AsString())
         );
-
     }
-    
+
     [Fact]
     public async Task Buffers()
     {
@@ -31,13 +30,13 @@ public sealed class BufferedAttachmentTests
         var buffered = new BufferedAttachment(origin);
         await buffered.Render(c => new AsText(c).AsString());
         await origin.Patch(_ => new MemoryStream());
-        
+
         Assert.Equal(
             "Je suis un attachement",
             await buffered.Render(c => new AsText(c).AsString())
         );
     }
-    
+
     [Fact]
     public async Task PatchesOriginWhenNotReadBefore()
     {
@@ -47,13 +46,13 @@ public sealed class BufferedAttachmentTests
 
         var buffered = new BufferedAttachment(origin);
         await buffered.Patch(_ => new AsInput("Je suis patched").Stream());
-        
+
         Assert.Equal(
             "Je suis patched",
             await origin.Render(c => new AsText(c).AsString())
         );
     }
-    
+
     [Fact]
     public async Task PatchesOriginWhenReadBefore()
     {
@@ -64,13 +63,13 @@ public sealed class BufferedAttachmentTests
         var buffered = new BufferedAttachment(origin);
         await buffered.Render(c => new AsText(c).AsString());
         await buffered.Patch(_ => new AsInput("Je suis patched").Stream());
-        
+
         Assert.Equal(
             "Je suis patched",
             await origin.Render(c => new AsText(c).AsString())
         );
     }
-    
+
     [Fact]
     public async Task RendersFromBuffer()
     {
@@ -81,7 +80,7 @@ public sealed class BufferedAttachmentTests
         var buffered = new BufferedAttachment(origin);
         await buffered.Render(c => new AsText(c).AsString());
         await origin.Patch(_ => new AsInput(":(").Stream());
-        
+
         Assert.Equal(
             ":)",
             await buffered.Render(c => new AsText(c).AsString())

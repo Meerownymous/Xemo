@@ -3,23 +3,12 @@
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>disable</Nullable>
-        <RootNamespace>Xemo</RootNamespace>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="System.Linq.Dynamic.Core" Version="1.4.5"/>
-        <PackageReference Include="Tonga" Version="0.9.0"/>
-        <PackageReference Include="xunit.assert" Version="2.8.1"/>
-        <PackageReference Include="xunit.extensibility.core" Version="2.8.1"/>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0"/>
-        <PackageReference Include="xunit" Version="2.8.1"/>
-        <PackageReference Include="xunit.console" Version="2.8.1"/>
-        <PackageReference Include="xunit.extensibility.core" Version="2.8.1"/>
-        <PackageReference Include="xunit.extensibility.execution" Version="2.8.1"/>
-        <PackageReference Include="xunit.runner.console" Version="2.8.1">
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+      <PackageReference Include="Tonga" Version="0.9.0" />
     </ItemGroup>
 
 </Project>

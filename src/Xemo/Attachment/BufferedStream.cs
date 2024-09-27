@@ -1,12 +1,11 @@
 using System;
 using System.IO;
-using System.Threading.Tasks;
 
 public class BufferingStream : Stream
 {
     private readonly Stream memory;
     private readonly MemoryStream origin;
-    private long _bufferedUntil = 0; // Tracks how much has been buffered
+    private long _bufferedUntil; // Tracks how much has been buffered
 
     public BufferingStream(Stream innerStream, MemoryStream memory)
     {
@@ -36,7 +35,7 @@ public class BufferingStream : Stream
 
     public override int Read(byte[] buffer, int offset, int count)
     {
-        int totalBytesRead = 0;
+        var totalBytesRead = 0;
 
         // Step 1: Read from buffer if the position is within the buffered range
         if (Position < _bufferedUntil)
@@ -45,19 +44,16 @@ public class BufferingStream : Stream
             origin.Position = Position;
 
             // Determine how many bytes we can read from the buffer
-            int bytesAvailableInBuffer = (int)(_bufferedUntil - Position);
-            int bytesToReadFromBuffer = Math.Min(bytesAvailableInBuffer, count);
+            var bytesAvailableInBuffer = (int)(_bufferedUntil - Position);
+            var bytesToReadFromBuffer = Math.Min(bytesAvailableInBuffer, count);
 
             // Read from the buffer
-            int bytesReadFromBuffer = origin.Read(buffer, offset, bytesToReadFromBuffer);
+            var bytesReadFromBuffer = origin.Read(buffer, offset, bytesToReadFromBuffer);
             totalBytesRead += bytesReadFromBuffer;
             Position += bytesReadFromBuffer;
 
             // If we read all requested bytes from the buffer, return
-            if (totalBytesRead == count)
-            {
-                return totalBytesRead;
-            }
+            if (totalBytesRead == count) return totalBytesRead;
 
             // Adjust the offset and count to reflect the remaining bytes we still need to read
             offset += bytesReadFromBuffer;
@@ -67,7 +63,7 @@ public class BufferingStream : Stream
         // Step 2: Read any remaining bytes from the inner stream
         if (count > 0)
         {
-            int bytesReadFromStream = memory.Read(buffer, offset, count);
+            var bytesReadFromStream = memory.Read(buffer, offset, count);
             if (bytesReadFromStream > 0)
             {
                 // Write to the buffer what was just read from the inner stream
@@ -93,7 +89,7 @@ public class BufferingStream : Stream
 
     public override long Seek(long offset, SeekOrigin origin)
     {
-        long newPosition = memory.Seek(offset, origin);
+        var newPosition = memory.Seek(offset, origin);
         this.origin.Position = Math.Min(newPosition, _bufferedUntil);
         return newPosition;
     }

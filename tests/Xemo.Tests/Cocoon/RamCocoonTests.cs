@@ -10,16 +10,16 @@ public sealed class RamCocoonTests
     {
         Assert.True(
             await new
-            {
-                Name = "Test Doe",
-                Modified = false
-            }
-            .InRamCocoon()
-            .Patch(p => p with { Modified = true })
-            .Render(c => c.Modified)
+                {
+                    Name = "Test Doe",
+                    Modified = false
+                }
+                .InRamCocoon()
+                .Patch(p => p with { Modified = true })
+                .Render(c => c.Modified)
         );
     }
-    
+
     [Fact]
     public async Task RefusesErasing()
     {

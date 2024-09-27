@@ -11,8 +11,8 @@ public sealed class BlobClusterTests
         var id = "cocoon-123";
         var serviceClient = new TestBlobServiceClient();
         using var containerService = new TestBlobContainer(subject, serviceClient);
-        
-        var cluster = 
+
+        var cluster =
             await new
             {
                 Name = "John Doe",
@@ -23,11 +23,11 @@ public sealed class BlobClusterTests
         var retries = 5;
         for (var i = 0; i < retries; i++)
         {
-            if(containerService
-               .Value()
-               .FindBlobsByTags("Name = 'John Doe'")
-               .Any()
-            )
+            if (containerService
+                .Value()
+                .FindBlobsByTags("Name = 'John Doe'")
+                .Any()
+               )
                 break;
             await Task.Delay(1000);
         }
@@ -35,7 +35,7 @@ public sealed class BlobClusterTests
         var match = await cluster.FirstMatch(p => p.Name == "John Doe");
         Assert.Equal(20, await match.Render(p => p.Age));
     }
-    
+
     [Fact]
     public async Task FindsMatches()
     {
@@ -43,8 +43,8 @@ public sealed class BlobClusterTests
         var id = "cocoon-123";
         var serviceClient = new TestBlobServiceClient();
         using var containerService = new TestBlobContainer(subject, serviceClient);
-        
-        var cluster = 
+
+        var cluster =
             await new
             {
                 Name = "John Doe",
@@ -57,8 +57,8 @@ public sealed class BlobClusterTests
         var retries = 3;
         for (var i = 0; i < retries; i++)
         {
-            if(containerService.Value().FindBlobsByTags("Name = 'John Doe'").Any()
-               && containerService.Value().FindBlobsByTags("Name = 'Jane Doe'").Any())
+            if (containerService.Value().FindBlobsByTags("Name = 'John Doe'").Any()
+                && containerService.Value().FindBlobsByTags("Name = 'Jane Doe'").Any())
                 break;
             await Task.Delay(1000);
         }

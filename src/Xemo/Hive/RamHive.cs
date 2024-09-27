@@ -1,4 +1,8 @@
+using System;
 using System.Collections.Concurrent;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using Xemo.Attachment;
 using Xemo.Cluster;
 using Xemo.Cocoon;
@@ -7,15 +11,15 @@ namespace Xemo.Hive;
 
 public sealed class RamHive : IHive
 {
-    private readonly ConcurrentDictionary<string,object> vaults = new();
-    private readonly ConcurrentDictionary<string,object> clusters = new();
-    private readonly ConcurrentDictionary<string,Task<Stream>> attachments = new();
+    private readonly ConcurrentDictionary<string, Task<Stream>> attachments = new();
+    private readonly ConcurrentDictionary<string, object> clusters = new();
+    private readonly ConcurrentDictionary<string, object> vaults = new();
 
     public ICocoon<TContent> Vault<TContent>(string name)
     {
         var vault =
             vaults.GetOrAdd(name,
-                _ =>new RamCocoon<TContent>(name, default)
+                _ => new RamCocoon<TContent>(name, default)
             );
         if (!vault.GetType().GetInterfaces().Contains(typeof(ICocoon<TContent>)))
             throw new ArgumentException(
@@ -39,8 +43,10 @@ public sealed class RamHive : IHive
         return (ICluster<TContent>)cluster;
     }
 
-    public IAttachment Attachment(string carrier) =>
-        new RamAttachment(
-            carrier, this.attachments
+    public IAttachment Attachment(string carrier)
+    {
+        return new RamAttachment(
+            carrier, attachments
         );
+    }
 }

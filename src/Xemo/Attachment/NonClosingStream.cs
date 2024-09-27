@@ -1,7 +1,11 @@
+using System.IO;
+
+namespace Xemo.Attachment;
+
 /// <summary>
-/// Stream which ignores any attempts to close it.
+///     Stream which ignores any attempts to close it.
 /// </summary>
-public class NonClosingStream(Stream origin) : Stream
+public sealed class NonClosingStream(Stream origin) : Stream
 {
     public override bool CanRead => origin.CanRead;
     public override bool CanSeek => origin.CanSeek;
@@ -14,11 +18,31 @@ public class NonClosingStream(Stream origin) : Stream
         set => origin.Position = value;
     }
 
-    public override void Flush() => origin.Flush();
-    public override int Read(byte[] buffer, int offset, int count) => origin.Read(buffer, offset, count);
-    public override long Seek(long offset, SeekOrigin seekOrigin) => origin.Seek(offset, seekOrigin);
-    public override void SetLength(long value) => origin.SetLength(value);
-    public override void Write(byte[] buffer, int offset, int count) => origin.Write(buffer, offset, count);
+    public override void Flush()
+    {
+        origin.Flush();
+    }
+
+    public override int Read(byte[] buffer, int offset, int count)
+    {
+        return origin.Read(buffer, offset, count);
+    }
+
+    public override long Seek(long offset, SeekOrigin seekOrigin)
+    {
+        return origin.Seek(offset, seekOrigin);
+    }
+
+    public override void SetLength(long value)
+    {
+        origin.SetLength(value);
+    }
+
+    public override void Write(byte[] buffer, int offset, int count)
+    {
+        origin.Write(buffer, offset, count);
+    }
+
     protected override void Dispose(bool disposing)
     {
     }

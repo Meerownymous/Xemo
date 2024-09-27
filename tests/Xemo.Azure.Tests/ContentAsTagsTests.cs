@@ -22,23 +22,23 @@ public sealed class ContentAsTagsTests
             }.AsTags()[tagName]
         );
     }
-    
+
     [Fact]
     public void DoesNotAddComplexPropertiesToTags()
     {
         Assert.Equal(
             ["Name"],
             new
-            {
-                Name = "Tagbert",
-                Skills = new string[0],
-                Address = new
                 {
-                    Street = "123 Main Street",
-                    City = "London"
-                }
-            }.AsTags()
-            .Keys()
+                    Name = "Tagbert",
+                    Skills = new string[0],
+                    Address = new
+                    {
+                        Street = "123 Main Street",
+                        City = "London"
+                    }
+                }.AsTags()
+                .Keys()
         );
     }
 }

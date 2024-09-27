@@ -1,10 +1,11 @@
+using System;
 using System.Linq.Expressions;
 using Tonga.Text;
 
 namespace Xemo.Azure;
 
 /// <summary>
-/// Translates a fact to an azure query.
+///     Translates a fact to an azure query.
 /// </summary>
 public sealed class FactAsTagQuery<TInput>(IFact<TInput> fact) : TextEnvelope(
     AsText._(() =>
@@ -12,8 +13,10 @@ public sealed class FactAsTagQuery<TInput>(IFact<TInput> fact) : TextEnvelope(
     )
 )
 {
-    private static string TranslateExpressionToAzureQuery(Expression<Func<TInput, bool>> expression) =>
-        ParseExpression(expression.Body);
+    private static string TranslateExpressionToAzureQuery(Expression<Func<TInput, bool>> expression)
+    {
+        return ParseExpression(expression.Body);
+    }
 
     private static string ParseExpression(Expression expression)
     {
@@ -25,24 +28,17 @@ public sealed class FactAsTagQuery<TInput>(IFact<TInput> fact) : TextEnvelope(
             var op = GetOperator(binaryExpression.NodeType);
             return $"{left} {op} {right}";
         }
-        else if (expression is MemberExpression memberExpression)
-        {
+
+        if (expression is MemberExpression memberExpression)
             // Handle property access (e.g., c.Name)
             return memberExpression.Member.Name;
-        }
-        else if (expression is ConstantExpression constantExpression)
-        {
+        if (expression is ConstantExpression constantExpression)
             // Handle constant values (e.g., "John", 30)
             return $"'{constantExpression.Value}'"; // Wrap the value in quotes for Azure
-        }
-        else if (expression is UnaryExpression unaryExpression)
-        {
+        if (expression is UnaryExpression unaryExpression)
             // Handle negation (e.g., !expression)
             if (unaryExpression.NodeType == ExpressionType.Not)
-            {
                 return $"NOT({ParseExpression(unaryExpression.Operand)})";
-            }
-        }
 
         throw new NotSupportedException($"Unsupported expression type: {expression.NodeType}");
     }

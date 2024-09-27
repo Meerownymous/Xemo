@@ -1,8 +1,9 @@
+using System;
 using System.Collections;
-using System.Linq.Expressions;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Tonga.Enumerable;
-using Xemo.Azure;
 using Xemo.Fact;
 
 namespace Xemo.Azure;
@@ -17,7 +18,8 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
     });
 
     public BlobCluster(BlobContainerClient containerClient) : this(() => containerClient)
-    { }
+    {
+    }
 
     public BlobCluster(string name, BlobServiceClient blobService) : this(
         () =>
@@ -27,7 +29,8 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
             return client;
         }
     )
-    { }
+    {
+    }
 
     public IEnumerator<ICocoon<TContent>> GetEnumerator()
     {
@@ -37,7 +40,10 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
             );
     }
 
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 
     public async ValueTask<ICocoon<TContent>> FirstMatch(IFact<TContent> fact)
     {
@@ -56,8 +62,9 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
         throw new ArgumentException($"No cocoon matching '{fact.AsExpression()}' exists.");
     }
 
-    public ValueTask<IEnumerable<ICocoon<TContent>>> Matches(IFact<TContent> fact) =>
-        ValueTask.FromResult(
+    public ValueTask<IEnumerable<ICocoon<TContent>>> Matches(IFact<TContent> fact)
+    {
+        return ValueTask.FromResult(
             Mapped._(
                 blob =>
                     new BlobCocoon<TContent>(
@@ -70,6 +77,7 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
                     )
             )
         );
+    }
 
     public async ValueTask<ICocoon<TContent>> Include(string identifier, TContent content)
     {
@@ -78,8 +86,10 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
         ).Patch(_ => content);
     }
 
-    public ValueTask<TShape> Render<TShape>(IRendering<ICluster<TContent>, TShape> rendering) =>
-        rendering.Render(this);
+    public ValueTask<TShape> Render<TShape>(IRendering<ICluster<TContent>, TShape> rendering)
+    {
+        return rendering.Render(this);
+    }
 }
 
 public static class BlobClusterSmarts

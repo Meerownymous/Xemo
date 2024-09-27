@@ -14,7 +14,7 @@ public sealed class RamClusterTests
             Name = "",
             Age = int.MinValue
         };
-            
+
         var cluster =
             new
             {
@@ -36,7 +36,7 @@ public sealed class RamClusterTests
             )
         );
     }
-    
+
     [Fact]
     public async Task Matches()
     {
@@ -45,7 +45,7 @@ public sealed class RamClusterTests
             Name = "",
             Age = int.MinValue
         };
-            
+
         var cluster =
             new
             {
@@ -59,7 +59,7 @@ public sealed class RamClusterTests
             )
         );
     }
-    
+
     [Fact]
     public async Task FindsFirstMatch()
     {
@@ -68,7 +68,7 @@ public sealed class RamClusterTests
             Name = "",
             Age = int.MinValue
         };
-            
+
         var cluster =
             new
             {
@@ -82,7 +82,7 @@ public sealed class RamClusterTests
                 If.True(schema, p => p.Name == "John Doe")
             ).Render(m => m.Name));
     }
-    
+
     [Fact]
     public async Task Erases()
     {
@@ -91,14 +91,14 @@ public sealed class RamClusterTests
             Name = "",
             Age = int.MinValue
         };
-            
+
         var cluster =
             new
             {
                 Name = "John Doe",
                 Age = int.MaxValue
             }.InRamCluster();
-        
+
         await (await cluster.FirstMatch(
             If.True(schema, p => p.Name == "John Doe")
         )).Erase();

@@ -1,5 +1,5 @@
+using System;
 using Azure.Storage.Blobs;
-using Xemo.Azure;
 
 namespace Xemo.Azure;
 
@@ -9,25 +9,27 @@ public sealed class BlobHive(
 ) : IHive
 {
     private readonly Lazy<BlobServiceClient> blobService = new(azureBlobService);
+
     private readonly Lazy<BlobContainerClient> vaultContainer = new(() =>
         azureBlobService()
             .GetBlobContainerClient(new EncodedContainerName(containerPrefix + "vaults").AsString())
-        );
+    );
 
     public BlobHive(
-        BlobServiceClient blobServiceClient, 
+        BlobServiceClient blobServiceClient,
         string prefix
     ) : this(
         () => blobServiceClient,
         prefix
     )
-    { }
+    {
+    }
 
     public ICocoon<TContent> Vault<TContent>(string name)
     {
         vaultContainer.Value.CreateIfNotExists();
-        var blobClient = vaultContainer.Value.GetBlobClient(new EncodedBlobName(name).AsString()); 
-        return 
+        var blobClient = vaultContainer.Value.GetBlobClient(new EncodedBlobName(name).AsString());
+        return
             new BlobCocoon<TContent>(blobClient);
     }
 
@@ -37,7 +39,7 @@ public sealed class BlobHive(
             blobService
                 .Value
                 .GetBlobContainerClient(containerPrefix + new EncodedContainerName(name).AsString());
-        
+
         return new BlobCluster<TContent>(containerClient);
     }
 
@@ -48,7 +50,7 @@ public sealed class BlobHive(
                 .Value
                 .GetBlobContainerClient(containerPrefix + new EncodedContainerName("attachments").AsString());
         containerClient.CreateIfNotExists();
-        var blobClient = containerClient.GetBlobClient(new EncodedBlobName(link).AsString()); 
+        var blobClient = containerClient.GetBlobClient(new EncodedBlobName(link).AsString());
 
         return new BlobAttachment(blobClient);
     }

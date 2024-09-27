@@ -37,7 +37,7 @@ public sealed class BufferedClusterTests
             ).ToArray()
         );
     }
-    
+
     [Fact]
     public async Task BuffersContentWhenRendering()
     {
@@ -55,10 +55,7 @@ public sealed class BufferedClusterTests
         var c = await origin.Include("3", "Item C");
 
         using var enumerator = buffered.GetEnumerator();
-        while (enumerator.MoveNext())
-        {
-            await enumerator.Current.Render(content => content);
-        }
+        while (enumerator.MoveNext()) await enumerator.Current.Render(content => content);
         await a.Erase();
         await b.Erase();
         await c.Erase();
@@ -71,7 +68,7 @@ public sealed class BufferedClusterTests
             ).ToArray()
         );
     }
-    
+
     [Fact]
     public async Task BuffersContentWhenIncluding()
     {
@@ -101,7 +98,7 @@ public sealed class BufferedClusterTests
             )
         );
     }
-    
+
     [Fact]
     public async Task ErasesFromBufferedCluster()
     {
@@ -123,7 +120,7 @@ public sealed class BufferedClusterTests
 
         Assert.Empty(buffered);
     }
-    
+
     [Fact]
     public async Task ErasesFromContentBuffer()
     {

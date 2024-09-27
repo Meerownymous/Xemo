@@ -30,17 +30,10 @@ public sealed class TestBlobServiceClient : IScalar<BlobServiceClient>, IDisposa
             );
     }
 
-    public BlobServiceClient Value()
-    {
-        return service.Value;
-    }
-
     public void Dispose()
     {
         foreach (var blobContainer in service.Value.GetBlobContainers())
-        {
-            if (this.deleteIdentifier != "" && blobContainer.Name.StartsWith(this.deleteIdentifier))
-            {
+            if (deleteIdentifier != "" && blobContainer.Name.StartsWith(deleteIdentifier))
                 try
                 {
                     service.Value.DeleteBlobContainer(blobContainer.Name);
@@ -49,7 +42,10 @@ public sealed class TestBlobServiceClient : IScalar<BlobServiceClient>, IDisposa
                 {
                     Console.WriteLine($"Failed to delete blob container {blobContainer.Name}");
                 }
-            }
-        }
+    }
+
+    public BlobServiceClient Value()
+    {
+        return service.Value;
     }
 }

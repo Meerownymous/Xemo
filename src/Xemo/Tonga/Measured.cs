@@ -1,31 +1,33 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using Tonga;
 
-namespace Xemo.Tonga
+namespace Xemo.Tonga;
+
+/// <summary>
+///     Measured time needed to execute the given function.
+/// </summary>
+public sealed class Measured : IScalar<TimeSpan>
 {
+    private readonly Lazy<TimeSpan> elapsed;
+
     /// <summary>
-    /// Measured time needed to execute the given function.
+    ///     Measured time needed to execute the given function.
     /// </summary>
-    public sealed class Measured : IScalar<TimeSpan>
+    public Measured(Action act)
     {
-        private readonly Lazy<TimeSpan> elapsed;
-
-        /// <summary>
-        /// Measured time needed to execute the given function.
-        /// </summary>
-        public Measured(Action act)
+        elapsed = new Lazy<TimeSpan>(() =>
         {
-            this.elapsed = new Lazy<TimeSpan>(() =>
-            {
-                var sw = new Stopwatch();
-                sw.Start();
-                act();
-                sw.Stop();
-                return sw.Elapsed;
-            });
-        }
+            var sw = new Stopwatch();
+            sw.Start();
+            act();
+            sw.Stop();
+            return sw.Elapsed;
+        });
+    }
 
-        public TimeSpan Value() => this.elapsed.Value;
+    public TimeSpan Value()
+    {
+        return elapsed.Value;
     }
 }
-

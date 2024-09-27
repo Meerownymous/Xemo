@@ -22,7 +22,7 @@ public sealed class BufferedCocoonTests
             await buffer["123"]
         );
     }
-    
+
     [Fact]
     public async Task RendersFromBuffer()
     {
@@ -40,7 +40,7 @@ public sealed class BufferedCocoonTests
             await bufferedCocoon.Render(c => c)
         );
     }
-    
+
     [Fact]
     public async Task PatchesBuffer()
     {
@@ -58,7 +58,7 @@ public sealed class BufferedCocoonTests
             await buffer["123"]
         );
     }
-    
+
     [Fact]
     public async Task PatchesOriginCocoon()
     {
@@ -76,7 +76,7 @@ public sealed class BufferedCocoonTests
             await cocoon.Render(c => c)
         );
     }
-    
+
     [Fact]
     public async Task ErasesFromBuffer()
     {

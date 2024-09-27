@@ -1,25 +1,31 @@
+using System;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace Xemo.Cocoon;
 
 /// <summary>
-/// Cocoon which is buffered in a <see cref="ConcurrentDictionary"/> 
+///     Cocoon which is buffered in a <see cref="ConcurrentDictionary" />
 /// </summary>
 public sealed class BufferedCocoon<TContent>(
-    ICocoon<TContent> origin, 
-    ConcurrentDictionary<string,ValueTask<object>> buffer,
+    ICocoon<TContent> origin,
+    ConcurrentDictionary<string, ValueTask<object>> buffer,
     Action onDelete
 ) : ICocoon<TContent>
 {
     private readonly Lazy<string> id = new(origin.ID);
 
     public BufferedCocoon(
-        ICocoon<TContent> origin, 
-        ConcurrentDictionary<string,ValueTask<object>> buffer
+        ICocoon<TContent> origin,
+        ConcurrentDictionary<string, ValueTask<object>> buffer
     ) : this(origin, buffer, () => { })
-    { }
-    
-    public string ID() => id.Value;
+    {
+    }
+
+    public string ID()
+    {
+        return id.Value;
+    }
 
     public async ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch)
     {
@@ -43,7 +49,7 @@ public sealed class BufferedCocoon<TContent>(
 
     public async ValueTask<TShape> Render<TShape>(IRendering<TContent, TShape> rendering)
     {
-        TContent content = 
+        var content =
             (TContent)await buffer.GetOrAdd(
                 id.Value,
                 async _ => await origin.Render(c => c)

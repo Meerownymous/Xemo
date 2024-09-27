@@ -1,4 +1,6 @@
 using System.Collections.Concurrent;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace Xemo.Attachment;
 
@@ -32,7 +34,6 @@ public sealed class RamAttachment(string id, ConcurrentDictionary<string, Task<S
                 async _ => await patch.Patch(new MemoryStream()),
                 async (_, existing) => await patch.Patch(await existing)
             );
-            return this;
+        return this;
     }
-
 }

@@ -1,25 +1,29 @@
+using System;
+using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Newtonsoft.Json;
 using Tonga.IO;
 using Tonga.Map;
 using Tonga.Text;
-using Xemo.Azure;
 
 namespace Xemo.Azure;
 
 public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TContent>
 {
     private readonly Lazy<string> id = new(() => new DecodedBlobName(blobClient.Name).AsString());
-    
-    public string ID() => id.Value;
+
+    public string ID()
+    {
+        return id.Value;
+    }
 
     public async ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch)
     {
         TContent current = default;
         var before = current;
         if (await blobClient.ExistsAsync())
-        {
             current =
                 JsonConvert.DeserializeObject<TContent>(
                     AsText._(
@@ -27,14 +31,14 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
                         Encoding.UTF8
                     ).AsString()
                 );
-        }
-        TContent patched = await patch.Patch(current);
-        
-        if(before != null && !before.Equals(patched) || before == null)
+        var patched = await patch.Patch(current);
+
+        if ((before != null && !before.Equals(patched)) || before == null)
         {
             await Upload(patched);
-            await UpdateTags(this.id.Value, patched);
+            await UpdateTags(id.Value, patched);
         }
+
         return this;
     }
 
@@ -42,8 +46,8 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
     {
         if (!await blobClient.ExistsAsync())
             throw new InvalidOperationException($"'{id.Value}' Has no content.");
-        
-        return 
+
+        return
             await rendering.Render(
                 JsonConvert.DeserializeObject<TContent>(
                     AsText._(
@@ -52,10 +56,12 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
                     ).AsString()
                 )
             );
-        
     }
 
-    public async ValueTask Erase() => await blobClient.DeleteAsync();
+    public async ValueTask Erase()
+    {
+        await blobClient.DeleteAsync();
+    }
 
     private async Task UpdateTags(string id, TContent content)
     {
@@ -67,26 +73,30 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
         );
     }
 
-    private async Task Upload(TContent newContent) =>
+    private async Task Upload(TContent newContent)
+    {
         await blobClient.UploadAsync(
             new MemoryStream(
                 Encoding.UTF8.GetBytes(
                     JsonConvert.SerializeObject(newContent)
                 )
             ),
-            overwrite: true
+            true
         );
+    }
 }
 
 public static class BlobClusterCocoonExtensions
 {
     public static Lazy<Task<BlobCocoon<TContent>>> InBlobClusterCocoon<TContent>(
         this TContent content, BlobClient blobClient
-    ) => 
-        new(() => Task.Run(async () => 
+    )
+    {
+        return new Lazy<Task<BlobCocoon<TContent>>>(() => Task.Run(async () =>
         {
             var result = new BlobCocoon<TContent>(blobClient);
             await result.Patch(_ => content);
             return result;
         }));
+    }
 }

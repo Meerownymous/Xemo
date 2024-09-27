@@ -1,18 +1,21 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 
-namespace Xemo
+namespace Xemo;
+
+/// <summary>
+///     Constructor for ConcurrentDictionary using schem object instead of a generic parameter.
+///     Can be handy when you want to make a dictionary for anonymous types.
+/// </summary>
+public static class ConcurrentDictionary
 {
     /// <summary>
-    /// Constructor for ConcurrentDictionary using schem object instead of a generic parameter.
-    /// Can be handy when you want to make a dictionary for anonymous types.
+    ///     Constructor for ConcurrentDictionary using schem object instead of generic parameter.
+    ///     Can be handy when you want to make a dictionary for anonymous types.
     /// </summary>
-    public static class ConcurrentDictionary
+    public static Lazy<ConcurrentDictionary<string, TSchema>> Construct<TSchema>(TSchema content)
     {
-        /// <summary>
-        /// Constructor for ConcurrentDictionary using schem object instead of generic parameter.
-        /// Can be handy when you want to make a dictionary for anonymous types.
-        /// </summary>
-        public static Lazy<ConcurrentDictionary<string, TSchema>> Construct<TSchema>(TSchema content) => new(() =>
+        return new Lazy<ConcurrentDictionary<string, TSchema>>(() =>
         {
             var memory = new ConcurrentDictionary<string, TSchema>();
             memory.AddOrUpdate(
@@ -24,4 +27,3 @@ namespace Xemo
         });
     }
 }
-

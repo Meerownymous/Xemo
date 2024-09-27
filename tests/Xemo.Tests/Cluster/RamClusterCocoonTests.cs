@@ -17,12 +17,12 @@ public sealed class RamClusterCocoonTests
         var memory = ConcurrentDictionary.Construct(ValueTask.FromResult(content)).Value;
         Assert.True(
             await content
-            .InRamClusterCocoon(memory.Keys.First(), memory)
-            .Patch(p => p with { Modified = true })
-            .Render(c => c.Modified)
+                .InRamClusterCocoon(memory.Keys.First(), memory)
+                .Patch(p => p with { Modified = true })
+                .Render(c => c.Modified)
         );
     }
-    
+
     [Fact]
     public async Task ErasesFromMemory()
     {

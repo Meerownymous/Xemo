@@ -12,25 +12,25 @@ public sealed class RamHiveTests
     {
         Assert.Equal(
             "Jumi",
-            await 
+            await
                 new RamHive()
                     .Vault<string>("username")
                     .Patch(_ => "Jumi")
                     .Render(name => name)
         );
     }
-    
+
     [Fact]
     public void RejectsVaultWithWrongType()
     {
         var hive = new RamHive();
         hive.Vault<string>("username");
-        
+
         Assert.Throws<ArgumentException>(() =>
             hive.Vault<int>("username")
         );
     }
-    
+
     [Fact]
     public async Task DeliversCluster()
     {
@@ -42,28 +42,28 @@ public sealed class RamHiveTests
                 .Render(name => name)
         );
     }
-    
+
     [Fact]
     public async Task DeliversAttachment()
     {
         var hive = new RamHive();
         var attachment =
             await hive.Attachment("settings").Patch(_ => new AsInput("Yes").Stream());
-            
+
         Assert.Equal(
             "Yes",
             await attachment.Render(stream => AsText._(stream).AsString())
         );
     }
-    
+
     [Fact]
     public async Task PatchesAttachment()
     {
-        var hive = 
+        var hive =
             new RamHive();
         var attachment =
             await hive.Attachment("settings").Patch(_ => new AsInput("Yes").Stream());
-            
+
         Assert.Equal(
             "Yes",
             await attachment.Render(stream => AsText._(stream).AsString())

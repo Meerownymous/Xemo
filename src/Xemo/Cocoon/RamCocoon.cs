@@ -1,20 +1,25 @@
-using Xemo;
+using System;
+using System.Threading.Tasks;
 
 namespace Xemo.Cocoon;
 
 /// <summary>
-/// Cocoon stored in RAM.
+///     Cocoon stored in RAM.
 /// </summary>
-public sealed class RamCocoon<TContent>(Func<string> id, TContent content) 
+public sealed class RamCocoon<TContent>(Func<string> id, TContent content)
     : ICocoon<TContent>
 {
-    private TContent content = content;
     private readonly Lazy<string> id = new(id);
+    private TContent content = content;
 
     public RamCocoon(string id, TContent content) : this(() => id, content)
-    { }
+    {
+    }
 
-    public string ID() => id.Value;
+    public string ID()
+    {
+        return id.Value;
+    }
 
     public async ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch)
     {
@@ -22,17 +27,26 @@ public sealed class RamCocoon<TContent>(Func<string> id, TContent content)
         return this;
     }
 
-    public ValueTask<TShape> Render<TShape>(IRendering<TContent, TShape> rendering) =>
-        rendering.Render(content);
-    
-    public ValueTask Erase() => throw new InvalidOperationException("A standalone RAM cocoon cannot be erased.");
+    public ValueTask<TShape> Render<TShape>(IRendering<TContent, TShape> rendering)
+    {
+        return rendering.Render(content);
+    }
+
+    public ValueTask Erase()
+    {
+        throw new InvalidOperationException("A standalone RAM cocoon cannot be erased.");
+    }
 }
 
 public static class RamCocoonExtensions
 {
-    public static RamCocoon<TContent> InRamCocoon<TContent>(this TContent content) => 
-        new(() => Guid.NewGuid().ToString(), content);
-    
-    public static RamCocoon<TContent> InRamCocoon<TContent>(this TContent content, string id) => 
-        new(id, content);
+    public static RamCocoon<TContent> InRamCocoon<TContent>(this TContent content)
+    {
+        return new RamCocoon<TContent>(() => Guid.NewGuid().ToString(), content);
+    }
+
+    public static RamCocoon<TContent> InRamCocoon<TContent>(this TContent content, string id)
+    {
+        return new RamCocoon<TContent>(id, content);
+    }
 }
