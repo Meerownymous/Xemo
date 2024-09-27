@@ -14,7 +14,6 @@ public sealed class RamHiveTests
             "Jumi",
             await 
                 new RamHive()
-                    .WithVault("username", "")
                     .Vault<string>("username")
                     .Patch(_ => "Jumi")
                     .Render(name => name)
@@ -25,20 +24,10 @@ public sealed class RamHiveTests
     public void RejectsVaultWithWrongType()
     {
         var hive = new RamHive();
-        hive.WithVault("username", "knuckles");
+        hive.Vault<string>("username");
         
         Assert.Throws<ArgumentException>(() =>
             hive.Vault<int>("username")
-        );
-    }
-    
-    [Fact]
-    public void RejectsExistingVault()
-    {
-        var hive = new RamHive();
-        hive.WithVault("usernames", "MT");
-            Assert.Throws<InvalidOperationException>(() =>
-            hive.WithVault("usernames", "TU")
         );
     }
     
@@ -47,39 +36,17 @@ public sealed class RamHiveTests
     {
         Assert.Equal(
             "Jumi",
-            await (await new RamHive()
-                .WithCluster<string>("names")
-                .Cluster<string>("names"))
+            await new RamHive()
+                .Cluster<string>("names")
                 .Include("1", "Jumi")
                 .Render(name => name)
         );
     }
     
     [Fact]
-    public async Task RejectsExistingCluster()
-    {
-        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            await new RamHive()
-                .WithCluster<string>("names")
-                .WithCluster<string>("names")
-        );
-    }
-    
-    [Fact]
-    public void RejectsUnknownClusterRequest()
-    {
-        Assert.Throws<ArgumentException>(() =>
-            new RamHive()
-                .Cluster<string>("noneexisting")
-        );
-    }
-    
-    [Fact]
     public async Task DeliversAttachment()
     {
-        var hive = 
-            await new RamHive()
-                .WithVault("settings", new string[0]);
+        var hive = new RamHive();
         var attachment =
             await hive.Attachment("settings").Patch(_ => new AsInput("Yes").Stream());
             
@@ -93,8 +60,7 @@ public sealed class RamHiveTests
     public async Task PatchesAttachment()
     {
         var hive = 
-            await new RamHive()
-                .WithVault("settings", new string[0]);
+            new RamHive();
         var attachment =
             await hive.Attachment("settings").Patch(_ => new AsInput("Yes").Stream());
             

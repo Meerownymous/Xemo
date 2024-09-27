@@ -25,29 +25,6 @@ public sealed class BlobHiveTests
                 .Render(s => s.MagicNumber)
         );
     }
-    
-    [Fact] 
-    public async Task RejectsDoubleVaultAdd()
-    {
-        var prefix = new EncodedContainerName(Guid.NewGuid().ToString()).AsString().Substring(0,8);
-        var blobServiceClient = new TestBlobServiceClient();
-        var hive = new BlobHive(blobServiceClient.Value(), prefix);
-        var vaultName = Guid.NewGuid().ToString();
-        await
-            new
-                {
-                    MagicNumber = 123
-                }
-                .InVault(vaultName, hive);
-        
-        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            await new
-                {
-                    MagicNumber = 123
-                }
-                .InVault(vaultName, hive)
-        );
-    }
 
     [Fact] 
     public async Task AddsCluster()
@@ -69,29 +46,6 @@ public sealed class BlobHiveTests
             )
             .First()
             .Render(s => s.MagicNumber)
-        );
-    }
-    
-    [Fact] 
-    public async Task RejectsDoubleClusterAdd()
-    {
-        var prefix = new EncodedContainerName(Guid.NewGuid().ToString()).AsString().Substring(0,8);
-        using var blobServiceClient = new TestBlobServiceClient();
-        var hive = new BlobHive(blobServiceClient.Value(), prefix);
-        var clusterName = Guid.NewGuid().ToString();
-        await
-            new
-                {
-                    MagicNumber = 123
-                }
-                .InCluster(clusterName, hive);
-        
-        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            await new
-                {
-                    MagicNumber = 123
-                }
-                .InCluster(clusterName, hive)
         );
     }
     

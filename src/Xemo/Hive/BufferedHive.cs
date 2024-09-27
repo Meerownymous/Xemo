@@ -27,9 +27,6 @@ public sealed class BufferedHive(
     public ICocoon<TContent> Vault<TContent>(string name) =>
         new BufferedCocoon<TContent>(origin.Vault<TContent>(name), vaultBuffer);
 
-    public ValueTask<IHive> WithVault<TContent>(string name, TContent content) =>
-        origin.WithVault(name, content);
-
     public ICluster<TContent> Cluster<TContent>(string name) =>
         (ICluster<TContent>)
             clusterBuffer.GetOrAdd(
@@ -41,20 +38,6 @@ public sealed class BufferedHive(
                     new ConcurrentDictionary<string, ValueTask<object>>()
                 )
             );
-
-    public ValueTask<IHive> WithCluster<TContent>(string name) 
-    {
-        clusterBuffer.GetOrAdd(
-            name,
-            _ => new BufferedCluster<TContent>(
-                Guid.NewGuid(),
-                origin.Cluster<TContent>(name),
-                new ConcurrentDictionary<string, BufferedCocoon<TContent>>(),
-                new ConcurrentDictionary<string, ValueTask<object>>()
-            )
-        );
-        return new ValueTask<IHive>(this);
-    }
 
     public IAttachment Attachment(string link) =>
         attachmentBuffer.GetOrAdd(
