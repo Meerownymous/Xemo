@@ -1,4 +1,6 @@
-﻿namespace Xemo;
+﻿using System;
+
+namespace Xemo;
 
 public interface IPart<TContent>
 {
