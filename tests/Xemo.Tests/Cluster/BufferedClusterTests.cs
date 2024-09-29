@@ -70,7 +70,7 @@ public sealed class BufferedClusterTests
     }
 
     [Fact]
-    public async Task BuffersContentWhenIncluding()
+    public async Task BuffersContentWhenAdding()
     {
         var contentBuffer = new ConcurrentDictionary<string, ValueTask<object>>();
         var origin = new RamCluster<string>();
@@ -96,6 +96,74 @@ public sealed class BufferedClusterTests
                     buffered
                 )
             )
+        );
+    }
+    
+    [Fact]
+    public async Task FirstMatchFromOrigin()
+    {
+        var contentBuffer = new ConcurrentDictionary<string, ValueTask<object>>();
+        var origin = new RamCluster<string>();
+        var buffered =
+            new BufferedCluster<string>(
+                Guid.NewGuid(),
+                origin,
+                new ConcurrentDictionary<string, BufferedCocoon<string>>(),
+                contentBuffer
+            );
+        await buffered.Add("1", "Item A");
+        await buffered.Add("2", "Item B");
+        await buffered.Add("3", "Item C");
+
+        foreach (var ramCocoon in origin)
+            await ramCocoon.Erase();
+
+        Assert.False(
+            await buffered.FirstMatch(s => s == "Item A").Has()
+        );
+    }
+    
+    [Fact]
+    public async Task MatchesFromOrigin()
+    {
+        var contentBuffer = new ConcurrentDictionary<string, ValueTask<object>>();
+        var origin = new RamCluster<string>();
+        var buffered =
+            new BufferedCluster<string>(
+                Guid.NewGuid(),
+                origin,
+                new ConcurrentDictionary<string, BufferedCocoon<string>>(),
+                contentBuffer
+            );
+        var cocoon = await buffered.Add("1", "Item");
+        await cocoon.Erase();
+
+        Assert.Empty(
+            await buffered.Matches(s => s == "Item")
+        );
+    }
+    
+    [Fact]
+    public async Task GrabsFromBuffer()
+    {
+        var contentBuffer = new ConcurrentDictionary<string, ValueTask<object>>();
+        var origin = new RamCluster<string>();
+        var buffered =
+            new BufferedCluster<string>(
+                Guid.NewGuid(),
+                origin,
+                new ConcurrentDictionary<string, BufferedCocoon<string>>(),
+                contentBuffer
+            );
+        await buffered.Add("1", "Item A");
+        await buffered.Add("2", "Item B");
+        await buffered.Add("3", "Item C");
+
+        foreach (var ramCocoon in origin)
+            await ramCocoon.Erase();
+
+        Assert.True(
+            await buffered.Grab("1").Has()
         );
     }
 

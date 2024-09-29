@@ -15,6 +15,25 @@ public interface ICocoon<TContent>
 
 public static class CocoonSmarts
 {
+    public static async ValueTask<bool> Has<TContent>(
+        this ValueTask<IOptional<ICocoon<TContent>>> responseTask)
+    {
+        return (await responseTask).Has();
+    }
+    
+    public static async ValueTask<ICocoon<TContent>> Out<TContent>(
+        this ValueTask<IOptional<ICocoon<TContent>>> responseTask)
+    {
+        return (await responseTask).Out();
+    }
+    
+    public static async ValueTask IfHas<TContent>(
+        this ValueTask<IOptional<ICocoon<TContent>>> responseTask,
+        Action<ICocoon<TContent>> action)
+    {
+        (await responseTask).IfHas(action);
+    }
+    
     public static ValueTask<TShape> Render<TContent, TShape>(
         this ICocoon<TContent> cocoon, Func<TContent, TShape> render
     )
