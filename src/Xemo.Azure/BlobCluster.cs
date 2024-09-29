@@ -63,7 +63,7 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
             var blob in
             containerClient
                 .Value
-                .FindBlobsByTagsAsync(
+                .FindBlobsByTagsAsync( 
                     new FactAsTagQuery<TContent>(new AssertSimple<TContent>(fact)).AsString()
                 )
         )

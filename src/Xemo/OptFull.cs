@@ -7,14 +7,15 @@ namespace Xemo;
 /// </summary>
 public sealed class OptFull<TValue>(Func<TValue> value) : IOptional<TValue>
 {
+    public OptFull(TValue value) : this(() => value)
+    { }
+    
     private readonly Lazy<TValue> value = new(value);
 
-    public void IfHas(Action<TValue> act)
-    {
-        act(value.Value);
-    }
+    public bool Has() => true;
+    
+    public void IfHas(Action<TValue> action) => action(value.Value);
 
-    public void IfEmpty(Action act)
-    {
-    }
+    public TValue Out() => value.Value;
+    
 }

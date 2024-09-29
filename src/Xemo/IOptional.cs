@@ -4,6 +4,8 @@ namespace Xemo;
 
 public interface IOptional<TValue>
 {
-    void IfHas(Action<TValue> act);
-    void IfEmpty(Action act);
+    bool Has();
+
+    void IfHas(Action<TValue> action);
+    TValue Out();
 }

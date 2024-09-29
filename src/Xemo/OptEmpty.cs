@@ -7,12 +7,9 @@ namespace Xemo;
 /// </summary>
 public sealed class OptEmpty<TValue> : IOptional<TValue>
 {
-    public void IfHas(Action<TValue> act)
-    {
-    }
+    public bool Has() => false;
 
-    public void IfEmpty(Action act)
-    {
-        act();
-    }
+    public void IfHas(Action<TValue> action){ }
+
+    public TValue Out() => throw new InvalidOperationException("The Optional is empty.");
 }

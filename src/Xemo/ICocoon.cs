@@ -73,10 +73,22 @@ public static class CocoonSmarts
     {
         return await (await responseTask).Patch(patch);
     }
+    
+    public static async ValueTask<ICocoon<TContent>> Patch<TContent>(
+        this Task<IOptional<ICocoon<TContent>>> responseTask, Func<TContent, TContent> patch)
+    {
+        return await (await responseTask).Out().Patch(patch);
+    }
 
     public static async ValueTask Erase<TContent>(
         this Task<ICocoon<TContent>> responseTask)
     {
         await (await responseTask).Erase();
+    }
+    
+    public static async ValueTask Erase<TContent>(
+        this Task<IOptional<ICocoon<TContent>>> responseTask)
+    {
+        await (await responseTask).Out().Erase();
     }
 }
