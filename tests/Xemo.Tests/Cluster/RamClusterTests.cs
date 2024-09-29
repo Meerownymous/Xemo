@@ -1,11 +1,27 @@
 using Xemo.Cluster;
 using Xemo.Fact;
+using Xemo.Hive;
 using Xunit;
 
 namespace Xemo.Tests.Cluster;
 
 public sealed class RamClusterTests
 {
+    [Theory]
+    [InlineData("Santa-Claus", true)]
+    [InlineData("Future", false)]
+    public async Task KnowsExistence(string who, bool exists)
+    {
+        var cluster = await new
+        {
+            Content = "Pesents"
+        }.InCluster("Santa-Claus", new RamHive());
+        Assert.Equal(
+            exists,
+            (await cluster.Grab(who)).Has()
+        );
+    }
+    
     [Fact]
     public async Task IncludesItem()
     {
@@ -21,7 +37,7 @@ public sealed class RamClusterTests
                 Name = "John Doe",
                 Age = int.MaxValue
             }.InRamCluster();
-        await cluster.Include(
+        await cluster.Add(
             "123",
             new
             {
@@ -40,12 +56,6 @@ public sealed class RamClusterTests
     [Fact]
     public async Task Matches()
     {
-        var schema = new
-        {
-            Name = "",
-            Age = int.MinValue
-        };
-
         var cluster =
             new
             {
@@ -54,9 +64,7 @@ public sealed class RamClusterTests
             }.InRamCluster();
 
         Assert.Single(
-            await cluster.Matches(
-                If.True(schema, p => p.Name == "John Doe")
-            )
+            await cluster.Matches(p => p.Name == "John Doe")
         );
     }
 
@@ -78,9 +86,12 @@ public sealed class RamClusterTests
 
         Assert.Equal(
             "John Doe",
-            await cluster.FirstMatch(
+            await (await cluster.FirstMatch(
                 If.True(schema, p => p.Name == "John Doe")
-            ).Render(m => m.Name));
+            ))
+            .Out()
+            .Render(m => m.Name)
+        );
     }
 
     [Fact]
@@ -101,7 +112,7 @@ public sealed class RamClusterTests
 
         await (await cluster.FirstMatch(
             If.True(schema, p => p.Name == "John Doe")
-        )).Erase();
+        )).Out().Erase();
 
         Assert.Empty(
             cluster

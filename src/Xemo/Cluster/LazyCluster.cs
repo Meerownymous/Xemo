@@ -18,8 +18,10 @@ public sealed class LazyCluster<TContent>(Func<ICluster<TContent>> construct) : 
     {
         return GetEnumerator();
     }
+    
+    public ValueTask<IOptional<ICocoon<TContent>>> Grab(string id) => cluster.Value.Grab(id);
 
-    public ValueTask<ICocoon<TContent>> FirstMatch(IFact<TContent> fact)
+    public ValueTask<IOptional<ICocoon<TContent>>> FirstMatch(IFact<TContent> fact)
     {
         return cluster.Value.FirstMatch(fact);
     }
@@ -29,9 +31,9 @@ public sealed class LazyCluster<TContent>(Func<ICluster<TContent>> construct) : 
         return cluster.Value.Matches(fact);
     }
 
-    public ValueTask<ICocoon<TContent>> Include(string identifier, TContent content)
+    public ValueTask<ICocoon<TContent>> Add(string identifier, TContent content)
     {
-        return cluster.Value.Include(identifier, content);
+        return cluster.Value.Add(identifier, content);
     }
 
     public ValueTask<TShape> Render<TShape>(IRendering<ICluster<TContent>, TShape> rendering)

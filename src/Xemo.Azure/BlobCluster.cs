@@ -45,8 +45,20 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
         return GetEnumerator();
     }
 
-    public async ValueTask<ICocoon<TContent>> FirstMatch(IFact<TContent> fact)
+    public async ValueTask<IOptional<ICocoon<TContent>>> Grab(string id)
     {
+        IOptional<ICocoon<TContent>> result = new OptEmpty<ICocoon<TContent>>();
+        var client = containerClient.Value.GetBlobClient(new EncodedBlobName(id).AsString());
+        if (await client.ExistsAsync())
+            result = new OptFull<ICocoon<TContent>>(
+                new BlobCocoon<TContent>(client)
+            );
+        return result;
+    }
+
+    public async ValueTask<IOptional<ICocoon<TContent>>> FirstMatch(IFact<TContent> fact)
+    {
+        IOptional<ICocoon<TContent>> result = new OptEmpty<ICocoon<TContent>>();
         await foreach (
             var blob in
             containerClient
@@ -55,11 +67,13 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
                     new FactAsTagQuery<TContent>(new AssertSimple<TContent>(fact)).AsString()
                 )
         )
-            return new BlobCocoon<TContent>(
-                containerClient.Value.GetBlobClient(blob.BlobName)
-            );
-
-        throw new ArgumentException($"No cocoon matching '{fact.AsExpression()}' exists.");
+            result = 
+                new OptFull<ICocoon<TContent>>(
+                    new BlobCocoon<TContent>(
+                        containerClient.Value.GetBlobClient(blob.BlobName)
+                    )
+                );
+        return result;
     }
 
     public ValueTask<IEnumerable<ICocoon<TContent>>> Matches(IFact<TContent> fact)
@@ -79,7 +93,7 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
         );
     }
 
-    public async ValueTask<ICocoon<TContent>> Include(string identifier, TContent content)
+    public async ValueTask<ICocoon<TContent>> Add(string identifier, TContent content)
     {
         return await new BlobCocoon<TContent>(
             containerClient.Value.GetBlobClient(new EncodedBlobName(identifier).AsString())
@@ -101,7 +115,7 @@ public static class BlobClusterSmarts
         {
             var containerClient = blobClient.GetBlobContainerClient(new EncodedContainerName(name).AsString());
             var result = new BlobCluster<TContent>(() => containerClient);
-            await result.Include(id, content);
+            await result.Add(id, content);
             return result;
         });
     }

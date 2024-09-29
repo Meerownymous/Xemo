@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.Reflection;
 using Tonga;
+using Tonga.Enumerable;
 using Tonga.Map;
 
 namespace Xemo.Azure;
@@ -12,20 +13,21 @@ namespace Xemo.Azure;
 ///     accessible from the source object.
 /// </summary>
 public sealed class ContentAsTags<TSource>(TSource source) : MapEnvelope<string, string>(
-    new Sticky<string, string>(() =>
-    {
-        IMap<string, string> result = new Empty<string, string>();
-        foreach (var property in source.GetType().GetProperties())
-            if (IsSuitableForBlobTag(property))
-                result =
-                    Merged._(
+    new AsMap<string, string>(
+        new AsEnumerable<IPair<string, string>>(() =>
+        {
+            IMap<string, string> result = new Empty<string, string>();
+            foreach (var property in source.GetType().GetProperties())
+                if (IsSuitableForBlobTag(property))
+                    result = result.With(
                         AsPair._(
                             property.Name,
-                            Convert.ToString(property.GetValue(source), CultureInfo.InvariantCulture)),
-                        result
+                            Convert.ToString(property.GetValue(source), CultureInfo.InvariantCulture)
+                        )
                     );
-        return result;
-    })
+            return result.Pairs();
+        })
+    )
 )
 {
     public static bool IsSuitableForBlobTag(PropertyInfo propertyInfo)

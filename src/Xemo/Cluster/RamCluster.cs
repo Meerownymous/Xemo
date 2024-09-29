@@ -16,8 +16,7 @@ public sealed class RamCluster<TContent>(
 ) : ICluster<TContent>
 {
     public RamCluster() : this(new ConcurrentDictionary<string, ValueTask<TContent>>())
-    {
-    }
+    { }
 
     public IEnumerator<ICocoon<TContent>> GetEnumerator()
     {
@@ -30,22 +29,27 @@ public sealed class RamCluster<TContent>(
         return GetEnumerator();
     }
 
-    public async ValueTask<ICocoon<TContent>> FirstMatch(IFact<TContent> fact)
+    public async ValueTask<IOptional<ICocoon<TContent>>> Grab(string id)
     {
-        ICocoon<TContent> result = null;
-        var found = false;
+        IOptional<ICocoon<TContent>> result = new OptEmpty<ICocoon<TContent>>();
+        if (memory.ContainsKey(id))
+            result = new OptFull<ICocoon<TContent>>(() => new RamClusterCocoon<TContent>(id, memory));
+        return result;
+    }
+
+    public async ValueTask<IOptional<ICocoon<TContent>>> FirstMatch(IFact<TContent> fact)
+    {
+        IOptional<ICocoon<TContent>> result = new OptEmpty<ICocoon<TContent>>();
         foreach (var pair in memory)
             if (new AssertSimple<TContent>(fact)
                 .IsTrue(await pair.Value)
                )
             {
-                result = new RamClusterCocoon<TContent>(pair.Key, memory);
-                found = true;
+                result = new OptFull<ICocoon<TContent>>(() => new RamClusterCocoon<TContent>(pair.Key, memory));
                 break;
             }
 
-        if (!found)
-            throw new ArgumentException("No matching cocoon found");
+        
         return result;
     }
 
@@ -59,7 +63,7 @@ public sealed class RamCluster<TContent>(
         return result;
     }
 
-    public ValueTask<ICocoon<TContent>> Include(string identifier, TContent content)
+    public ValueTask<ICocoon<TContent>> Add(string identifier, TContent content)
     {
         memory.AddOrUpdate(
             identifier,
@@ -93,7 +97,7 @@ public static class RamClusterExtensions
                 new RamCluster<TContent>(
                     new ConcurrentDictionary<string, ValueTask<TContent>>()
                 );
-            cluster.Include(name(), content);
+            cluster.Add(name(), content);
             return cluster;
         });
     }

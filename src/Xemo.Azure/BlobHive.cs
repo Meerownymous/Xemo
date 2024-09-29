@@ -1,4 +1,5 @@
 using System;
+using Azure.Storage;
 using Azure.Storage.Blobs;
 
 namespace Xemo.Azure;
@@ -17,13 +18,23 @@ public sealed class BlobHive(
 
     public BlobHive(
         BlobServiceClient blobServiceClient,
-        string prefix
+        string prefix = ""
     ) : this(
         () => blobServiceClient,
         prefix
     )
-    {
-    }
+    { }
+
+    public BlobHive(Uri storageUri, string accountName, string accountSecret) : this(() =>
+        new BlobServiceClient(
+            storageUri,
+            new StorageSharedKeyCredential(
+                accountName,
+                accountSecret
+            )
+        )
+    )
+    { }
 
     public ICocoon<TContent> Vault<TContent>(string name)
     {

@@ -8,9 +8,10 @@ namespace Xemo;
 
 public interface ICluster<TContent> : IEnumerable<ICocoon<TContent>>
 {
-    ValueTask<ICocoon<TContent>> FirstMatch(IFact<TContent> fact);
+    ValueTask<IOptional<ICocoon<TContent>>> Grab(string id);
+    ValueTask<IOptional<ICocoon<TContent>>> FirstMatch(IFact<TContent> fact);
     ValueTask<IEnumerable<ICocoon<TContent>>> Matches(IFact<TContent> fact);
-    ValueTask<ICocoon<TContent>> Include(string identifier, TContent content);
+    ValueTask<ICocoon<TContent>> Add(string identifier, TContent content);
 }
 
 public static class ClusterSmarts
@@ -29,7 +30,7 @@ public static class ClusterSmarts
         return await Task.WhenAll(tasks); // Wait for all tasks to complete
     }
 
-    public static ValueTask<ICocoon<TContent>> FirstMatch<TContent>(
+    public static ValueTask<IOptional<ICocoon<TContent>>> FirstMatch<TContent>(
         this ICluster<TContent> cluster,
         Expression<Func<TContent, bool>> matching
     )

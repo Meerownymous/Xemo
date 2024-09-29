@@ -52,9 +52,21 @@ public sealed class BufferedCluster<TContent>(
         return GetEnumerator();
     }
 
-    public async ValueTask<ICocoon<TContent>> FirstMatch(IFact<TContent> fact)
+    public ValueTask<IOptional<ICocoon<TContent>>> Grab(string id)
     {
-        return new BufferedCocoon<TContent>(await origin.FirstMatch(fact), contentBuffer);
+        this.GetEnumerator();
+        IOptional<ICocoon<TContent>> result = new OptEmpty<ICocoon<TContent>>();
+        if (cocoonBuffer.TryGetValue(id, out var cocoon))
+            result = new OptFull<ICocoon<TContent>>(cocoon);
+        return new ValueTask<IOptional<ICocoon<TContent>>>(result);
+    }
+
+    public async ValueTask<IOptional<ICocoon<TContent>>> FirstMatch(IFact<TContent> fact)
+    {
+        var opt = await origin.FirstMatch(fact);
+        return opt.Has()
+            ? new OptFull<ICocoon<TContent>>(new BufferedCocoon<TContent>(opt.Out(), contentBuffer))
+            : new OptEmpty<ICocoon<TContent>>();
     }
 
     public ValueTask<IEnumerable<ICocoon<TContent>>> Matches(IFact<TContent> fact)
@@ -73,13 +85,13 @@ public sealed class BufferedCluster<TContent>(
         );
     }
 
-    public ValueTask<ICocoon<TContent>> Include(string identifier, TContent content)
+    public ValueTask<ICocoon<TContent>> Add(string identifier, TContent content)
     {
         ICocoon<TContent> result = default;
         contentBuffer.AddOrUpdate(identifier,
             async _ =>
             {
-                result = await origin.Include(identifier, content);
+                result = await origin.Add(identifier, content);
                 cocoonBuffer.TryAdd(
                     result.ID(),
                     new BufferedCocoon<TContent>(
@@ -92,7 +104,7 @@ public sealed class BufferedCluster<TContent>(
             },
             async (_, _) =>
             {
-                result = await origin.Include(identifier, content);
+                result = await origin.Add(identifier, content);
                 cocoonBuffer.TryAdd(
                     result.ID(),
                     new BufferedCocoon<TContent>(
