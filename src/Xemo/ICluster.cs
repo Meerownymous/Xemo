@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using Xemo.Fact;
 
 namespace Xemo;
@@ -16,11 +13,11 @@ public interface ICluster<TContent> : IEnumerable<ICocoon<TContent>>
 
 public static class ClusterSmarts
 {
-    public static ValueTask<TShape> Render<TContent, TShape>(
+    public static ValueTask<TShape> Fab<TContent, TShape>(
         this ICluster<TContent> cluster,
-        IRendering<ICluster<TContent>, TShape> rendering)
+        IFabrication<ICluster<TContent>, TShape> fabrication)
     {
-        return rendering.Render(cluster);
+        return fabrication.Fabricate(cluster);
     }
 
     public static async Task<IEnumerable<TResult>> Mapped<TContent, TResult>(

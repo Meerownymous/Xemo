@@ -11,11 +11,11 @@ public sealed class BufferedAttachment(IAttachment origin) : IAttachment
 {
     private readonly IList<Stream> buffer = new List<Stream>();
 
-    public async ValueTask<TFormat> Render<TFormat>(IRendering<Stream, TFormat> rendering)
+    public async ValueTask<TFormat> Fab<TFormat>(IFabrication<Stream, TFormat> fabrication)
     {
         if (buffer.Count == 0)
             buffer.Add(
-                await origin.Render<Stream>(s =>
+                await origin.Fab<Stream>(s =>
                 {
                     var memory = new MemoryStream();
                     s.CopyTo(memory);
@@ -24,7 +24,7 @@ public sealed class BufferedAttachment(IAttachment origin) : IAttachment
                 })
             );
         buffer[0].Seek(0, SeekOrigin.Begin);
-        return await rendering.Render(new NonClosingStream(buffer[0]));
+        return await fabrication.Fabricate(new NonClosingStream(buffer[0]));
     }
 
     public async ValueTask<IAttachment> Patch(IPatch<Stream> patch)

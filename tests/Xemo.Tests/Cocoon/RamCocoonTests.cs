@@ -16,7 +16,7 @@ public sealed class RamCocoonTests
                 }
                 .InRamCocoon()
                 .Patch(p => p with { Modified = true })
-                .Render(c => c.Modified)
+                .Fab(c => c.Modified)
         );
     }
 
@@ -35,7 +35,7 @@ public sealed class RamCocoonTests
     }
 
     [Fact]
-    public async Task Renders()
+    public async Task Fabs()
     {
         Assert.True(
             await new
@@ -43,7 +43,7 @@ public sealed class RamCocoonTests
                     Name = "Test Doe"
                 }
                 .InRamCocoon()
-                .Render(p => p.Name.Contains("Doe"))
+                .Fab(p => p.Name.Contains("Doe"))
         );
     }
 }

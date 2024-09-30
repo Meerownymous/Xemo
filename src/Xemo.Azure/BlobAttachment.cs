@@ -16,9 +16,9 @@ public sealed class BlobAttachment(Func<BlobClient> client) : IAttachment
     {
     }
 
-    public async ValueTask<TFormat> Render<TFormat>(IRendering<Stream, TFormat> rendering)
+    public async ValueTask<TFormat> Fab<TFormat>(IFabrication<Stream, TFormat> fabrication)
     {
-        return await rendering.Render(
+        return await fabrication.Fabricate(
             (await blobClient.Value.DownloadAsync())
             .Value
             .Content

@@ -42,13 +42,13 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
         return this;
     }
 
-    public async ValueTask<TShape> Render<TShape>(IRendering<TContent, TShape> rendering)
+    public async ValueTask<TShape> Fab<TShape>(IFabrication<TContent, TShape> fabrication)
     {
         if (!await blobClient.ExistsAsync())
             throw new InvalidOperationException($"'{id.Value}' Has no content.");
 
         return
-            await rendering.Render(
+            await fabrication.Fabricate(
                 JsonConvert.DeserializeObject<TContent>(
                     AsText._(
                         new AsInput((await blobClient.DownloadAsync()).Value.Content),

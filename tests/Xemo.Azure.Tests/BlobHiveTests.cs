@@ -22,7 +22,7 @@ public sealed class BlobHiveTests
                         "vault-" + Guid.NewGuid(),
                         new BlobHive(blobServiceClient.Value(), prefix)
                     )
-                    .Render(s => s.MagicNumber)
+                    .Fab(s => s.MagicNumber)
         );
     }
 
@@ -45,7 +45,7 @@ public sealed class BlobHiveTests
                         )
                 )
                 .First()
-                .Render(s => s.MagicNumber)
+                .Fab(s => s.MagicNumber)
         );
     }
 
@@ -59,7 +59,7 @@ public sealed class BlobHiveTests
 
         Assert.Equal(
             ":)",
-            await hive.Attachment("cocoon-123-mood").Render(s => AsText._(s).AsString())
+            await hive.Attachment("cocoon-123-mood").Fab(s => AsText._(s).AsString())
         );
     }
 }

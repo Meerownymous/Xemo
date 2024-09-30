@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Xemo.Patch;
-using Xemo.Rendering;
+using Xemo.Fabing;
 
 namespace Xemo;
 
@@ -9,7 +9,7 @@ public interface ICocoon<TContent>
 {
     string ID();
     ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch);
-    ValueTask<TShape> Render<TShape>(IRendering<TContent, TShape> rendering);
+    ValueTask<TShape> Fab<TShape>(IFabrication<TContent, TShape> fabrication);
     ValueTask Erase();
 }
 
@@ -34,12 +34,12 @@ public static class CocoonSmarts
         (await responseTask).IfHas(action);
     }
     
-    public static ValueTask<TShape> Render<TContent, TShape>(
-        this ICocoon<TContent> cocoon, Func<TContent, TShape> render
+    public static ValueTask<TShape> Fab<TContent, TShape>(
+        this ICocoon<TContent> cocoon, Func<TContent, TShape> Fab
     )
     {
-        return cocoon.Render(
-            new AsRendering<TContent, TShape>(content => Task.FromResult(render(content)))
+        return cocoon.Fab(
+            new AsFabrication<TContent, TShape>(content => Task.FromResult(Fab(content)))
         );
     }
 
@@ -51,22 +51,22 @@ public static class CocoonSmarts
         );
     }
 
-    public static async ValueTask<TShape> Render<TContent, TShape>(
-        this Task<ICocoon<TContent>> responseTask, IRendering<TContent, TShape> rendering)
+    public static async ValueTask<TShape> Fab<TContent, TShape>(
+        this Task<ICocoon<TContent>> responseTask, IFabrication<TContent, TShape> fabrication)
     {
-        return await (await responseTask).Render(rendering);
+        return await (await responseTask).Fab(fabrication);
     }
 
-    public static async ValueTask<TShape> Render<TContent, TShape>(
-        this Task<ICocoon<TContent>> responseTask, Func<TContent, TShape> rendering)
+    public static async ValueTask<TShape> Fab<TContent, TShape>(
+        this Task<ICocoon<TContent>> responseTask, Func<TContent, TShape> Fabing)
     {
-        return await (await responseTask).Render(rendering);
+        return await (await responseTask).Fab(Fabing);
     }
 
-    public static async ValueTask<TShape> Render<TContent, TShape>(
-        this ValueTask<ICocoon<TContent>> responseTask, Func<TContent, TShape> rendering)
+    public static async ValueTask<TShape> Fab<TContent, TShape>(
+        this ValueTask<ICocoon<TContent>> responseTask, Func<TContent, TShape> Fabing)
     {
-        return await (await responseTask).Render(rendering);
+        return await (await responseTask).Fab(Fabing);
     }
 
     public static async ValueTask<ICocoon<TContent>> Patch<TContent>(

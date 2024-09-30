@@ -19,7 +19,7 @@ public sealed class RamClusterCocoonTests
             await content
                 .InRamClusterCocoon(memory.Keys.First(), memory)
                 .Patch(p => p with { Modified = true })
-                .Render(c => c.Modified)
+                .Fab(c => c.Modified)
         );
     }
 
@@ -44,7 +44,7 @@ public sealed class RamClusterCocoonTests
     }
 
     [Fact]
-    public async Task Renders()
+    public async Task Fabs()
     {
         var content =
             new
@@ -56,7 +56,7 @@ public sealed class RamClusterCocoonTests
         Assert.True(
             await content
                 .InRamClusterCocoon(memory.Keys.First(), memory)
-                .Render(p => p.Name.Contains("Doe"))
+                .Fab(p => p.Name.Contains("Doe"))
         );
     }
 }

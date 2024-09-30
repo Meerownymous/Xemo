@@ -36,8 +36,8 @@ public sealed class LazyCluster<TContent>(Func<ICluster<TContent>> construct) : 
         return cluster.Value.Add(identifier, content);
     }
 
-    public ValueTask<TShape> Render<TShape>(IRendering<ICluster<TContent>, TShape> rendering)
+    public ValueTask<TShape> Fab<TShape>(IFabrication<ICluster<TContent>, TShape> fabrication)
     {
-        return cluster.Value.Render(rendering);
+        return cluster.Value.Fab(fabrication);
     }
 }

@@ -33,7 +33,7 @@ public sealed class BufferedCocoon<TContent>(
             id.Value,
             async _ =>
             {
-                var patched = await patch.Patch(await origin.Render(c => c));
+                var patched = await patch.Patch(await origin.Fab(c => c));
                 await origin.Patch(_ => patched);
                 return patched;
             },
@@ -47,14 +47,14 @@ public sealed class BufferedCocoon<TContent>(
         return origin;
     }
 
-    public async ValueTask<TShape> Render<TShape>(IRendering<TContent, TShape> rendering)
+    public async ValueTask<TShape> Fab<TShape>(IFabrication<TContent, TShape> fabrication)
     {
         var content =
             (TContent)await buffer.GetOrAdd(
                 id.Value,
-                async _ => await origin.Render(c => c)
+                async _ => await origin.Fab(c => c)
             );
-        return await rendering.Render(content);
+        return await fabrication.Fabricate(content);
     }
 
     public async ValueTask Erase()

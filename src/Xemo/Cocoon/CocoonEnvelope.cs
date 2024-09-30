@@ -14,9 +14,9 @@ public abstract class CocoonEnvelope<TContent>(ICocoon<TContent> guts) : ICocoon
         return guts.Patch(patch);
     }
 
-    public ValueTask<TShape> Render<TShape>(IRendering<TContent, TShape> rendering)
+    public ValueTask<TShape> Fab<TShape>(IFabrication<TContent, TShape> fabrication)
     {
-        return guts.Render(rendering);
+        return guts.Fab(fabrication);
     }
 
     public ValueTask Erase()
