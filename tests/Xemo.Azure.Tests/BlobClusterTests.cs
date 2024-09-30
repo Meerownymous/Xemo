@@ -98,7 +98,7 @@ public sealed class BlobClusterTests
         }
 
         var match = await cluster.FirstMatch(p => p.Name == "John Doe");
-        Assert.Equal(20, await match.Out().Render(p => p.Age));
+        Assert.Equal(20, await match.Out().Fab(p => p.Age));
     }
 
     [Fact]

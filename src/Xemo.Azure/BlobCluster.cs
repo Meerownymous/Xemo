@@ -100,9 +100,9 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
         ).Patch(_ => content);
     }
 
-    public ValueTask<TShape> Render<TShape>(IRendering<ICluster<TContent>, TShape> rendering)
+    public ValueTask<TShape> Fab<TShape>(IFabrication<ICluster<TContent>, TShape> fabrication)
     {
-        return rendering.Render(this);
+        return fabrication.Fabricate(this);
     }
 }
 

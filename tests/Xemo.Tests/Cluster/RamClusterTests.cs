@@ -90,7 +90,7 @@ public sealed class RamClusterTests
                 If.True(schema, p => p.Name == "John Doe")
             ))
             .Out()
-            .Render(m => m.Name)
+            .Fab(m => m.Name)
         );
     }
 

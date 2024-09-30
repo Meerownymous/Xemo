@@ -23,16 +23,16 @@ public sealed class RamClusterCocoon<TContent>(
         return this;
     }
 
-    public async ValueTask<TShape> Render<TShape>(IRendering<TContent, TShape> rendering)
+    public async ValueTask<TShape> Fab<TShape>(IFabrication<TContent, TShape> fabrication)
     {
         TShape result = default;
         await memory.AddOrUpdate(
             id,
             _ => throw new InvalidOperationException(
-                $"Cannot render '{id}' - it does not exist. It might have been deleted."),
+                $"Cannot Fab '{id}' - it does not exist. It might have been deleted."),
             async (_, existing) =>
             {
-                result = rendering.Render(await existing).ConfigureAwait(false).GetAwaiter().GetResult();
+                result = fabrication.Fabricate(await existing).ConfigureAwait(false).GetAwaiter().GetResult();
                 return await existing;
             }
         );

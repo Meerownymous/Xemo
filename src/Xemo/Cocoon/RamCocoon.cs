@@ -27,9 +27,9 @@ public sealed class RamCocoon<TContent>(Func<string> id, TContent content)
         return this;
     }
 
-    public ValueTask<TShape> Render<TShape>(IRendering<TContent, TShape> rendering)
+    public ValueTask<TShape> Fab<TShape>(IFabrication<TContent, TShape> fabrication)
     {
-        return rendering.Render(content);
+        return fabrication.Fabricate(content);
     }
 
     public ValueTask Erase()

@@ -2,13 +2,13 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Xemo.Patch;
-using Xemo.Rendering;
+using Xemo.Fabing;
 
 namespace Xemo;
 
 public interface IAttachment
 {
-    ValueTask<TFormat> Render<TFormat>(IRendering<Stream, TFormat> rendering);
+    ValueTask<TFormat> Fab<TFormat>(IFabrication<Stream, TFormat> fabrication);
     ValueTask<IAttachment> Patch(IPatch<Stream> patch);
 }
 
@@ -19,11 +19,11 @@ public static class AttachmentExtensions
         return attachment.Patch(new AsPatch<Stream>(patch));
     }
 
-    public static ValueTask<TFormat> Render<TFormat>(this IAttachment attachment, Func<Stream, TFormat> rendering)
+    public static ValueTask<TFormat> Fab<TFormat>(this IAttachment attachment, Func<Stream, TFormat> Fabing)
     {
-        return attachment.Render(
-            new AsRendering<Stream, TFormat>(
-                content => Task.Run(() => rendering(content))
+        return attachment.Fab(
+            new AsFabrication<Stream, TFormat>(
+                content => Task.Run(() => Fabing(content))
             )
         );
     }

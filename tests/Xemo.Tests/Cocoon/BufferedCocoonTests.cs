@@ -15,7 +15,7 @@ public sealed class BufferedCocoonTests
                 new RamCocoon<string>("123", "Secret Ingredients"),
                 buffer
             );
-        await bufferedCocoon.Render(c => c);
+        await bufferedCocoon.Fab(c => c);
 
         Assert.Equal(
             "Secret Ingredients",
@@ -24,7 +24,7 @@ public sealed class BufferedCocoonTests
     }
 
     [Fact]
-    public async Task RendersFromBuffer()
+    public async Task FabsFromBuffer()
     {
         var buffer = new ConcurrentDictionary<string, ValueTask<object>>();
         var bufferedCocoon =
@@ -32,12 +32,12 @@ public sealed class BufferedCocoonTests
                 new RamCocoon<string>("123", "Secret Ingredients"),
                 buffer
             );
-        await bufferedCocoon.Render(c => c);
+        await bufferedCocoon.Fab(c => c);
         buffer["123"] = new ValueTask<object>("Buffered Ingredients");
 
         Assert.Equal(
             "Buffered Ingredients",
-            await bufferedCocoon.Render(c => c)
+            await bufferedCocoon.Fab(c => c)
         );
     }
 
@@ -50,7 +50,7 @@ public sealed class BufferedCocoonTests
                 new RamCocoon<string>("123", "Secret Ingredients"),
                 buffer
             );
-        await bufferedCocoon.Render(c => c);
+        await bufferedCocoon.Fab(c => c);
         await bufferedCocoon.Patch(_ => "Patched Ingredients");
 
         Assert.Equal(
@@ -73,7 +73,7 @@ public sealed class BufferedCocoonTests
 
         Assert.Equal(
             "Patched Ingredients",
-            await cocoon.Render(c => c)
+            await cocoon.Fab(c => c)
         );
     }
 
@@ -87,7 +87,7 @@ public sealed class BufferedCocoonTests
                 cocoon,
                 buffer
             );
-        await bufferedCocoon.Render(c => c);
+        await bufferedCocoon.Fab(c => c);
         try
         {
             await bufferedCocoon.Erase();

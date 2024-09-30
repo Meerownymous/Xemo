@@ -27,6 +27,6 @@ public abstract class ClusterEnvelope<TContent>(ICluster<TContent> origin) : ICl
     public ValueTask<ICocoon<TContent>> Add(string identifier, TContent content) =>
         origin.Add(identifier, content);
 
-    public ValueTask<TShape> Render<TShape>(IRendering<ICluster<TContent>, TShape> rendering) =>
-        origin.Render(rendering);
+    public ValueTask<TShape> Fab<TShape>(IFabrication<ICluster<TContent>, TShape> fabrication) =>
+        origin.Fab(fabrication);
 }
