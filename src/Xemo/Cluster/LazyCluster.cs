@@ -21,23 +21,14 @@ public sealed class LazyCluster<TContent>(Func<ICluster<TContent>> construct) : 
     
     public ValueTask<IOptional<ICocoon<TContent>>> Grab(string id) => cluster.Value.Grab(id);
 
-    public ValueTask<IOptional<ICocoon<TContent>>> FirstMatch(IFact<TContent> fact)
-    {
-        return cluster.Value.FirstMatch(fact);
-    }
+    public ValueTask<IOptional<ICocoon<TContent>>> FirstMatch(IFact<TContent> fact) =>
+        cluster.Value.FirstMatch(fact);
 
-    public ValueTask<IEnumerable<ICocoon<TContent>>> Matches(IFact<TContent> fact)
-    {
-        return cluster.Value.Matches(fact);
-    }
+    public ValueTask<IEnumerable<ICocoon<TContent>>> Matches(IFact<TContent> fact) =>
+        cluster.Value.Matches(fact);
 
     public ValueTask<ICocoon<TContent>> Add(string identifier, TContent content)
     {
         return cluster.Value.Add(identifier, content);
-    }
-
-    public ValueTask<TShape> Fab<TShape>(IFabrication<ICluster<TContent>, TShape> fabrication)
-    {
-        return cluster.Value.Fab(fabrication);
     }
 }

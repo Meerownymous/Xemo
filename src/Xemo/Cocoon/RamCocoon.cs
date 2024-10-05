@@ -21,15 +21,15 @@ public sealed class RamCocoon<TContent>(Func<string> id, TContent content)
         return id.Value;
     }
 
-    public async ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch)
+    public async ValueTask<ICocoon<TContent>> Infuse(IPatch<TContent> patch)
     {
         content = await patch.Patch(content);
         return this;
     }
 
-    public ValueTask<TShape> Fab<TShape>(IFabrication<TContent, TShape> fabrication)
+    public ValueTask<TShape> Grow<TShape>(IMorph<TContent, TShape> morph)
     {
-        return fabrication.Fabricate(content);
+        return morph.Shaped(content);
     }
 
     public ValueTask Erase()

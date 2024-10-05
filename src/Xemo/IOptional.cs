@@ -1,11 +1,10 @@
-using System;
-
 namespace Xemo;
 
 public interface IOptional<TValue>
 {
     bool Has();
 
-    void IfHas(Action<TValue> action);
+    IOptional<TValue> IfHas(Action<TValue> action);
+    IOptional<TValue> IfNot(Action action);
     TValue Out();
 }

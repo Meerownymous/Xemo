@@ -11,11 +11,11 @@ public sealed class BufferedAttachment(IAttachment origin) : IAttachment
 {
     private readonly IList<Stream> buffer = new List<Stream>();
 
-    public async ValueTask<TFormat> Fab<TFormat>(IFabrication<Stream, TFormat> fabrication)
+    public async ValueTask<TFormat> Grow<TFormat>(IMorph<Stream, TFormat> morph)
     {
         if (buffer.Count == 0)
             buffer.Add(
-                await origin.Fab<Stream>(s =>
+                await origin.Grow<Stream>(s =>
                 {
                     var memory = new MemoryStream();
                     s.CopyTo(memory);
@@ -24,10 +24,10 @@ public sealed class BufferedAttachment(IAttachment origin) : IAttachment
                 })
             );
         buffer[0].Seek(0, SeekOrigin.Begin);
-        return await fabrication.Fabricate(new NonClosingStream(buffer[0]));
+        return await morph.Shaped(new NonClosingStream(buffer[0]));
     }
 
-    public async ValueTask<IAttachment> Patch(IPatch<Stream> patch)
+    public async ValueTask<IAttachment> Infuse(IPatch<Stream> patch)
     {
         if (buffer.Count == 1)
         {
@@ -36,7 +36,7 @@ public sealed class BufferedAttachment(IAttachment origin) : IAttachment
         }
         else
         {
-            await origin.Patch(patch);
+            await origin.Infuse(patch);
         }
 
         return this;

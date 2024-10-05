@@ -9,14 +9,14 @@ namespace Xemo.Tests.Attachment;
 public sealed class BufferedAttachmentTests
 {
     [Fact]
-    public async Task FabsfromOrigin()
+    public async Task GrowsFromOrigin()
     {
         var origin = new RamAttachment("1", new ConcurrentDictionary<string, Task<Stream>>());
         await origin.Patch(_ => new AsInput("Je suis un attachement").Stream());
 
         Assert.Equal(
             "Je suis un attachement",
-            await new BufferedAttachment(origin).Fab(c => new AsText(c).AsString())
+            await new BufferedAttachment(origin).Grow(c => new AsText(c).AsString())
         );
     }
 
@@ -28,12 +28,12 @@ public sealed class BufferedAttachmentTests
         await origin.Patch(_ => new AsInput("Je suis un attachement").Stream());
 
         var buffered = new BufferedAttachment(origin);
-        await buffered.Fab(c => new AsText(c).AsString());
+        await buffered.Grow(c => new AsText(c).AsString());
         await origin.Patch(_ => new MemoryStream());
 
         Assert.Equal(
             "Je suis un attachement",
-            await buffered.Fab(c => new AsText(c).AsString())
+            await buffered.Grow(c => new AsText(c).AsString())
         );
     }
 
@@ -49,7 +49,7 @@ public sealed class BufferedAttachmentTests
 
         Assert.Equal(
             "Je suis patched",
-            await origin.Fab(c => new AsText(c).AsString())
+            await origin.Grow(c => new AsText(c).AsString())
         );
     }
 
@@ -61,29 +61,29 @@ public sealed class BufferedAttachmentTests
         await origin.Patch(_ => new AsInput("Je suis un attachement").Stream());
 
         var buffered = new BufferedAttachment(origin);
-        await buffered.Fab(c => new AsText(c).AsString());
+        await buffered.Grow(c => new AsText(c).AsString());
         await buffered.Patch(_ => new AsInput("Je suis patched").Stream());
 
         Assert.Equal(
             "Je suis patched",
-            await origin.Fab(c => new AsText(c).AsString())
+            await origin.Grow(c => new AsText(c).AsString())
         );
     }
 
     [Fact]
-    public async Task FabsFromBuffer()
+    public async Task GrowsFromBuffer()
     {
         var ram = new ConcurrentDictionary<string, Task<Stream>>();
         var origin = new RamAttachment("1", ram);
         await origin.Patch(_ => new AsInput(":)").Stream());
 
         var buffered = new BufferedAttachment(origin);
-        await buffered.Fab(c => new AsText(c).AsString());
+        await buffered.Grow(c => new AsText(c).AsString());
         await origin.Patch(_ => new AsInput(":(").Stream());
 
         Assert.Equal(
             ":)",
-            await buffered.Fab(c => new AsText(c).AsString())
+            await buffered.Grow(c => new AsText(c).AsString())
         );
     }
 }

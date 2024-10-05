@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Concurrent;
-using System.Threading.Tasks;
 
 namespace Xemo.Cocoon;
 
@@ -27,34 +25,34 @@ public sealed class BufferedCocoon<TContent>(
         return id.Value;
     }
 
-    public async ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch)
+    public async ValueTask<ICocoon<TContent>> Infuse(IPatch<TContent> patch)
     {
         await buffer.AddOrUpdate(
             id.Value,
             async _ =>
             {
-                var patched = await patch.Patch(await origin.Fab(c => c));
-                await origin.Patch(_ => patched);
+                var patched = await patch.Patch(await origin.Grow(c => c));
+                await origin.Infuse(_ => patched);
                 return patched;
             },
             async (_, existing) =>
             {
                 var patched = await patch.Patch((TContent)await existing);
-                await origin.Patch(_ => patched);
+                await origin.Infuse(_ => patched);
                 return patched;
             }
         );
         return origin;
     }
 
-    public async ValueTask<TShape> Fab<TShape>(IFabrication<TContent, TShape> fabrication)
+    public async ValueTask<TShape> Grow<TShape>(IMorph<TContent, TShape> morph)
     {
         var content =
             (TContent)await buffer.GetOrAdd(
                 id.Value,
-                async _ => await origin.Fab(c => c)
+                async _ => await origin.Grow(c => c)
             );
-        return await fabrication.Fabricate(content);
+        return await morph.Shaped(content);
     }
 
     public async ValueTask Erase()

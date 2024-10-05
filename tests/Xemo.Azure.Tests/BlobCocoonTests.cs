@@ -5,7 +5,7 @@ namespace Xemo.Azure.Tests;
 public sealed class BlobCocoonTests
 {
     [Fact]
-    public async Task FabsInformation()
+    public async Task GrowsInformation()
     {
         var schema =
             new
@@ -26,7 +26,7 @@ public sealed class BlobCocoonTests
                                 new EncodedBlobName(blobName).AsString()
                             )
                     ).Value
-                ).Fab(content => content.FirstName)
+                ).Grow(content => content.FirstName)
         );
     }
 
@@ -77,9 +77,9 @@ public sealed class BlobCocoonTests
                             )
                     ).Value
                 )
-                .Patch(_ => schema)
-                .Patch(content => content with { FirstName = "Rodriguez" })
-                .Fab(content => content.FirstName)
+                .Infuse(_ => schema)
+                .Infuse(content => content with { FirstName = "Rodriguez" })
+                .Grow(content => content.FirstName)
         );
     }
 }

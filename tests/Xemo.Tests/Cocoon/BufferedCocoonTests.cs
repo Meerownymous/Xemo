@@ -15,7 +15,7 @@ public sealed class BufferedCocoonTests
                 new RamCocoon<string>("123", "Secret Ingredients"),
                 buffer
             );
-        await bufferedCocoon.Fab(c => c);
+        await bufferedCocoon.Grow(c => c);
 
         Assert.Equal(
             "Secret Ingredients",
@@ -24,7 +24,7 @@ public sealed class BufferedCocoonTests
     }
 
     [Fact]
-    public async Task FabsFromBuffer()
+    public async Task GrowsFromBuffer()
     {
         var buffer = new ConcurrentDictionary<string, ValueTask<object>>();
         var bufferedCocoon =
@@ -32,12 +32,12 @@ public sealed class BufferedCocoonTests
                 new RamCocoon<string>("123", "Secret Ingredients"),
                 buffer
             );
-        await bufferedCocoon.Fab(c => c);
+        await bufferedCocoon.Grow(c => c);
         buffer["123"] = new ValueTask<object>("Buffered Ingredients");
 
         Assert.Equal(
             "Buffered Ingredients",
-            await bufferedCocoon.Fab(c => c)
+            await bufferedCocoon.Grow(c => c)
         );
     }
 
@@ -50,8 +50,8 @@ public sealed class BufferedCocoonTests
                 new RamCocoon<string>("123", "Secret Ingredients"),
                 buffer
             );
-        await bufferedCocoon.Fab(c => c);
-        await bufferedCocoon.Patch(_ => "Patched Ingredients");
+        await bufferedCocoon.Grow(c => c);
+        await bufferedCocoon.Infuse(_ => "Patched Ingredients");
 
         Assert.Equal(
             "Patched Ingredients",
@@ -69,11 +69,11 @@ public sealed class BufferedCocoonTests
                 cocoon,
                 buffer
             );
-        await bufferedCocoon.Patch(_ => "Patched Ingredients");
+        await bufferedCocoon.Infuse(_ => "Patched Ingredients");
 
         Assert.Equal(
             "Patched Ingredients",
-            await cocoon.Fab(c => c)
+            await cocoon.Grow(c => c)
         );
     }
 
@@ -87,7 +87,7 @@ public sealed class BufferedCocoonTests
                 cocoon,
                 buffer
             );
-        await bufferedCocoon.Fab(c => c);
+        await bufferedCocoon.Grow(c => c);
         try
         {
             await bufferedCocoon.Erase();

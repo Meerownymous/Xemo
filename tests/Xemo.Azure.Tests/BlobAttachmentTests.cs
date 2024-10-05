@@ -26,7 +26,7 @@ public sealed class BlobAttachmentTests
 
         Assert.Equal(
             "I am attached!",
-            await attachment.Fab(
+            await attachment.Grow(
                 stream => AsText._(stream).AsString()
             )
         );
@@ -49,7 +49,7 @@ public sealed class BlobAttachmentTests
 
         Assert.Equal(
             "I am attached!",
-            await new BlobAttachment(blobClient).Fab(
+            await new BlobAttachment(blobClient).Grow(
                 stream => AsText._(stream).AsString()
             )
         );

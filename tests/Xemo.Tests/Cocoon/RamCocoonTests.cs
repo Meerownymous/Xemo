@@ -15,8 +15,8 @@ public sealed class RamCocoonTests
                     Modified = false
                 }
                 .InRamCocoon()
-                .Patch(p => p with { Modified = true })
-                .Fab(c => c.Modified)
+                .Infuse(p => p with { Modified = true })
+                .Grow(c => c.Modified)
         );
     }
 
@@ -35,7 +35,7 @@ public sealed class RamCocoonTests
     }
 
     [Fact]
-    public async Task Fabs()
+    public async Task Grows()
     {
         Assert.True(
             await new
@@ -43,7 +43,7 @@ public sealed class RamCocoonTests
                     Name = "Test Doe"
                 }
                 .InRamCocoon()
-                .Fab(p => p.Name.Contains("Doe"))
+                .Grow(p => p.Name.Contains("Doe"))
         );
     }
 }

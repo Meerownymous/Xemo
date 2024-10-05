@@ -39,7 +39,7 @@ public sealed class BufferedClusterTests
     }
 
     [Fact]
-    public async Task BuffersContentWhenFabing()
+    public async Task BuffersContentWhenGrowing()
     {
         var contentBuffer = new ConcurrentDictionary<string, ValueTask<object>>();
         var origin = new RamCluster<string>();
@@ -55,7 +55,7 @@ public sealed class BufferedClusterTests
         var c = await origin.Add("3", "Item C");
 
         using var enumerator = buffered.GetEnumerator();
-        while (enumerator.MoveNext()) await enumerator.Current.Fab(content => content);
+        while (enumerator.MoveNext()) await enumerator.Current.Grow(content => content);
         await a.Erase();
         await b.Erase();
         await c.Erase();
@@ -63,7 +63,7 @@ public sealed class BufferedClusterTests
         Assert.Equal(
             new[] { "Item A", "Item B", "Item C" },
             Mapped._(
-                cocoon => cocoon.Fab(c => c).Result,
+                cocoon => cocoon.Grow(c => c).Result,
                 buffered
             ).ToArray()
         );
@@ -92,7 +92,7 @@ public sealed class BufferedClusterTests
             ["Item A", "Item B", "Item C"],
             Sorted._(
                 Mapped._(
-                    cocoon => cocoon.Fab(c => c).Result,
+                    cocoon => cocoon.Grow(c => c).Result,
                     buffered
                 )
             )

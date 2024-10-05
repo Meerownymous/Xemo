@@ -1,8 +1,5 @@
-using System;
 using System.Collections;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Xemo.Fact;
 
@@ -29,12 +26,12 @@ public sealed class RamCluster<TContent>(
         return GetEnumerator();
     }
 
-    public async ValueTask<IOptional<ICocoon<TContent>>> Grab(string id)
+    public ValueTask<IOptional<ICocoon<TContent>>> Grab(string id)
     {
         IOptional<ICocoon<TContent>> result = new OptEmpty<ICocoon<TContent>>();
         if (memory.ContainsKey(id))
             result = new OptFull<ICocoon<TContent>>(() => new RamClusterCocoon<TContent>(id, memory));
-        return result;
+        return new ValueTask<IOptional<ICocoon<TContent>>>(result);
     }
 
     public async ValueTask<IOptional<ICocoon<TContent>>> FirstMatch(IFact<TContent> fact)
@@ -69,7 +66,7 @@ public sealed class RamCluster<TContent>(
             identifier,
             _ => new ValueTask<TContent>(content),
             (_, _) => throw new InvalidOperationException(
-                $"Content '{identifier}' already exists: {JsonConvert.SerializeObject(content)}")
+                $"Cocoon '{identifier}' already exists: {JsonConvert.SerializeObject(content)}")
         );
         return ValueTask.FromResult<ICocoon<TContent>>(
             new RamClusterCocoon<TContent>(identifier, memory)

@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Concurrent;
-using System.Threading.Tasks;
 
 namespace Xemo.Cluster;
 
@@ -14,7 +12,7 @@ public sealed class RamClusterCocoon<TContent>(
         return id;
     }
 
-    public async ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch)
+    public async ValueTask<ICocoon<TContent>> Infuse(IPatch<TContent> patch)
     {
         await memory.AddOrUpdate(id,
             _ => throw new InvalidOperationException("No content to patch."),
@@ -23,16 +21,16 @@ public sealed class RamClusterCocoon<TContent>(
         return this;
     }
 
-    public async ValueTask<TShape> Fab<TShape>(IFabrication<TContent, TShape> fabrication)
+    public async ValueTask<TShape> Grow<TShape>(IMorph<TContent, TShape> morph)
     {
         TShape result = default;
         await memory.AddOrUpdate(
             id,
             _ => throw new InvalidOperationException(
-                $"Cannot Fab '{id}' - it does not exist. It might have been deleted."),
+                $"Cannot grow from '{id}' - it does not exist. It might have been deleted."),
             async (_, existing) =>
             {
-                result = fabrication.Fabricate(await existing).ConfigureAwait(false).GetAwaiter().GetResult();
+                result = morph.Shaped(await existing).ConfigureAwait(false).GetAwaiter().GetResult();
                 return await existing;
             }
         );

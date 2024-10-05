@@ -16,16 +16,16 @@ public sealed class BlobAttachment(Func<BlobClient> client) : IAttachment
     {
     }
 
-    public async ValueTask<TFormat> Fab<TFormat>(IFabrication<Stream, TFormat> fabrication)
+    public async ValueTask<TFormat> Grow<TFormat>(IMorph<Stream, TFormat> morph)
     {
-        return await fabrication.Fabricate(
+        return await morph.Shaped(
             (await blobClient.Value.DownloadAsync())
             .Value
             .Content
         );
     }
 
-    public async ValueTask<IAttachment> Patch(IPatch<Stream> patch)
+    public async ValueTask<IAttachment> Infuse(IPatch<Stream> patch)
     {
         Stream current = new MemoryStream();
         if (await blobClient.Value.ExistsAsync())

@@ -13,8 +13,14 @@ public sealed class OptFull<TValue>(Func<TValue> value) : IOptional<TValue>
     private readonly Lazy<TValue> value = new(value);
 
     public bool Has() => true;
-    
-    public void IfHas(Action<TValue> action) => action(value.Value);
+
+    public IOptional<TValue> IfHas(Action<TValue> action)
+    {
+        action(value.Value);
+        return this;
+    }
+
+    public IOptional<TValue> IfNot(Action action) => this;
 
     public TValue Out() => value.Value;
     

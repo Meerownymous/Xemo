@@ -97,26 +97,11 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
     {
         return await new BlobCocoon<TContent>(
             containerClient.Value.GetBlobClient(new EncodedBlobName(identifier).AsString())
-        ).Patch(_ => content);
+        ).Infuse(_ => content);
     }
 
-    public ValueTask<TShape> Fab<TShape>(IFabrication<ICluster<TContent>, TShape> fabrication)
+    public ValueTask<TShape> Grow<TShape>(IMorph<ICluster<TContent>, TShape> morph)
     {
-        return fabrication.Fabricate(this);
-    }
-}
-
-public static class BlobClusterSmarts
-{
-    public static Task<BlobCluster<TContent>> InBlobCluster<TContent>(this TContent content, string id,
-        string name, BlobServiceClient blobClient)
-    {
-        return Task.Run(async () =>
-        {
-            var containerClient = blobClient.GetBlobContainerClient(new EncodedContainerName(name).AsString());
-            var result = new BlobCluster<TContent>(() => containerClient);
-            await result.Add(id, content);
-            return result;
-        });
+        return morph.Shaped(this);
     }
 }

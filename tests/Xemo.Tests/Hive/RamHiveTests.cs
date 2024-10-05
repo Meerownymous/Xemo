@@ -15,8 +15,8 @@ public sealed class RamHiveTests
             await
                 new RamHive()
                     .Vault<string>("username")
-                    .Patch(_ => "Jumi")
-                    .Fab(name => name)
+                    .Infuse(_ => "Jumi")
+                    .Grow(name => name)
         );
     }
 
@@ -39,7 +39,7 @@ public sealed class RamHiveTests
             await new RamHive()
                 .Cluster<string>("names")
                 .Add("1", "Jumi")
-                .Fab(name => name)
+                .Grow(name => name)
         );
     }
 
@@ -52,7 +52,7 @@ public sealed class RamHiveTests
 
         Assert.Equal(
             "Yes",
-            await attachment.Fab(stream => AsText._(stream).AsString())
+            await attachment.Grow(stream => AsText._(stream).AsString())
         );
     }
 
@@ -66,7 +66,7 @@ public sealed class RamHiveTests
 
         Assert.Equal(
             "Yes",
-            await attachment.Fab(stream => AsText._(stream).AsString())
+            await attachment.Grow(stream => AsText._(stream).AsString())
         );
     }
 }

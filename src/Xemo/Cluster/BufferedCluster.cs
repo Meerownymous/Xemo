@@ -25,7 +25,7 @@ public sealed class BufferedCluster<TContent>(
     public IEnumerator<ICocoon<TContent>> GetEnumerator()
     {
         cocoonBuffer.GetOrAdd(
-            isBufferedIndicator.ToString(),
+            isBufferedIndicator.Value,
             _ =>
             {
                 foreach (var cocoon in origin)

@@ -1,26 +1,17 @@
-using System.Threading.Tasks;
-
 namespace Xemo.Cocoon;
 
+/// <summary>
+/// Envelope for cocoons.
+/// </summary>
 public abstract class CocoonEnvelope<TContent>(ICocoon<TContent> guts) : ICocoon<TContent>
 {
-    public string ID()
-    {
-        return guts.ID();
-    }
+    public string ID() => guts.ID();
 
-    public ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch)
-    {
-        return guts.Patch(patch);
-    }
+    public ValueTask<ICocoon<TContent>> Infuse(IPatch<TContent> patch) =>
+        guts.Infuse(patch);
 
-    public ValueTask<TShape> Fab<TShape>(IFabrication<TContent, TShape> fabrication)
-    {
-        return guts.Fab(fabrication);
-    }
+    public ValueTask<TShape> Grow<TShape>(IMorph<TContent, TShape> morph) =>
+        guts.Grow(morph);
 
-    public ValueTask Erase()
-    {
-        return guts.Erase();
-    }
+    public ValueTask Erase() => guts.Erase();
 }

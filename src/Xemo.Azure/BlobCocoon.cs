@@ -1,7 +1,4 @@
-using System;
-using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Newtonsoft.Json;
 using Tonga.IO;
@@ -19,7 +16,7 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
         return id.Value;
     }
 
-    public async ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch)
+    public async ValueTask<ICocoon<TContent>> Infuse(IPatch<TContent> patch)
     {
         TContent current = default;
         var before = current;
@@ -42,13 +39,13 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
         return this;
     }
 
-    public async ValueTask<TShape> Fab<TShape>(IFabrication<TContent, TShape> fabrication)
+    public async ValueTask<TShape> Grow<TShape>(IMorph<TContent, TShape> morph)
     {
         if (!await blobClient.ExistsAsync())
             throw new InvalidOperationException($"'{id.Value}' Has no content.");
 
         return
-            await fabrication.Fabricate(
+            await morph.Shaped(
                 JsonConvert.DeserializeObject<TContent>(
                     AsText._(
                         new AsInput((await blobClient.DownloadAsync()).Value.Content),
@@ -83,20 +80,5 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
             ),
             true
         );
-    }
-}
-
-public static class BlobClusterCocoonExtensions
-{
-    public static Lazy<Task<BlobCocoon<TContent>>> InBlobClusterCocoon<TContent>(
-        this TContent content, BlobClient blobClient
-    )
-    {
-        return new Lazy<Task<BlobCocoon<TContent>>>(() => Task.Run(async () =>
-        {
-            var result = new BlobCocoon<TContent>(blobClient);
-            await result.Patch(_ => content);
-            return result;
-        }));
     }
 }

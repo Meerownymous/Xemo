@@ -6,7 +6,7 @@ namespace Xemo.Attachment;
 
 public sealed class RamAttachment(string id, ConcurrentDictionary<string, Task<Stream>> memory) : IAttachment
 {
-    public async ValueTask<TFormat> Fab<TFormat>(IFabrication<Stream, TFormat> fabrication)
+    public async ValueTask<TFormat> Grow<TFormat>(IMorph<Stream, TFormat> morph)
     {
         TFormat result = default;
         await memory.AddOrUpdate(
@@ -14,19 +14,19 @@ public sealed class RamAttachment(string id, ConcurrentDictionary<string, Task<S
             async _ =>
             {
                 var content = new MemoryStream();
-                result = await fabrication.Fabricate(content);
+                result = await morph.Shaped(content);
                 return content;
             },
             async (_, existing) =>
             {
-                result = await fabrication.Fabricate(await existing);
+                result = await morph.Shaped(await existing);
                 return await existing;
             });
         return result;
     }
 
 
-    public async ValueTask<IAttachment> Patch(IPatch<Stream> patch)
+    public async ValueTask<IAttachment> Infuse(IPatch<Stream> patch)
     {
         await
             memory.AddOrUpdate(
