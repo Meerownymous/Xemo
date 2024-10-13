@@ -183,8 +183,9 @@ public sealed class BufferedClusterTests
                 contentBuffer,
                 matchFromOrigin: false
             );
-        var cocoon = await buffered.Add("1", "Item");
-        await cocoon.Erase();
+        
+        await buffered.Add("1", "Item");
+        await (await origin.Grab("1")).Out().Erase();
 
         Assert.Single(
             await buffered.Matches(s => s == "Item")
