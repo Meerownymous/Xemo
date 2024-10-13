@@ -96,6 +96,6 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
 
     private BlobClient Client(string blobName) =>
         clients.GetOrAdd(blobName,
-            containerClient.Value.GetBlobClient(new EncodedBlobName(blobName).AsString())
+            containerClient.Value.GetBlobClient(blobName)
         );
 }
