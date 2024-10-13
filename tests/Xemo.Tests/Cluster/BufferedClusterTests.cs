@@ -109,7 +109,8 @@ public sealed class BufferedClusterTests
                 Guid.NewGuid(),
                 origin,
                 new ConcurrentDictionary<string, BufferedCocoon<string>>(),
-                contentBuffer
+                contentBuffer,
+                matchFromOrigin: true
             );
         await buffered.Add("1", "Item A");
         await buffered.Add("2", "Item B");
@@ -124,6 +125,31 @@ public sealed class BufferedClusterTests
     }
     
     [Fact]
+    public async Task FirstMatchFromBuffer()
+    {
+        var contentBuffer = new ConcurrentDictionary<string, ValueTask<object>>();
+        var origin = new RamCluster<string>();
+        var buffered =
+            new BufferedCluster<string>(
+                Guid.NewGuid(),
+                origin,
+                new ConcurrentDictionary<string, BufferedCocoon<string>>(),
+                contentBuffer,
+                matchFromOrigin: false
+            );
+        await buffered.Add("1", "Item A");
+        await buffered.Add("2", "Item B");
+        await buffered.Add("3", "Item C");
+
+        foreach (var ramCocoon in origin)
+            await ramCocoon.Erase();
+
+        Assert.True(
+            await buffered.FirstMatch(s => s == "Item A").Has()
+        );
+    }
+    
+    [Fact]
     public async Task MatchesFromOrigin()
     {
         var contentBuffer = new ConcurrentDictionary<string, ValueTask<object>>();
@@ -133,12 +159,34 @@ public sealed class BufferedClusterTests
                 Guid.NewGuid(),
                 origin,
                 new ConcurrentDictionary<string, BufferedCocoon<string>>(),
-                contentBuffer
+                contentBuffer,
+                matchFromOrigin: true
             );
         var cocoon = await buffered.Add("1", "Item");
         await cocoon.Erase();
 
         Assert.Empty(
+            await buffered.Matches(s => s == "Item")
+        );
+    }
+    
+    [Fact]
+    public async Task MatchesFromBuffer()
+    {
+        var contentBuffer = new ConcurrentDictionary<string, ValueTask<object>>();
+        var origin = new RamCluster<string>();
+        var buffered =
+            new BufferedCluster<string>(
+                Guid.NewGuid(),
+                origin,
+                new ConcurrentDictionary<string, BufferedCocoon<string>>(),
+                contentBuffer,
+                matchFromOrigin: false
+            );
+        var cocoon = await buffered.Add("1", "Item");
+        await cocoon.Erase();
+
+        Assert.Single(
             await buffered.Matches(s => s == "Item")
         );
     }

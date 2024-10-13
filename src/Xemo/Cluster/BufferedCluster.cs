@@ -17,7 +17,8 @@ public sealed class BufferedCluster<TContent>(
     Guid isBufferedIndicator,
     ICluster<TContent> origin,
     ConcurrentDictionary<string, BufferedCocoon<TContent>> cocoonBuffer,
-    ConcurrentDictionary<string, ValueTask<object>> contentBuffer
+    ConcurrentDictionary<string, ValueTask<object>> contentBuffer,
+    bool matchFromOrigin = false
 ) : ICluster<TContent>
 {
     private readonly Lazy<string> isBufferedIndicator = new(isBufferedIndicator.ToString);
@@ -63,15 +64,20 @@ public sealed class BufferedCluster<TContent>(
 
     public async ValueTask<IOptional<ICocoon<TContent>>> FirstMatch(IFact<TContent> fact)
     {
-        var opt = await origin.FirstMatch(fact);
+        var opt = matchFromOrigin
+            ? await origin.FirstMatch(fact)
+            : await FirstBufferMatch(fact);
         return opt.Has()
             ? new OptFull<ICocoon<TContent>>(new BufferedCocoon<TContent>(opt.Out(), contentBuffer))
             : new OptEmpty<ICocoon<TContent>>();
     }
 
-    public ValueTask<IEnumerable<ICocoon<TContent>>> Matches(IFact<TContent> fact)
+    public async ValueTask<IEnumerable<ICocoon<TContent>>> Matches(IFact<TContent> fact)
     {
-        return ValueTask.FromResult(
+        var matches = matchFromOrigin
+            ? await origin.Matches(fact)
+            : await BufferMatches(fact);
+        return
             Mapped._(
                 cocoon =>
                     (ICocoon<TContent>)
@@ -80,9 +86,8 @@ public sealed class BufferedCluster<TContent>(
                         contentBuffer,
                         () => cocoonBuffer.TryRemove(cocoon.ID(), out _)
                     ),
-                origin
-            )
-        );
+                matches
+            );
     }
 
     public ValueTask<ICocoon<TContent>> Add(string identifier, TContent content)
@@ -116,5 +121,33 @@ public sealed class BufferedCluster<TContent>(
                 return content;
             });
         return ValueTask.FromResult(result);
+    }
+    
+    private async Task<IEnumerable<ICocoon<TContent>>> BufferMatches(IFact<TContent> fact)
+    {
+        this.GetEnumerator();
+        var matches = new List<ICocoon<TContent>>();
+        foreach (var pair in contentBuffer)
+        {
+            if (fact.IsTrue((TContent)await pair.Value))
+                matches.Add(cocoonBuffer[pair.Key]);
+        }
+        return matches;
+    }
+    
+    private async Task<IOptional<ICocoon<TContent>>> FirstBufferMatch(IFact<TContent> fact)
+    {
+        IOptional<ICocoon<TContent>> result = new OptEmpty<ICocoon<TContent>>();
+        this.GetEnumerator();
+        var matches = new List<ICocoon<TContent>>();
+        foreach (var pair in contentBuffer)
+        {
+            if (fact.IsTrue((TContent)await pair.Value))
+            {
+                result = new OptFull<ICocoon<TContent>>(cocoonBuffer[pair.Key]);
+                break;
+            }
+        }
+        return result;
     }
 }
