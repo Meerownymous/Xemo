@@ -38,20 +38,17 @@ public sealed class BufferedCluster<TContent>(
 
     public async ValueTask<IOptional<ICocoon<TContent>>> Grab(string id)
     {
-        Console.WriteLine($"Grab {id}");
         await indexLock.WaitAsync();
         try{ Preload(); }
         finally{ indexLock.Release(); }
         IOptional<ICocoon<TContent>> result = new OptEmpty<ICocoon<TContent>>();
         if (cocoonBuffer.TryGetValue(id, out var cocoon))
             result = new OptFull<ICocoon<TContent>>(cocoon);
-        Console.WriteLine($"DONE Grab {id}");
         return result;
     }
 
     public async ValueTask<IOptional<ICocoon<TContent>>> FirstMatch(IFact<TContent> fact)
     {
-        Console.WriteLine($"FirstMatch");
         var opt = matchFromOrigin
             ? await origin.FirstMatch(fact)
             : await FirstBufferMatch(fact);
@@ -64,7 +61,6 @@ public sealed class BufferedCluster<TContent>(
 
     public async ValueTask<IEnumerable<ICocoon<TContent>>> Matches(IFact<TContent> fact)
     {
-        Console.WriteLine($"Matches");
         var matches = matchFromOrigin
             ? await origin.Matches(fact)
             : await BufferMatches(fact);
