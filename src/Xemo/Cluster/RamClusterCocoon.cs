@@ -11,6 +11,15 @@ public sealed class RamClusterCocoon<TContent>(
     {
         return id;
     }
+    
+    public async ValueTask<ICocoon<TContent>> Infuse(TContent content)
+    {
+        await memory.AddOrUpdate(id,
+            _ => throw new InvalidOperationException("No content to patch."),
+            (_, _) => ValueTask.FromResult(content)
+        );
+        return this;
+    }
 
     public async ValueTask<ICocoon<TContent>> Infuse(IPatch<TContent> patch)
     {

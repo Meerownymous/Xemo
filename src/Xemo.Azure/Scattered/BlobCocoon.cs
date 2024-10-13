@@ -15,6 +15,13 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
     {
         return id.Value;
     }
+    
+    public async ValueTask<ICocoon<TContent>> Infuse(TContent content)
+    {
+        await Upload(content);
+        await UpdateTags(id.Value, content);
+        return this;
+    }
 
     public async ValueTask<ICocoon<TContent>> Infuse(IPatch<TContent> patch)
     {

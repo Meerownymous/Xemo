@@ -24,6 +24,26 @@ public sealed class BufferedCocoon<TContent>(
     {
         return id.Value;
     }
+    
+    public async ValueTask<ICocoon<TContent>> Infuse(TContent content)
+    {
+        await buffer.AddOrUpdate(
+            id.Value,
+            async _ =>
+            {
+                await origin.Infuse(_ => content);
+                return content;
+            },
+            async (_, existing) =>
+            {
+                var before = (TContent)await existing;
+                if(!content.Equals(before))
+                    await origin.Infuse(_ => content);
+                return content;
+            }
+        );
+        return origin;
+    }
 
     public async ValueTask<ICocoon<TContent>> Infuse(IPatch<TContent> patch)
     {

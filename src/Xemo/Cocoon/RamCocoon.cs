@@ -20,6 +20,12 @@ public sealed class RamCocoon<TContent>(Func<string> id, TContent content)
     {
         return id.Value;
     }
+    
+    public async ValueTask<ICocoon<TContent>> Infuse(TContent content)
+    {
+        this.content = content;
+        return this;
+    }
 
     public async ValueTask<ICocoon<TContent>> Infuse(IPatch<TContent> patch)
     {

@@ -6,6 +6,9 @@ namespace Xemo.Cocoon;
 public abstract class CocoonEnvelope<TContent>(ICocoon<TContent> guts) : ICocoon<TContent>
 {
     public string ID() => guts.ID();
+    
+    public ValueTask<ICocoon<TContent>> Infuse(TContent content) =>
+        guts.Infuse(content);
 
     public ValueTask<ICocoon<TContent>> Infuse(IPatch<TContent> patch) =>
         guts.Infuse(patch);
