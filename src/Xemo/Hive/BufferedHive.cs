@@ -15,21 +15,26 @@ public sealed class BufferedHive(
     IHive origin,
     ConcurrentDictionary<string, ValueTask<object>> vaultBuffer,
     ConcurrentDictionary<string, object> clusterBuffer,
-    ConcurrentDictionary<string, IAttachment> attachmentBuffer
+    ConcurrentDictionary<string, IAttachment> attachmentBuffer,
+    bool matchFromOrigin = false
 ) : IHive
 {
-    public BufferedHive(IHive origin) : this(
+    public BufferedHive(IHive origin, bool matchFromOrigin = false) : this(
         origin,
         new ConcurrentDictionary<string, ValueTask<object>>(),
         new ConcurrentDictionary<string, object>(),
-        new ConcurrentDictionary<string, IAttachment>()
+        new ConcurrentDictionary<string, IAttachment>(),
+        matchFromOrigin
     )
     {
     }
 
     public ICocoon<TContent> Vault<TContent>(string name)
     {
-        return new BufferedCocoon<TContent>(origin.Vault<TContent>(name), vaultBuffer);
+        return new BufferedCocoon<TContent>(
+            origin.Vault<TContent>(name), 
+            vaultBuffer
+        );
     }
 
     public ICluster<TContent> Cluster<TContent>(string name)
@@ -41,7 +46,8 @@ public sealed class BufferedHive(
                     Guid.NewGuid(),
                     origin.Cluster<TContent>(name),
                     new ConcurrentDictionary<string, BufferedCocoon<TContent>>(),
-                    new ConcurrentDictionary<string, ValueTask<object>>()
+                    new ConcurrentDictionary<string, ValueTask<object>>(),
+                    matchFromOrigin
                 )
             );
     }
