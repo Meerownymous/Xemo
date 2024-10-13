@@ -37,8 +37,10 @@ public sealed class BufferedCocoon<TContent>(
             },
             async (_, existing) =>
             {
-                var patched = await patch.Patch((TContent)await existing);
-                await origin.Infuse(_ => patched);
+                var before = (TContent)await existing;
+                var patched = await patch.Patch(before);
+                if(!patched.Equals(before))
+                    await origin.Infuse(_ => patched);
                 return patched;
             }
         );
