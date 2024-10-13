@@ -1,7 +1,5 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Collections.Concurrent;
 using Azure.Storage.Blobs;
 using Tonga.Enumerable;
 using Xemo.Fact;
@@ -10,6 +8,7 @@ namespace Xemo.Azure;
 
 public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerClient) : ICluster<TContent>
 {
+    private readonly ConcurrentDictionary<string, BlobClient> clients = new();
     private readonly Lazy<BlobContainerClient> containerClient = new(() =>
     {
         var client = containerClient();
@@ -35,9 +34,7 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
     public IEnumerator<ICocoon<TContent>> GetEnumerator()
     {
         foreach (var blob in containerClient.Value.GetBlobs())
-            yield return new BlobCocoon<TContent>(
-                containerClient.Value.GetBlobClient(blob.Name)
-            );
+            yield return new BlobCocoon<TContent>(Client(blob.Name));
     }
 
     IEnumerator IEnumerable.GetEnumerator()
@@ -48,7 +45,7 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
     public async ValueTask<IOptional<ICocoon<TContent>>> Grab(string id)
     {
         IOptional<ICocoon<TContent>> result = new OptEmpty<ICocoon<TContent>>();
-        var client = containerClient.Value.GetBlobClient(new EncodedBlobName(id).AsString());
+        var client = Client(new EncodedBlobName(id).AsString());
         if (await client.ExistsAsync())
             result = new OptFull<ICocoon<TContent>>(
                 new BlobCocoon<TContent>(client)
@@ -69,9 +66,7 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
         )
             result = 
                 new OptFull<ICocoon<TContent>>(
-                    new BlobCocoon<TContent>(
-                        containerClient.Value.GetBlobClient(blob.BlobName)
-                    )
+                    new BlobCocoon<TContent>(Client(blob.BlobName))
                 );
         return result;
     }
@@ -81,9 +76,7 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
         return ValueTask.FromResult(
             Mapped._(
                 blob =>
-                    new BlobCocoon<TContent>(
-                        containerClient.Value.GetBlobClient(blob.BlobName)
-                    ) as ICocoon<TContent>,
+                    new BlobCocoon<TContent>(Client(blob.BlobName)) as ICocoon<TContent>,
                 containerClient
                     .Value
                     .FindBlobsByTags(
@@ -95,13 +88,14 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
 
     public async ValueTask<ICocoon<TContent>> Add(string identifier, TContent content)
     {
-        return await new BlobCocoon<TContent>(
-            containerClient.Value.GetBlobClient(new EncodedBlobName(identifier).AsString())
-        ).Infuse(_ => content);
+        return 
+            await new BlobCocoon<TContent>(
+                Client(new EncodedBlobName(identifier).AsString())
+            ).Infuse(_ => content);
     }
 
-    public ValueTask<TShape> Grow<TShape>(IMorph<ICluster<TContent>, TShape> morph)
-    {
-        return morph.Shaped(this);
-    }
+    private BlobClient Client(string blobName) =>
+        clients.GetOrAdd(blobName,
+            containerClient.Value.GetBlobClient(new EncodedBlobName(blobName).AsString())
+        );
 }

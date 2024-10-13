@@ -35,6 +35,7 @@ public sealed class BlobClusterTests
             exists,
             (await cluster.Grab(who)).Has()
         );
+        
     }
     
     [Theory]
