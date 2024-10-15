@@ -132,4 +132,32 @@ public sealed class BlobClusterTests
         var matches = await cluster.Matches(p => p.Age > 12);
         Assert.Equal(2, matches.Count());
     }
+    
+    [Fact]
+    public async Task MatchesWithSpecialCharacters()
+    {
+        var subject = "subject-" + Guid.NewGuid();
+        var id = "cocoon-123";
+        var serviceClient = new TestBlobServiceClient();
+        using var containerService = new TestBlobContainer(subject, serviceClient);
+
+        var cluster =
+            await new
+            {
+                Pattern = ".*"
+            }.InBlobCluster(id, subject, serviceClient.Value());
+
+        await cluster.Add("cocoon-456", new { Pattern = ".$" });
+
+        //Wait for azure updates
+        var retries = 30;
+        for (var i = 0; i < retries; i++)
+        {
+            if (containerService.Value().FindBlobsByTags($"Name = '{new EncodedTag(".*").AsString()}'").Any()
+                && containerService.Value().FindBlobsByTags($"Name = '{new EncodedTag(".$").AsString()}'").Any())
+                break;
+            await Task.Delay(100);
+        }
+        Assert.Single(await cluster.Matches(p => p.Pattern == ".*"));
+    }
 }

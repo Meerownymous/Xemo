@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 namespace Xemo;
 
 public interface ICocoon<TContent>

@@ -22,6 +22,17 @@ public sealed class FactAsTagQueryTests
     }
     
     [Fact]
+    public void BuildsQueryWithSpecialChars()
+    {
+        Assert.Equal(
+            $"Name = '{new EncodedTag(".*").AsString()}'",
+            new FactAsTagQuery<Rec>(
+                new AssertSimple<Rec>(If.True<Rec>(s => s.Name == ".*"))
+            ).AsString()
+        );
+    }
+    
+    [Fact]
     public void BuildsQueryWithVariable()
     {
         var name = "Yada";

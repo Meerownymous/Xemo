@@ -1,4 +1,7 @@
+using System;
+using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Newtonsoft.Json;
 using Tonga.IO;
@@ -19,7 +22,7 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
     public async ValueTask<ICocoon<TContent>> Infuse(TContent content)
     {
         await Upload(content);
-        await UpdateTags(id.Value, content);
+        await UpdateTags(content);
         return this;
     }
 
@@ -40,7 +43,7 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
         if ((before != null && !before.Equals(patched)) || before == null)
         {
             await Upload(patched);
-            await UpdateTags(id.Value, patched);
+            await UpdateTags(patched);
         }
 
         return this;
@@ -67,12 +70,12 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
         await blobClient.DeleteAsync();
     }
 
-    private async Task UpdateTags(string id, TContent content)
+    private async Task UpdateTags(TContent content)
     {
         await blobClient.SetTagsAsync(
             new AsDictionary<string, string>(
                 new ContentAsTags<TContent>(content)
-                    .With(AsPair._("_id", id))
+                    .With(AsPair._("_id", id.Value))
             )
         );
     }
