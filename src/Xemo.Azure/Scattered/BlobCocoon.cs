@@ -85,7 +85,7 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
         await blobClient.UploadAsync(
             new MemoryStream(
                 Encoding.UTF8.GetBytes(
-                    JsonConvert.SerializeObject(newContent)
+                    JsonConvert.SerializeObject(newContent, Formatting.Indented)
                 )
             ),
             true
