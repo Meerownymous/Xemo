@@ -91,7 +91,7 @@ public sealed class BlobClusterTests
         {
             if (containerService
                 .Value()
-                .FindBlobsByTags("Name = 'John Doe'")
+                .FindBlobsByTags($"Name = '{new EncodedTag("John Doe").AsString()}'")
                 .Any()
                )
                 break;
@@ -120,16 +120,21 @@ public sealed class BlobClusterTests
         await cluster.Add("cocoon-456", new { Name = "Jane Doe", Age = 18 });
 
         //Wait for azure updates
+        var found = false;
         var retries = 30;
         for (var i = 0; i < retries; i++)
         {
-            if (containerService.Value().FindBlobsByTags("Name = 'John Doe'").Any()
-                && containerService.Value().FindBlobsByTags("Name = 'Jane Doe'").Any())
+            if (containerService.Value().FindBlobsByTags($"Name = '{new EncodedTag("John Doe").AsString()}'").Any()
+                && containerService.Value().FindBlobsByTags($"Name = '{new EncodedTag("John Doe").AsString()}'").Any())
+            {
+                found = true;
                 break;
+            }
             await Task.Delay(100);
         }
 
         var matches = await cluster.Matches(p => p.Age > 12);
+        Assert.True(found);
         Assert.Equal(2, matches.Count());
     }
     
@@ -151,13 +156,19 @@ public sealed class BlobClusterTests
 
         //Wait for azure updates
         var retries = 30;
+        var found = false;
         for (var i = 0; i < retries; i++)
         {
-            if (containerService.Value().FindBlobsByTags($"Name = '{new EncodedTag(".*").AsString()}'").Any()
-                && containerService.Value().FindBlobsByTags($"Name = '{new EncodedTag(".$").AsString()}'").Any())
+            if (containerService.Value().FindBlobsByTags($"Pattern = '{new EncodedTag(".*").AsString()}'").Any()
+                && containerService.Value().FindBlobsByTags($"Pattern = '{new EncodedTag(".$").AsString()}'").Any())
+            {
+                found = true;
                 break;
+            }
             await Task.Delay(100);
         }
+
+        Assert.True(found);
         Assert.Single(await cluster.Matches(p => p.Pattern == ".*"));
     }
 }
