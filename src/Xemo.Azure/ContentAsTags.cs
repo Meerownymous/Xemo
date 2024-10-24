@@ -20,16 +20,20 @@ public sealed class ContentAsTags<TSource> : MapEnvelope<string, string>
             new AsEnumerable<IPair<string, string>>(() =>
             {
                 IMap<string, string> result = new Empty<string, string>();
-                foreach (var property in source.GetType().GetProperties())
-                    if (IsSuitableForBlobTag(property))
-                        result = result.With(
-                            AsPair._(
-                                property.Name,
-                                new EncodedTag(
-                                    Convert.ToString(property.GetValue(source), CultureInfo.InvariantCulture)
-                                ).AsString()
-                            )
-                        );
+                if (!typeof(TSource).IsPrimitive && typeof(TSource) != typeof(string))
+                {
+                    foreach (var property in source.GetType().GetProperties())
+                        if (IsSuitableForBlobTag(property))
+                            result = result.With(
+                                AsPair._(
+                                    property.Name,
+                                    new EncodedTag(
+                                        Convert.ToString(property.GetValue(source), CultureInfo.InvariantCulture)
+                                    ).AsString()
+                                )
+                            );
+                }
+
                 return result.Pairs();
             })
         )

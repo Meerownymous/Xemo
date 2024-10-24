@@ -1,7 +1,4 @@
-using System;
-using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Newtonsoft.Json;
 using Tonga.IO;
@@ -51,8 +48,9 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
 
     public async ValueTask<TShape> Grow<TShape>(IMorph<TContent, TShape> morph)
     {
-        if (!await blobClient.ExistsAsync())
-            throw new InvalidOperationException($"'{id.Value}' Has no content.");
+        var result = default(TShape);
+        if (!await blobClient.ExistsAsync() && result == null)
+            throw new InvalidOperationException($"'{id.Value}' has no content.");
 
         return
             await morph.Shaped(

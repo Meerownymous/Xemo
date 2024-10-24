@@ -28,6 +28,20 @@ public sealed class RamHive : IHive
                 + $"while you requested '{typeof(ICocoon<TContent>).Name}'.");
         return (ICocoon<TContent>)vault;
     }
+    
+    public ICocoon<TContent> Vault<TContent>(string name, TContent defaultValue)
+    {
+        var vault =
+            vaults.GetOrAdd(name,
+                _ => new RamCocoon<TContent>(name, defaultValue)
+            );
+        if (!vault.GetType().GetInterfaces().Contains(typeof(ICocoon<TContent>)))
+            throw new ArgumentException(
+                $"Vault '{name}' has been created with a different content type: "
+                + $"Vault is '{vault.GetType().Name}' "
+                + $"while you requested '{typeof(ICocoon<TContent>).Name}'.");
+        return (ICocoon<TContent>)vault;
+    }
 
     public ICluster<TContent> Cluster<TContent>(string name)
     {

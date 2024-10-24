@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Concurrent;
+using System.Text;
 using Azure.Storage;
 using Azure.Storage.Blobs;
+using Newtonsoft.Json;
+using Tonga.Map;
 
 namespace Xemo.Azure;
 
@@ -52,6 +55,21 @@ public sealed class BlobHive(
         );
 
     }
+    
+    public ICocoon<TContent> Vault<TContent>(string name, TContent defaultValue)
+    {
+        return
+            new BlobCocoon<TContent>(
+                this.vaults.GetOrAdd(name, _ =>
+                {
+                    vaultContainer.Value.CreateIfNotExists();
+                    var blobClient = vaultContainer.Value.GetBlobClient(new EncodedBlobName(name).AsString());
+                    Upload(blobClient, name, defaultValue);
+                    UpdateTags(blobClient, name, defaultValue);
+                    return blobClient;
+                })
+            );
+    }
 
     public ICluster<TContent> Cluster<TContent>(string name)
     {
@@ -84,5 +102,27 @@ public sealed class BlobHive(
                     return new BlobAttachment(blobClient);
                 }
             );
+    }
+    
+    private void UpdateTags<TContent>(BlobClient blobClient, string id, TContent content)
+    {
+        blobClient.SetTags(
+            new AsDictionary<string, string>(
+                new ContentAsTags<TContent>(content)
+                    .With(AsPair._("_id", id))
+            )
+        );
+    }
+
+    private void Upload<TContent>(BlobClient blobClient, string id, TContent content)
+    {
+        blobClient.Upload(
+            new MemoryStream(
+                Encoding.UTF8.GetBytes(
+                    JsonConvert.SerializeObject(content, Formatting.Indented)
+                )
+            ),
+            true
+        );
     }
 }

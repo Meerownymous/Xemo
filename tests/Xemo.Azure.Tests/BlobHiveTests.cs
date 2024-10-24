@@ -25,6 +25,25 @@ public sealed class BlobHiveTests
                     .Grow(s => s.MagicNumber)
         );
     }
+    
+    [Fact]
+    public async Task AddsVaultWithDefaultValue()
+    {
+        var prefix = new EncodedContainerName(Guid.NewGuid().ToString()).AsString().Substring(0, 8);
+        var blobServiceClient = new TestBlobServiceClient(prefix);
+        
+        await new BlobHive(blobServiceClient.Value(), prefix)
+            .Vault("guid", "123")
+            .Grow(id => id);
+        
+        Assert.Equal(
+            "123",
+            await 
+                new BlobHive(blobServiceClient.Value(), prefix)
+                    .Vault<string>("guid")
+                    .Grow(id => id)
+        );
+    }
 
     [Fact]
     public async Task AddsCluster()

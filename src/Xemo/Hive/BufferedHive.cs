@@ -36,6 +36,14 @@ public sealed class BufferedHive(
             vaultBuffer
         );
     }
+    
+    public ICocoon<TContent> Vault<TContent>(string name, TContent defaultValue)
+    {
+        return new BufferedCocoon<TContent>(
+            origin.Vault(name, defaultValue),
+            vaultBuffer
+        );
+    }
 
     public ICluster<TContent> Cluster<TContent>(string name)
     {
