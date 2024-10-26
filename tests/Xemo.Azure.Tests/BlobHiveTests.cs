@@ -27,7 +27,7 @@ public sealed class BlobHiveTests
     }
     
     [Fact]
-    public async Task AddsVaultWithDefaultValue()
+    public async Task AddsStringVaultWithDefaultValue()
     {
         var prefix = new EncodedContainerName(Guid.NewGuid().ToString()).AsString().Substring(0, 8);
         var blobServiceClient = new TestBlobServiceClient(prefix);

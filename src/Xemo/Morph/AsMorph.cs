@@ -6,6 +6,10 @@ namespace Xemo.Morph;
 public sealed class AsMorph<TContent, TShape>(Func<TContent, Task<TShape>> morph) :
     IMorph<TContent, TShape>
 {
+    public AsMorph(Func<TContent, TShape> morph) : this(
+        content => Task.FromResult(morph(content))
+    ){ }
+    
     public ValueTask<TShape> Shaped(TContent content)
     {
         return new ValueTask<TShape>(morph(content));

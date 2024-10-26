@@ -33,7 +33,7 @@ public sealed class ContentAsTags<TSource> : MapEnvelope<string, string>
                                 )
                             );
                 }
-
+                
                 return result.Pairs();
             })
         )
