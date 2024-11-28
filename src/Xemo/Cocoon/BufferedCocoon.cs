@@ -25,7 +25,7 @@ public sealed class BufferedCocoon<TContent>(
         return id.Value;
     }
     
-    public async ValueTask<ICocoon<TContent>> Infuse(TContent content)
+    public async ValueTask<ICocoon<TContent>> Put(TContent content)
     {
         await buffer.AddOrUpdate(
             id.Value,
@@ -45,7 +45,7 @@ public sealed class BufferedCocoon<TContent>(
         return origin;
     }
 
-    public async ValueTask<ICocoon<TContent>> Infuse(IPatch<TContent> patch)
+    public async ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch)
     {
         await buffer.AddOrUpdate(
             id.Value,

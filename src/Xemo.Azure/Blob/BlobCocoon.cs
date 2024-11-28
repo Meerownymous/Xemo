@@ -5,7 +5,7 @@ using Tonga.IO;
 using Tonga.Map;
 using Tonga.Text;
 
-namespace Xemo.Azure;
+namespace Xemo.Azure.Blob;
 
 public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TContent>
 {
@@ -16,14 +16,14 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
         return id.Value;
     }
     
-    public async ValueTask<ICocoon<TContent>> Infuse(TContent content)
+    public async ValueTask<ICocoon<TContent>> Put(TContent content)
     {
         await Upload(content);
         await UpdateTags(content);
         return this;
     }
 
-    public async ValueTask<ICocoon<TContent>> Infuse(IPatch<TContent> patch)
+    public async ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch)
     {
         TContent current = default;
         var before = current;

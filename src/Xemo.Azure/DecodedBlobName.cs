@@ -1,4 +1,3 @@
-using System;
 using System.Text;
 using Tonga.Text;
 
@@ -22,6 +21,4 @@ public sealed class DecodedBlobName(string encoded) : TextEnvelope(
             throw new ArgumentException($"Cannot decode '{encoded}': {ex}", ex);
         }
     })
-)
-{
-}
+);

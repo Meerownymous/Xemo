@@ -1,4 +1,5 @@
 using Tonga.Map;
+using Xemo.Azure.Blob;
 using Xunit;
 
 namespace Xemo.Azure.Tests;

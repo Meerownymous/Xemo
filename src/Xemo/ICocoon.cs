@@ -1,12 +1,13 @@
-using System.Threading.Tasks;
-
 namespace Xemo;
 
+/// <summary>
+/// A cocoon that contains 
+/// </summary>
 public interface ICocoon<TContent>
 {
     string ID();
-    ValueTask<ICocoon<TContent>> Infuse(TContent content);
-    ValueTask<ICocoon<TContent>> Infuse(IPatch<TContent> patch);
+    ValueTask<ICocoon<TContent>> Put(TContent content);
+    ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch);
     ValueTask<TShape> Grow<TShape>(IMorph<TContent, TShape> morph);
     ValueTask Erase();
 }

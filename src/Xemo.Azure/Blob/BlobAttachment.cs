@@ -1,9 +1,6 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 
-namespace Xemo.Azure;
+namespace Xemo.Azure.Blob;
 
 /// <summary>
 ///     Attachment in Azure blob storage.

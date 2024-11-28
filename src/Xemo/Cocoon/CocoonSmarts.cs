@@ -38,7 +38,7 @@ public static class CocoonSmarts
     public static async ValueTask<ICocoon<TContent>> Infuse<TContent>(this ICocoon<TContent> cocoon,
         Func<TContent, TContent> patch)
     {
-        return await cocoon.Infuse(
+        return await cocoon.Patch(
             new AsPatch<TContent>(patch)
         );
     }
@@ -64,13 +64,13 @@ public static class CocoonSmarts
     public static async ValueTask<ICocoon<TContent>> Infuse<TContent>(
         this Task<ICocoon<TContent>> responseTask, IPatch<TContent> patch)
     {
-        return await (await responseTask).Infuse(patch);
+        return await (await responseTask).Patch(patch);
     }
 
     public static async ValueTask<ICocoon<TContent>> Infuse<TContent>(
         this ValueTask<ICocoon<TContent>> responseTask, IPatch<TContent> patch)
     {
-        return await (await responseTask).Infuse(patch);
+        return await (await responseTask).Patch(patch);
     }
 
     public static async ValueTask<ICocoon<TContent>> Infuse<TContent>(

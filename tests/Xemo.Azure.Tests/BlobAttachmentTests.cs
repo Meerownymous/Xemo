@@ -1,5 +1,6 @@
 using Tonga.IO;
 using Tonga.Text;
+using Xemo.Azure.Blob;
 using Xunit;
 
 namespace Xemo.Azure.Tests;

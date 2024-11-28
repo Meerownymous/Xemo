@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Concurrent;
 using System.Text;
 using Azure.Storage;
@@ -6,8 +5,11 @@ using Azure.Storage.Blobs;
 using Newtonsoft.Json;
 using Tonga.Map;
 
-namespace Xemo.Azure;
+namespace Xemo.Azure.Blob;
 
+/// <summary>
+/// Hive stored in Azure Blob storage.
+/// </summary>
 public sealed class BlobHive(
     Func<BlobServiceClient> azureBlobService,
     string containerPrefix = ""

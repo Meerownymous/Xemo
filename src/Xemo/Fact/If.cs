@@ -1,26 +1,16 @@
-using System;
 using System.Linq.Expressions;
 
 namespace Xemo.Fact;
 
-public sealed class If<TContent> : IFact<TContent>
+/// <summary>
+/// Simple fact.
+/// </summary>
+public sealed class If<TContent>(Expression<Func<TContent, bool>> condition) : IFact<TContent>
 {
-    private readonly Expression<Func<TContent, bool>> condition;
+    public bool IsTrue(TContent content) =>
+        condition.Compile().Invoke(content);
 
-    public If(Expression<Func<TContent, bool>> condition)
-    {
-        this.condition = condition;
-    }
-
-    public bool IsTrue(TContent content)
-    {
-        return condition.Compile().Invoke(content);
-    }
-
-    public Expression<Func<TContent, bool>> AsExpression()
-    {
-        return condition;
-    }
+    public Expression<Func<TContent, bool>> AsExpression() => condition;
 }
 
 public static class If

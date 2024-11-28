@@ -7,11 +7,11 @@ public abstract class CocoonEnvelope<TContent>(ICocoon<TContent> guts) : ICocoon
 {
     public string ID() => guts.ID();
     
-    public ValueTask<ICocoon<TContent>> Infuse(TContent content) =>
-        guts.Infuse(content);
+    public ValueTask<ICocoon<TContent>> Put(TContent content) =>
+        guts.Put(content);
 
-    public ValueTask<ICocoon<TContent>> Infuse(IPatch<TContent> patch) =>
-        guts.Infuse(patch);
+    public ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch) =>
+        guts.Patch(patch);
 
     public ValueTask<TShape> Grow<TShape>(IMorph<TContent, TShape> morph) =>
         guts.Grow(morph);

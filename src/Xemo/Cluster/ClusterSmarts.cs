@@ -22,10 +22,7 @@ public static class ClusterSmarts
     public static ValueTask<IOptional<ICocoon<TContent>>> FirstMatch<TContent>(
         this ICluster<TContent> cluster,
         Expression<Func<TContent, bool>> matching
-    )
-    {
-        return cluster.FirstMatch(If.True(matching));
-    }
+    ) => cluster.FirstMatch(If.True(matching));
 
     public static ValueTask<IEnumerable<ICocoon<TContent>>> Matches<TContent>(
         this ICluster<TContent> cluster,

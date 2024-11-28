@@ -1,7 +1,5 @@
-using System;
 using System.Globalization;
 using System.Reflection;
-using System.Web;
 using Tonga;
 using Tonga.Enumerable;
 using Tonga.Map;
@@ -13,33 +11,30 @@ namespace Xemo.Azure;
 ///     These are all the properties of the given object which are primitive and directly
 ///     accessible from the source object.
 /// </summary>
-public sealed class ContentAsTags<TSource> : MapEnvelope<string, string>
-{
-    public ContentAsTags(TSource source) : base(
-        new AsMap<string, string>(
-            new AsEnumerable<IPair<string, string>>(() =>
+public sealed class ContentAsTags<TSource>(TSource source) : MapEnvelope<string, string>(
+    new AsMap<string, string>(
+        new AsEnumerable<IPair<string, string>>(() =>
+        {
+            IMap<string, string> result = new Empty<string, string>();
+            if (!typeof(TSource).IsPrimitive && typeof(TSource) != typeof(string))
             {
-                IMap<string, string> result = new Empty<string, string>();
-                if (!typeof(TSource).IsPrimitive && typeof(TSource) != typeof(string))
-                {
-                    foreach (var property in source.GetType().GetProperties())
-                        if (IsSuitableForBlobTag(property))
-                            result = result.With(
-                                AsPair._(
-                                    property.Name,
-                                    new EncodedTag(
-                                        Convert.ToString(property.GetValue(source), CultureInfo.InvariantCulture)
-                                    ).AsString()
-                                )
-                            );
-                }
-                
-                return result.Pairs();
-            })
-        )
+                foreach (var property in source.GetType().GetProperties())
+                    if (IsSuitableForBlobTag(property))
+                        result = result.With(
+                            AsPair._(
+                                property.Name,
+                                new EncodedTag(
+                                    Convert.ToString(property.GetValue(source), CultureInfo.InvariantCulture)
+                                ).AsString()
+                            )
+                        );
+            }
+
+            return result.Pairs();
+        })
     )
-    { }
-    
+)
+{ 
     public static bool IsSuitableForBlobTag(PropertyInfo propertyInfo)
     {
         // Check if the property is a primitive type or a string
@@ -50,10 +45,8 @@ public sealed class ContentAsTags<TSource> : MapEnvelope<string, string>
     }
 }
 
-public static class TagsExtensions
+public static class ContentSmarts
 {
-    public static IMap<string, string> AsTags<TContent>(this TContent source)
-    {
-        return new ContentAsTags<TContent>(source);
-    }
+    public static IMap<string, string> AsTags<TContent>(this TContent source) =>
+        new ContentAsTags<TContent>(source);
 }

@@ -19,6 +19,19 @@ public sealed class RamHiveTests
                     .Grow(name => name)
         );
     }
+    
+    [Fact]
+    public async Task FillsVaultWithDefault()
+    {
+        Assert.Equal(
+            "Jumi",
+            await
+                new RamHive()
+                    .Vault<string>("username")
+                    .Infuse(_ => "Jumi")
+                    .Grow(name => name)
+        );
+    }
 
     [Fact]
     public void RejectsVaultWithWrongType()

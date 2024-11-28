@@ -1,6 +1,6 @@
 using Azure.Storage.Blobs;
 
-namespace Xemo.Azure;
+namespace Xemo.Azure.Blob;
 
 public static class BlobCocoonSmarts
 {
