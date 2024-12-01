@@ -5,6 +5,8 @@ version: "{build}"
 image: Visual Studio 2022
 configuration: Release
 environment:
+  matrix:
+    - DOTNET_SDK_VERSION: 9.0.100
   NUGET_TOKEN:
     secure: hA7gNbFhOr/6AilfgIRGHT1A6TzB1+hhxxYmwctD4lDaVgGb+qGeFYV6xJ0wyNTM
 # Do not build feature branch with open Pull Requests
