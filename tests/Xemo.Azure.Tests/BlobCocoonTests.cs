@@ -78,8 +78,8 @@ public sealed class BlobCocoonTests
                             )
                     ).Value
                 )
-                .Infuse(_ => schema)
-                .Infuse(content => content with { FirstName = "Rodriguez" })
+                .Patch(_ => schema)
+                .Patch(content => content with { FirstName = "Rodriguez" })
                 .Grow(content => content.FirstName)
         );
     }

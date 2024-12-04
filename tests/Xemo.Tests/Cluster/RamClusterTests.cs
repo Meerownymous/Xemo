@@ -89,7 +89,7 @@ public sealed class RamClusterTests
             await (await cluster.FirstMatch(
                 If.True(schema, p => p.Name == "John Doe")
             ))
-            .Out()
+            .Value()
             .Grow(m => m.Name)
         );
     }
@@ -112,7 +112,7 @@ public sealed class RamClusterTests
 
         await (await cluster.FirstMatch(
             If.True(schema, p => p.Name == "John Doe")
-        )).Out().Erase();
+        )).Value().Erase();
 
         Assert.Empty(
             cluster

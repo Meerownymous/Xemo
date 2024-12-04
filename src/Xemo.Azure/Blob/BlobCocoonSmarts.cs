@@ -14,7 +14,7 @@ public static class BlobCocoonSmarts
         return new Lazy<Task<BlobCocoon<TContent>>>(() => Task.Run(async () =>
         {
             var result = new BlobCocoon<TContent>(blobClient);
-            await result.Infuse(_ => content);
+            await result.Patch(_ => content);
             return result;
         }));
     }

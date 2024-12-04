@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Concurrent;
+using Tonga;
 using Tonga.Enumerable;
+using Tonga.Optional;
 using Xemo.Cocoon;
 using Xemo.Fact;
 
@@ -54,7 +56,7 @@ public sealed class BufferedCluster<TContent>(
             : await FirstBufferMatch(fact);
         return opt.Has()
             ? new OptFull<ICocoon<TContent>>(
-                AsBuffered(opt.Out())
+                AsBuffered(opt.Value())
             )
             : new OptEmpty<ICocoon<TContent>>();
     }

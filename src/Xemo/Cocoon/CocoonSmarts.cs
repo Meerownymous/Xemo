@@ -1,5 +1,6 @@
 
 
+using Tonga;
 using Xemo;
 using Xemo.Morph;
 using Xemo.Patch;
@@ -13,10 +14,10 @@ public static class CocoonSmarts
         return (await responseTask).Has();
     }
     
-    public static async ValueTask<ICocoon<TContent>> Out<TContent>(
+    public static async ValueTask<ICocoon<TContent>> Value<TContent>(
         this ValueTask<IOptional<ICocoon<TContent>>> responseTask)
     {
-        return (await responseTask).Out();
+        return (await responseTask).Value();
     }
     
     public static async ValueTask IfHas<TContent>(
@@ -35,7 +36,7 @@ public static class CocoonSmarts
         );
     }
 
-    public static async ValueTask<ICocoon<TContent>> Infuse<TContent>(this ICocoon<TContent> cocoon,
+    public static async ValueTask<ICocoon<TContent>> Patch<TContent>(this ICocoon<TContent> cocoon,
         Func<TContent, TContent> patch)
     {
         return await cocoon.Patch(
@@ -61,34 +62,34 @@ public static class CocoonSmarts
         return await (await responseTask).Grow(morph);
     }
 
-    public static async ValueTask<ICocoon<TContent>> Infuse<TContent>(
+    public static async ValueTask<ICocoon<TContent>> Patch<TContent>(
         this Task<ICocoon<TContent>> responseTask, IPatch<TContent> patch)
     {
         return await (await responseTask).Patch(patch);
     }
 
-    public static async ValueTask<ICocoon<TContent>> Infuse<TContent>(
+    public static async ValueTask<ICocoon<TContent>> Patch<TContent>(
         this ValueTask<ICocoon<TContent>> responseTask, IPatch<TContent> patch)
     {
         return await (await responseTask).Patch(patch);
     }
 
-    public static async ValueTask<ICocoon<TContent>> Infuse<TContent>(
+    public static async ValueTask<ICocoon<TContent>> Patch<TContent>(
         this ValueTask<ICocoon<TContent>> responseTask, Func<TContent, TContent> patch)
     {
-        return await (await responseTask).Infuse(patch);
+        return await (await responseTask).Patch(patch);
     }
 
-    public static async ValueTask<ICocoon<TContent>> Infuse<TContent>(
+    public static async ValueTask<ICocoon<TContent>> Patch<TContent>(
         this Task<ICocoon<TContent>> responseTask, Func<TContent, TContent> patch)
     {
-        return await (await responseTask).Infuse(patch);
+        return await (await responseTask).Patch(patch);
     }
     
-    public static async ValueTask<ICocoon<TContent>> Infuse<TContent>(
+    public static async ValueTask<ICocoon<TContent>> Patch<TContent>(
         this Task<IOptional<ICocoon<TContent>>> responseTask, Func<TContent, TContent> patch)
     {
-        return await (await responseTask).Out().Infuse(patch);
+        return await (await responseTask).Value().Patch(patch);
     }
 
     public static async ValueTask Erase<TContent>(
@@ -100,6 +101,6 @@ public static class CocoonSmarts
     public static async ValueTask Erase<TContent>(
         this Task<IOptional<ICocoon<TContent>>> responseTask)
     {
-        await (await responseTask).Out().Erase();
+        await (await responseTask).Value().Erase();
     }
 }

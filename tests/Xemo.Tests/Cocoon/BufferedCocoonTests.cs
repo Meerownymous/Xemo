@@ -51,7 +51,7 @@ public sealed class BufferedCocoonTests
                 buffer
             );
         await bufferedCocoon.Grow(c => c);
-        await bufferedCocoon.Infuse(_ => "Patched Ingredients");
+        await bufferedCocoon.Patch(_ => "Patched Ingredients");
 
         Assert.Equal(
             "Patched Ingredients",
@@ -68,9 +68,9 @@ public sealed class BufferedCocoonTests
         var origin = new RamCocoon<Person>("123", new Person("Yong", "Yeng"));
         var bufferedCocoon = new BufferedCocoon<Person>(origin, buffer);
         await bufferedCocoon.Grow(c => c);
-        await bufferedCocoon.Infuse(_ => new Person("Günther", "Ganther"));
-        await origin.Infuse(_ => new Person("Samson", "Simson"));
-        await bufferedCocoon.Infuse(_ => new Person("Günther", "Ganther"));
+        await bufferedCocoon.Patch(_ => new Person("Günther", "Ganther"));
+        await origin.Patch(_ => new Person("Samson", "Simson"));
+        await bufferedCocoon.Patch(_ => new Person("Günther", "Ganther"));
 
         Assert.Equal(
             "Samson",
@@ -88,7 +88,7 @@ public sealed class BufferedCocoonTests
                 cocoon,
                 buffer
             );
-        await bufferedCocoon.Infuse(_ => "Patched Ingredients");
+        await bufferedCocoon.Patch(_ => "Patched Ingredients");
 
         Assert.Equal(
             "Patched Ingredients",

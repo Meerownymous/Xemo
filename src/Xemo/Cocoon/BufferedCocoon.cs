@@ -31,14 +31,14 @@ public sealed class BufferedCocoon<TContent>(
             id.Value,
             async _ =>
             {
-                await origin.Infuse(_ => content);
+                await origin.Patch(_ => content);
                 return content;
             },
             async (_, existing) =>
             {
                 var before = (TContent)await existing;
                 if(!content.Equals(before))
-                    await origin.Infuse(_ => content);
+                    await origin.Patch(_ => content);
                 return content;
             }
         );
@@ -52,7 +52,7 @@ public sealed class BufferedCocoon<TContent>(
             async _ =>
             {
                 var patched = await patch.Patch(await origin.Grow(c => c));
-                await origin.Infuse(_ => patched);
+                await origin.Patch(_ => patched);
                 return patched;
             },
             async (_, existing) =>
@@ -60,7 +60,7 @@ public sealed class BufferedCocoon<TContent>(
                 var before = (TContent)await existing;
                 var patched = await patch.Patch(before);
                 if(!patched.Equals(before))
-                    await origin.Infuse(_ => patched);
+                    await origin.Patch(_ => patched);
                 return patched;
             }
         );

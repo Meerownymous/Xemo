@@ -15,7 +15,7 @@ public sealed class RamCocoonTests
                     Modified = false
                 }
                 .InRamCocoon()
-                .Infuse(p => p with { Modified = true })
+                .Patch(p => p with { Modified = true })
                 .Grow(c => c.Modified)
         );
     }

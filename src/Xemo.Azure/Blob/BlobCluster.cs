@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using Azure.Storage.Blobs;
+using Tonga;
 using Tonga.Enumerable;
+using Tonga.Optional;
 using Xemo.Fact;
 
 namespace Xemo.Azure.Blob;
@@ -91,7 +93,7 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
         return 
             await new BlobCocoon<TContent>(
                 Client(new EncodedBlobName(identifier).AsString())
-            ).Infuse(_ => content);
+            ).Patch(_ => content);
     }
 
     private BlobClient Client(string blobName) =>

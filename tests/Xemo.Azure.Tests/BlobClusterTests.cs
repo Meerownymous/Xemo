@@ -100,7 +100,7 @@ public sealed class BlobClusterTests
         }
 
         var match = await cluster.FirstMatch(p => p.Name == "John Doe");
-        Assert.Equal(20, await match.Out().Grow(p => p.Age));
+        Assert.Equal(20, await match.Value().Grow(p => p.Age));
     }
 
     [Fact]

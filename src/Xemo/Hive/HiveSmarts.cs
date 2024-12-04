@@ -12,7 +12,7 @@ public static class HiveSmarts
     /// <returns></returns>
     public static async ValueTask<ICocoon<TContent>> InVault<TContent>(this TContent content, string name, IHive hive)
     {
-        return await hive.Vault<TContent>(name).Infuse(_ => content);
+        return await hive.Vault<TContent>(name).Patch(_ => content);
     }
 
     /// <summary>

@@ -185,7 +185,7 @@ public sealed class BufferedClusterTests
             );
         
         await buffered.Add("1", "Item");
-        await (await origin.Grab("1")).Out().Erase();
+        await (await origin.Grab("1")).Value().Erase();
 
         Assert.Single(
             await buffered.Matches(s => s == "Item")

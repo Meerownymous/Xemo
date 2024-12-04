@@ -18,7 +18,7 @@ public sealed class RamClusterCocoonTests
         Assert.True(
             await content
                 .InRamClusterCocoon(memory.Keys.First(), memory)
-                .Infuse(p => p with { Modified = true })
+                .Patch(p => p with { Modified = true })
                 .Grow(c => c.Modified)
         );
     }

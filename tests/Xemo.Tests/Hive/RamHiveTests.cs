@@ -15,7 +15,7 @@ public sealed class RamHiveTests
             await
                 new RamHive()
                     .Vault<string>("username")
-                    .Infuse(_ => "Jumi")
+                    .Patch(_ => "Jumi")
                     .Grow(name => name)
         );
     }
@@ -28,7 +28,7 @@ public sealed class RamHiveTests
             await
                 new RamHive()
                     .Vault<string>("username")
-                    .Infuse(_ => "Jumi")
+                    .Patch(_ => "Jumi")
                     .Grow(name => name)
         );
     }
