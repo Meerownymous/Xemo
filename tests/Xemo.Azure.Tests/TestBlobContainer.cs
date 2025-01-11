@@ -38,7 +38,8 @@ public sealed class TestBlobContainer : IScalar<BlobContainerClient>, IDisposabl
         {
             var name = new EncodedContainerName(containerName()).AsString();
             var cont = blobService.Value().GetBlobContainerClient(name);
-            cont.CreateIfNotExists();
+            if(!cont.Exists())
+                cont.Create();
             return cont;
         });
     }
