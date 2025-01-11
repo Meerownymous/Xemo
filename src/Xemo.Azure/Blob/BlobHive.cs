@@ -19,12 +19,12 @@ public sealed class BlobHive(
 
     private readonly Lazy<BlobContainerClient> vaultContainer = new(() =>
     {
-        var containerCLient =
+        var containerClient =
             azureBlobService()
                 .GetBlobContainerClient(new EncodedContainerName(containerPrefix + "vaults").AsString());
-        if (!containerCLient.Exists())
-            containerCLient.Create();
-        return containerCLient;
+        if (!containerClient.Exists())
+            containerClient.Create();
+        return containerClient;
     });
 
     private readonly ConcurrentDictionary<string, BlobClient> vaults = new();
@@ -102,7 +102,8 @@ public sealed class BlobHive(
                             .Value
                             .GetBlobContainerClient(
                                 containerPrefix + new EncodedContainerName("attachments").AsString());
-                    containerClient.CreateIfNotExists();
+                    if (!containerClient.Exists())
+                        containerClient.Create();
                     var blobClient = containerClient.GetBlobClient(new EncodedBlobName(link).AsString());
                     return new BlobAttachment(blobClient);
                 }

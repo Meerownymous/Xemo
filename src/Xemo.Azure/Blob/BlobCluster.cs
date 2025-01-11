@@ -14,7 +14,8 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
     private readonly Lazy<BlobContainerClient> containerClient = new(() =>
     {
         var client = containerClient();
-        client.CreateIfNotExists();
+        if(!client.Exists())
+            client.Create();
         return client;
     });
 
@@ -26,7 +27,8 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
         () =>
         {
             var client = blobService.GetBlobContainerClient(new EncodedContainerName(name).AsString());
-            client.CreateIfNotExists();
+            if(!client.Exists())
+                client.Create();
             return client;
         }
     )
