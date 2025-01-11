@@ -28,6 +28,16 @@ public sealed class BlobHiveTests
     }
     
     [Fact]
+    public async Task UsesExistingVault()
+    {
+        var prefix = new EncodedContainerName(Guid.NewGuid().ToString()).AsString().Substring(0, 8);
+        var blobServiceClient = new TestBlobServiceClient(prefix);
+
+        await new BlobHive(blobServiceClient.Value(), prefix).Vault("last-periodic-report", "initial").Grow(s => s);
+        await new BlobHive(blobServiceClient.Value(), prefix).Vault("last-periodic-report", "following").Grow(s => s);
+    }
+    
+    [Fact]
     public async Task AddsStringVaultWithDefaultValue()
     {
         var prefix = new EncodedContainerName(Guid.NewGuid().ToString()).AsString().Substring(0, 8);

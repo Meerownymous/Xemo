@@ -18,9 +18,14 @@ public sealed class BlobHive(
     private readonly Lazy<BlobServiceClient> blobService = new(azureBlobService);
 
     private readonly Lazy<BlobContainerClient> vaultContainer = new(() =>
-        azureBlobService()
-            .GetBlobContainerClient(new EncodedContainerName(containerPrefix + "vaults").AsString())
-    );
+    {
+        var containerCLient =
+            azureBlobService()
+                .GetBlobContainerClient(new EncodedContainerName(containerPrefix + "vaults").AsString());
+        if (!containerCLient.Exists())
+            containerCLient.Create();
+        return containerCLient;
+    });
 
     private readonly ConcurrentDictionary<string, BlobClient> vaults = new();
     private readonly ConcurrentDictionary<string, object> clusters = new();
@@ -51,7 +56,6 @@ public sealed class BlobHive(
         return new BlobCocoon<TContent>(
             this.vaults.GetOrAdd(name, _ =>
             {
-                vaultContainer.Value.CreateIfNotExists();
                 return vaultContainer.Value.GetBlobClient(new EncodedBlobName(name).AsString());
             })
         );
@@ -64,7 +68,6 @@ public sealed class BlobHive(
             new BlobCocoon<TContent>(
                 this.vaults.GetOrAdd(name, _ =>
                 {
-                    vaultContainer.Value.CreateIfNotExists();
                     var blobClient = vaultContainer.Value.GetBlobClient(new EncodedBlobName(name).AsString());
                     Upload(blobClient, name, defaultValue);
                     UpdateTags(blobClient, name, defaultValue);
