@@ -22,8 +22,21 @@ public sealed class BlobHive(
         var containerClient =
             azureBlobService()
                 .GetBlobContainerClient(new EncodedContainerName(containerPrefix + "vaults").AsString());
-        if (!containerClient.Exists())
-            containerClient.Create();
+        containerClient.CreateIfNotExists();
+        
+        // Retry loop to ensure the container is ready
+        const int maxRetries = 5;
+        const int delayMilliseconds = 200; // Wait time between retries
+
+        for (int i = 0; i < maxRetries; i++)
+        {
+            if (containerClient.Exists())
+            {
+                break; // Container is ready
+            }
+
+            Thread.Sleep(delayMilliseconds); // Wait before retrying
+        }
         return containerClient;
     });
 
@@ -54,10 +67,7 @@ public sealed class BlobHive(
     public ICocoon<TContent> Vault<TContent>(string name)
     {
         return new BlobCocoon<TContent>(
-            this.vaults.GetOrAdd(name, _ =>
-            {
-                return vaultContainer.Value.GetBlobClient(new EncodedBlobName(name).AsString());
-            })
+            this.vaults.GetOrAdd(name, _ => vaultContainer.Value.GetBlobClient(new EncodedBlobName(name).AsString()))
         );
 
     }
@@ -102,8 +112,21 @@ public sealed class BlobHive(
                             .Value
                             .GetBlobContainerClient(
                                 containerPrefix + new EncodedContainerName("attachments").AsString());
-                    if (!containerClient.Exists())
-                        containerClient.Create();
+                    containerClient.CreateIfNotExists();
+        
+                    // Retry loop to ensure the container is ready
+                    const int maxRetries = 5;
+                    const int delayMilliseconds = 200; // Wait time between retries
+
+                    for (int i = 0; i < maxRetries; i++)
+                    {
+                        if (containerClient.Exists())
+                        {
+                            break; // Container is ready
+                        }
+
+                        Thread.Sleep(delayMilliseconds); // Wait before retrying
+                    }
                     var blobClient = containerClient.GetBlobClient(new EncodedBlobName(link).AsString());
                     return new BlobAttachment(blobClient);
                 }
