@@ -38,8 +38,15 @@ public sealed class TestBlobContainer : IScalar<BlobContainerClient>, IDisposabl
         {
             var name = new EncodedContainerName(containerName()).AsString();
             var cont = blobService.Value().GetBlobContainerClient(name);
-            if(!cont.Exists())
-                cont.Create();
+            cont.CreateIfNotExists();
+            const int maxRetries = 5;
+            const int delayMilliseconds = 200;
+
+            for (int i = 0; i < maxRetries; i++)
+            {
+                if (cont.Exists()) break;
+                Thread.Sleep(delayMilliseconds); // Wait before retrying
+            }
             return cont;
         });
     }

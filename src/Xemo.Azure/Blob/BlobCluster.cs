@@ -14,24 +14,20 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
     private readonly Lazy<BlobContainerClient> containerClient = new(() =>
     {
         var client = containerClient();
-        if(!client.Exists())
-            client.Create();
+        client.CreateIfNotExists();
+        
+        const int maxRetries = 5;
+        const int delayMilliseconds = 200;
+
+        for (int i = 0; i < maxRetries; i++)
+        {
+            if (client.Exists()) break;
+            Thread.Sleep(delayMilliseconds); // Wait before retrying
+        }
         return client;
     });
 
     public BlobCluster(BlobContainerClient containerClient) : this(() => containerClient)
-    {
-    }
-
-    public BlobCluster(string name, BlobServiceClient blobService) : this(
-        () =>
-        {
-            var client = blobService.GetBlobContainerClient(new EncodedContainerName(name).AsString());
-            if(!client.Exists())
-                client.Create();
-            return client;
-        }
-    )
     {
     }
 
