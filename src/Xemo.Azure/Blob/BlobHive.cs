@@ -19,19 +19,20 @@ public sealed class BlobHive(
 
     private readonly Lazy<BlobContainerClient> vaultContainer = new(() =>
     {
-        var containerClient =
+        var container =
             azureBlobService()
                 .GetBlobContainerClient(new EncodedContainerName(containerPrefix + "vaults").AsString());
         try
         {
-            containerClient.CreateIfNotExists();
+            if (!container.Exists())
+                container.CreateIfNotExists();
         }
         catch (Exception e)
         {
             // ignored
         }
-        WaitUntilReady(containerClient);
-        return containerClient;
+        WaitUntilReady(container);
+        return container;
     });
 
     private readonly ConcurrentDictionary<string, BlobClient> vaults = new();
@@ -101,21 +102,22 @@ public sealed class BlobHive(
             this.attachments.GetOrAdd(link,
                 _ =>
                 {
-                    var containerClient =
+                    var container =
                         blobService
                             .Value
                             .GetBlobContainerClient(
                                 containerPrefix + new EncodedContainerName("attachments").AsString());
                     try
                     {
-                        containerClient.CreateIfNotExists();
+                        if (!container.Exists())
+                            container.CreateIfNotExists();
                     }
                     catch (Exception)
                     {
                         // ignored
                     }
-                    WaitUntilReady(containerClient);
-                    var blobClient = containerClient.GetBlobClient(new EncodedBlobName(link).AsString());
+                    WaitUntilReady(container);
+                    var blobClient = container.GetBlobClient(new EncodedBlobName(link).AsString());
                     return new BlobAttachment(blobClient);
                 }
             );
@@ -150,9 +152,16 @@ public sealed class BlobHive(
 
         for (int i = 0; i < maxRetries; i++)
         {
-            if (containerClient.Exists())
+            try
             {
-                break; // Container is ready
+                if (containerClient.Exists())
+                {
+                    break; // Container is ready
+                }
+            }
+            catch (Exception)
+            {
+                // ignored
             }
 
             Thread.Sleep(delayMilliseconds); // Wait before retrying
