@@ -30,21 +30,7 @@ public sealed class BlobHive(
         {
             // ignored
         }
-
-
-        // Retry loop to ensure the container is ready
-        const int maxRetries = 5;
-        const int delayMilliseconds = 200; // Wait time between retries
-
-        for (int i = 0; i < maxRetries; i++)
-        {
-            if (containerClient.Exists())
-            {
-                break; // Container is ready
-            }
-
-            Thread.Sleep(delayMilliseconds); // Wait before retrying
-        }
+        WaitUntilReady(containerClient);
         return containerClient;
     });
 
@@ -128,20 +114,7 @@ public sealed class BlobHive(
                     {
                         // ignored
                     }
-
-                    // Retry loop to ensure the container is ready
-                    const int maxRetries = 5;
-                    const int delayMilliseconds = 200; // Wait time between retries
-
-                    for (int i = 0; i < maxRetries; i++)
-                    {
-                        if (containerClient.Exists())
-                        {
-                            break; // Container is ready
-                        }
-
-                        Thread.Sleep(delayMilliseconds); // Wait before retrying
-                    }
+                    WaitUntilReady(containerClient);
                     var blobClient = containerClient.GetBlobClient(new EncodedBlobName(link).AsString());
                     return new BlobAttachment(blobClient);
                 }
@@ -168,5 +141,21 @@ public sealed class BlobHive(
             ),
             true
         );
+    }
+
+    private static void WaitUntilReady(BlobContainerClient containerClient)
+    {
+        const int maxRetries = 5;
+        const int delayMilliseconds = 200; 
+
+        for (int i = 0; i < maxRetries; i++)
+        {
+            if (containerClient.Exists())
+            {
+                break; // Container is ready
+            }
+
+            Thread.Sleep(delayMilliseconds); // Wait before retrying
+        }
     }
 }

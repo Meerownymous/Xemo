@@ -46,15 +46,7 @@ public sealed class TestBlobContainer : IScalar<BlobContainerClient>, IDisposabl
             {
                 // ignored
             }
-
-            const int maxRetries = 5;
-            const int delayMilliseconds = 200;
-
-            for (int i = 0; i < maxRetries; i++)
-            {
-                if (cont.Exists()) break;
-                Thread.Sleep(delayMilliseconds); // Wait before retrying
-            }
+            WaitUntilReady(cont);
             return cont;
         });
     }
@@ -67,5 +59,21 @@ public sealed class TestBlobContainer : IScalar<BlobContainerClient>, IDisposabl
     public BlobContainerClient Value()
     {
         return container.Value;
+    }
+    
+    private static void WaitUntilReady(BlobContainerClient containerClient)
+    {
+        const int maxRetries = 5;
+        const int delayMilliseconds = 200; 
+
+        for (int i = 0; i < maxRetries; i++)
+        {
+            if (containerClient.Exists())
+            {
+                break; // Container is ready
+            }
+
+            Thread.Sleep(delayMilliseconds); // Wait before retrying
+        }
     }
 }

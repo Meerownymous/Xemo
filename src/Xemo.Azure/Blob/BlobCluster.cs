@@ -15,15 +15,7 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
     {
         var client = containerClient();
         client.CreateIfNotExists();
-        
-        const int maxRetries = 5;
-        const int delayMilliseconds = 200;
-
-        for (int i = 0; i < maxRetries; i++)
-        {
-            if (client.Exists()) break;
-            Thread.Sleep(delayMilliseconds); // Wait before retrying
-        }
+        WaitUntilReady(client);
         return client;
     });
 
@@ -98,4 +90,20 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
         clients.GetOrAdd(blobName,
             containerClient.Value.GetBlobClient(blobName)
         );
+    
+    private static void WaitUntilReady(BlobContainerClient containerClient)
+    {
+        const int maxRetries = 5;
+        const int delayMilliseconds = 200; 
+
+        for (int i = 0; i < maxRetries; i++)
+        {
+            if (containerClient.Exists())
+            {
+                break; // Container is ready
+            }
+
+            Thread.Sleep(delayMilliseconds); // Wait before retrying
+        }
+    }
 }
