@@ -22,8 +22,16 @@ public sealed class BlobHive(
         var containerClient =
             azureBlobService()
                 .GetBlobContainerClient(new EncodedContainerName(containerPrefix + "vaults").AsString());
-        containerClient.CreateIfNotExists();
-        
+        try
+        {
+            containerClient.CreateIfNotExists();
+        }
+        catch (Exception e)
+        {
+            // ignored
+        }
+
+
         // Retry loop to ensure the container is ready
         const int maxRetries = 5;
         const int delayMilliseconds = 200; // Wait time between retries
@@ -112,8 +120,15 @@ public sealed class BlobHive(
                             .Value
                             .GetBlobContainerClient(
                                 containerPrefix + new EncodedContainerName("attachments").AsString());
-                    containerClient.CreateIfNotExists();
-        
+                    try
+                    {
+                        containerClient.CreateIfNotExists();
+                    }
+                    catch (Exception)
+                    {
+                        // ignored
+                    }
+
                     // Retry loop to ensure the container is ready
                     const int maxRetries = 5;
                     const int delayMilliseconds = 200; // Wait time between retries
