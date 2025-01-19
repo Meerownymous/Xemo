@@ -13,10 +13,19 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
     private readonly ConcurrentDictionary<string, BlobClient> clients = new();
     private readonly Lazy<BlobContainerClient> containerClient = new(() =>
     {
-        var client = containerClient();
-        client.CreateIfNotExists();
-        WaitUntilReady(client);
-        return client;
+        var container = containerClient();
+        try
+        {
+            if (!container.Exists())
+                container.CreateIfNotExists();
+        }
+        catch (Exception)
+        {
+            // ignored
+        }
+
+        WaitUntilReady(container);
+        return container;
     });
 
     public BlobCluster(BlobContainerClient containerClient) : this(() => containerClient)
@@ -98,9 +107,16 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
 
         for (int i = 0; i < maxRetries; i++)
         {
-            if (containerClient.Exists())
+            try
             {
-                break; // Container is ready
+                if (containerClient.Exists())
+                {
+                    break; // Container is ready
+                }
+            }
+            catch (Exception)
+            {
+                // ignored
             }
 
             Thread.Sleep(delayMilliseconds); // Wait before retrying
