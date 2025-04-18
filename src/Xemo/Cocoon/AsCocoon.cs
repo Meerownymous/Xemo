@@ -17,5 +17,5 @@ public sealed class AsCocoon<TContent>(Func<ICocoon<TContent>> cocoon) : ICocoon
     public ValueTask<TShape> Grow<TShape>(IMorph<TContent, TShape> morph) =>
         this.cocoon.Value.Grow(morph);
 
-    public ValueTask Erase() => this.cocoon.Value.Erase();
+    public ValueTask Delete() => this.cocoon.Value.Delete();
 }

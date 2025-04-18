@@ -22,7 +22,7 @@ public static class HiveSmarts
         IHive hive)
     {
         var cluster = hive.Cluster<TContent>(name);
-        await cluster.Add(name, content);
+        await cluster.Add(content, name);
         return cluster;
     }
 }

@@ -30,7 +30,7 @@ public sealed class RamCocoonTests
                     Modified = false
                 }
                 .InRamCocoon()
-                .Erase()
+                .Delete()
         );
     }
 

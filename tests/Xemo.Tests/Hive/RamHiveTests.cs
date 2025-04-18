@@ -51,7 +51,7 @@ public sealed class RamHiveTests
             "Jumi",
             await new RamHive()
                 .Cluster<string>("names")
-                .Add("1", "Jumi")
+                .Add("Jumi", "1")
                 .Grow(name => name)
         );
     }

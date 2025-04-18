@@ -22,13 +22,11 @@ public sealed class OnBeforeAddTests
             );
 
         await
-            cluster.Add(
-                "2",
-                new
-                {
-                    Name = "Jane Doe",
-                    Age = 21
-                });
+            cluster.Add(new
+            {
+                Name = "Jane Doe",
+                Age = 21
+            }, "2");
 
         Assert.Equal(
             21,

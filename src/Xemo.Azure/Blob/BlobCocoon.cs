@@ -63,7 +63,7 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
             );
     }
 
-    public async ValueTask Erase()
+    public async ValueTask Delete()
     {
         await blobClient.DeleteAsync();
     }

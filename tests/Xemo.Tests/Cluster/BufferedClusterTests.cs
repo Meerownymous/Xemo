@@ -20,14 +20,14 @@ public sealed class BufferedClusterTests
                 new ConcurrentDictionary<string, BufferedCocoon<string>>(),
                 contentBuffer
             );
-        var a = await origin.Add("1", "Item A");
-        var b = await origin.Add("2", "Item B");
-        var c = await origin.Add("3", "Item C");
+        var a = await origin.Add("Item A", "1");
+        var b = await origin.Add("Item B", "2");
+        var c = await origin.Add("Item C", "3");
 
         buffered.GetEnumerator().MoveNext();
-        await a.Erase();
-        await b.Erase();
-        await c.Erase();
+        await a.Delete();
+        await b.Delete();
+        await c.Delete();
 
         Assert.Equal(
             new[] { "1", "2", "3" },
@@ -50,15 +50,15 @@ public sealed class BufferedClusterTests
                 new ConcurrentDictionary<string, BufferedCocoon<string>>(),
                 contentBuffer
             );
-        var a = await origin.Add("1", "Item A");
-        var b = await origin.Add("2", "Item B");
-        var c = await origin.Add("3", "Item C");
+        var a = await origin.Add("Item A", "1");
+        var b = await origin.Add("Item B", "2");
+        var c = await origin.Add("Item C", "3");
 
         using var enumerator = buffered.GetEnumerator();
         while (enumerator.MoveNext()) await enumerator.Current.Grow(content => content);
-        await a.Erase();
-        await b.Erase();
-        await c.Erase();
+        await a.Delete();
+        await b.Delete();
+        await c.Delete();
 
         Assert.Equal(
             new[] { "Item A", "Item B", "Item C" },
@@ -81,12 +81,12 @@ public sealed class BufferedClusterTests
                 new ConcurrentDictionary<string, BufferedCocoon<string>>(),
                 contentBuffer
             );
-        await buffered.Add("1", "Item A");
-        await buffered.Add("2", "Item B");
-        await buffered.Add("3", "Item C");
+        await buffered.Add("Item A", "1");
+        await buffered.Add("Item B", "2");
+        await buffered.Add("Item C", "3");
 
         foreach (var ramCocoon in origin)
-            await ramCocoon.Erase();
+            await ramCocoon.Delete();
 
         Assert.Equal(
             ["Item A", "Item B", "Item C"],
@@ -112,12 +112,12 @@ public sealed class BufferedClusterTests
                 contentBuffer,
                 matchFromOrigin: true
             );
-        await buffered.Add("1", "Item A");
-        await buffered.Add("2", "Item B");
-        await buffered.Add("3", "Item C");
+        await buffered.Add("Item A", "1");
+        await buffered.Add("Item B", "2");
+        await buffered.Add("Item C", "3");
 
         foreach (var ramCocoon in origin)
-            await ramCocoon.Erase();
+            await ramCocoon.Delete();
 
         Assert.False(
             await buffered.FirstMatch(s => s == "Item A").Has()
@@ -137,12 +137,12 @@ public sealed class BufferedClusterTests
                 contentBuffer,
                 matchFromOrigin: false
             );
-        await buffered.Add("1", "Item A");
-        await buffered.Add("2", "Item B");
-        await buffered.Add("3", "Item C");
+        await buffered.Add("Item A", "1");
+        await buffered.Add("Item B", "2");
+        await buffered.Add("Item C", "3");
 
         foreach (var ramCocoon in origin)
-            await ramCocoon.Erase();
+            await ramCocoon.Delete();
 
         Assert.True(
             await buffered.FirstMatch(s => s == "Item A").Has()
@@ -162,8 +162,8 @@ public sealed class BufferedClusterTests
                 contentBuffer,
                 matchFromOrigin: true
             );
-        var cocoon = await buffered.Add("1", "Item");
-        await cocoon.Erase();
+        var cocoon = await buffered.Add("Item", "1");
+        await cocoon.Delete();
 
         Assert.Empty(
             await buffered.Matches(s => s == "Item")
@@ -184,8 +184,8 @@ public sealed class BufferedClusterTests
                 matchFromOrigin: false
             );
         
-        await buffered.Add("1", "Item");
-        await (await origin.Grab("1")).Value().Erase();
+        await buffered.Add("Item", "1");
+        await (await origin.Grab("1")).Value().Delete();
 
         Assert.Single(
             await buffered.Matches(s => s == "Item")
@@ -204,12 +204,12 @@ public sealed class BufferedClusterTests
                 new ConcurrentDictionary<string, BufferedCocoon<string>>(),
                 contentBuffer
             );
-        await buffered.Add("1", "Item A");
-        await buffered.Add("2", "Item B");
-        await buffered.Add("3", "Item C");
+        await buffered.Add("Item A", "1");
+        await buffered.Add("Item B", "2");
+        await buffered.Add("Item C", "3");
 
         foreach (var ramCocoon in origin)
-            await ramCocoon.Erase();
+            await ramCocoon.Delete();
 
         Assert.True(
             await buffered.Grab("1").Has()
@@ -228,12 +228,12 @@ public sealed class BufferedClusterTests
                 new ConcurrentDictionary<string, BufferedCocoon<string>>(),
                 contentBuffer
             );
-        await buffered.Add("1", "Item A");
-        await buffered.Add("2", "Item B");
-        await buffered.Add("3", "Item C");
+        await buffered.Add("Item A", "1");
+        await buffered.Add("Item B", "2");
+        await buffered.Add("Item C", "3");
 
         foreach (var cocoon in buffered)
-            await cocoon.Erase();
+            await cocoon.Delete();
 
         Assert.Empty(buffered);
     }
@@ -250,12 +250,12 @@ public sealed class BufferedClusterTests
                 new ConcurrentDictionary<string, BufferedCocoon<string>>(),
                 contentBuffer
             );
-        await buffered.Add("1", "Item A");
-        await buffered.Add("2", "Item B");
-        await buffered.Add("3", "Item C");
+        await buffered.Add("Item A", "1");
+        await buffered.Add("Item B", "2");
+        await buffered.Add("Item C", "3");
 
         foreach (var cocoon in buffered)
-            await cocoon.Erase();
+            await cocoon.Delete();
 
         Assert.Empty(contentBuffer.Keys);
     }

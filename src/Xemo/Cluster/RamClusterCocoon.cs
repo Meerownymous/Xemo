@@ -46,7 +46,7 @@ public sealed class RamClusterCocoon<TContent>(
         return result;
     }
 
-    public ValueTask Erase()
+    public ValueTask Delete()
     {
         memory.TryRemove(id, out _);
         return ValueTask.CompletedTask;

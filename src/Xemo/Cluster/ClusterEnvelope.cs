@@ -19,6 +19,6 @@ public abstract class ClusterEnvelope<TContent>(ICluster<TContent> origin) : ICl
         origin.Matches(fact);
     public ValueTask<IOptional<ICocoon<TContent>>> FirstMatch(IFact<TContent> fact) =>
         origin.FirstMatch(fact);
-    public ValueTask<ICocoon<TContent>> Add(string identifier, TContent content) =>
-        origin.Add(identifier, content);
+    public ValueTask<ICocoon<TContent>> Add(TContent content, string identifier) =>
+        origin.Add(content, identifier);
 }

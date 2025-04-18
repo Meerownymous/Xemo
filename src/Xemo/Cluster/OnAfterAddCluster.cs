@@ -9,9 +9,9 @@ namespace Xemo.Cluster
     /// </summary>
     public sealed class OnAfterAddCluster<T>(ICluster<T> origin, Action<ICocoon<T>> act) : ICluster<T>
     {
-        public async ValueTask<ICocoon<T>> Add(string identifier, T content)
+        public async ValueTask<ICocoon<T>> Add(T content, string identifier)
         {
-            var cocoon = await origin.Add(identifier, content);
+            var cocoon = await origin.Add(content, identifier);
             act(cocoon);
             return cocoon;
         }

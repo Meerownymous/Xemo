@@ -87,7 +87,7 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
         );
     }
 
-    public async ValueTask<ICocoon<TContent>> Add(string identifier, TContent content)
+    public async ValueTask<ICocoon<TContent>> Add(TContent content, string identifier)
     {
         return 
             await new BlobCocoon<TContent>(

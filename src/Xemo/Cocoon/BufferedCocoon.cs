@@ -77,10 +77,10 @@ public sealed class BufferedCocoon<TContent>(
         return await morph.Shaped(content);
     }
 
-    public async ValueTask Erase()
+    public async ValueTask Delete()
     {
         buffer.TryRemove(id.Value, out _);
         onDelete();
-        await origin.Erase();
+        await origin.Delete();
     }
 }

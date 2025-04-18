@@ -38,7 +38,7 @@ public sealed class RamCocoon<TContent>(Func<string> id, TContent content)
         return morph.Shaped(content);
     }
 
-    public ValueTask Erase()
+    public ValueTask Delete()
     {
         throw new InvalidOperationException("A standalone RAM cocoon cannot be erased.");
     }
