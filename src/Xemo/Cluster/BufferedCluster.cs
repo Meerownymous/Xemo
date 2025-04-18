@@ -75,14 +75,14 @@ public sealed class BufferedCluster<TContent>(
             );
     }
 
-    public async ValueTask<ICocoon<TContent>> Add(string identifier, TContent content)
+    public async ValueTask<ICocoon<TContent>> Add(TContent content, string identifier)
     {
         await indexLock.WaitAsync();
         try
         {
             Preload();
             var added =
-                AsBuffered(await origin.Add(identifier, content));
+                AsBuffered(await origin.Add(content, identifier));
             await contentBuffer.AddOrUpdate(identifier,
                 _ => new ValueTask<object>(content),
                 (_,_) => new ValueTask<object>(content)

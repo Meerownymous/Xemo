@@ -21,13 +21,11 @@ public sealed class OnAfterAddTests
             .OnAfterAdd(_ => acted = true);
 
         await
-            cluster.Add(
-                "2",
-                new
-                {
-                    Name = "Jane Doe",
-                    Age = 21
-                });
+            cluster.Add(new
+            {
+                Name = "Jane Doe",
+                Age = 21
+            }, "2");
 
         Assert.True(acted);
     }

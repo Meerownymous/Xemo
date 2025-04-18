@@ -28,8 +28,8 @@ public sealed class LazyCluster<TContent>(Func<ICluster<TContent>> construct) : 
     public ValueTask<IEnumerable<ICocoon<TContent>>> Matches(IFact<TContent> fact) =>
         cluster.Value.Matches(fact);
 
-    public ValueTask<ICocoon<TContent>> Add(string identifier, TContent content)
+    public ValueTask<ICocoon<TContent>> Add(TContent content, string identifier)
     {
-        return cluster.Value.Add(identifier, content);
+        return cluster.Value.Add(content, identifier);
     }
 }

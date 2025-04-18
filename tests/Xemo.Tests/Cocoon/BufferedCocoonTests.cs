@@ -109,7 +109,7 @@ public sealed class BufferedCocoonTests
         await bufferedCocoon.Grow(c => c);
         try
         {
-            await bufferedCocoon.Erase();
+            await bufferedCocoon.Delete();
         }
         catch (Exception)
         {

@@ -16,5 +16,5 @@ public abstract class CocoonEnvelope<TContent>(ICocoon<TContent> guts) : ICocoon
     public ValueTask<TShape> Grow<TShape>(IMorph<TContent, TShape> morph) =>
         guts.Grow(morph);
 
-    public ValueTask Erase() => guts.Erase();
+    public ValueTask Delete() => guts.Delete();
 }

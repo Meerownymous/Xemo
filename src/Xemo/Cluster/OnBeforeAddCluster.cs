@@ -9,8 +9,8 @@ namespace Xemo.Cluster
     /// </summary>
     public sealed class OnBeforeAddCluster<T>(ICluster<T> origin, Func<T, T> intercept) : ICluster<T>
     {
-        public ValueTask<ICocoon<T>> Add(string identifier, T content) =>
-            origin.Add(identifier, intercept(content));
+        public ValueTask<ICocoon<T>> Add(T content, string identifier) =>
+            origin.Add(intercept(content), identifier);
 
         public IEnumerator<ICocoon<T>> GetEnumerator() => origin.GetEnumerator();
 

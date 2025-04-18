@@ -95,12 +95,12 @@ public static class CocoonSmarts
     public static async ValueTask Erase<TContent>(
         this Task<ICocoon<TContent>> responseTask)
     {
-        await (await responseTask).Erase();
+        await (await responseTask).Delete();
     }
     
     public static async ValueTask Erase<TContent>(
         this Task<IOptional<ICocoon<TContent>>> responseTask)
     {
-        await (await responseTask).Value().Erase();
+        await (await responseTask).Value().Delete();
     }
 }

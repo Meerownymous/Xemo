@@ -62,7 +62,7 @@ public sealed class RamCluster<TContent>(
         return result;
     }
 
-    public ValueTask<ICocoon<TContent>> Add(string identifier, TContent content)
+    public ValueTask<ICocoon<TContent>> Add(TContent content, string identifier)
     {
         memory.AddOrUpdate(
             identifier,
@@ -96,7 +96,7 @@ public static class RamClusterExtensions
                 new RamCluster<TContent>(
                     new ConcurrentDictionary<string, ValueTask<TContent>>()
                 );
-            cluster.Add(name(), content);
+            cluster.Add(content, name());
             return cluster;
         });
     }

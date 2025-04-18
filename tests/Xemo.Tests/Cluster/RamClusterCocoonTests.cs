@@ -39,7 +39,7 @@ public sealed class RamClusterCocoonTests
                 Modified = false
             }
             .InRamClusterCocoon(memory.Keys.First(), memory)
-            .Erase();
+            .Delete();
         Assert.Empty(memory);
     }
 

@@ -37,14 +37,11 @@ public sealed class RamClusterTests
                 Name = "John Doe",
                 Age = int.MaxValue
             }.InRamCluster();
-        await cluster.Add(
-            "123",
-            new
+        await cluster.Add(new
             {
                 Name = "Jane Doe",
                 Age = int.MaxValue
-            }
-        );
+            }, "123");
 
         Assert.Single(
             await cluster.Matches(
@@ -112,7 +109,7 @@ public sealed class RamClusterTests
 
         await (await cluster.FirstMatch(
             If.True(schema, p => p.Name == "John Doe")
-        )).Value().Erase();
+        )).Value().Delete();
 
         Assert.Empty(
             cluster

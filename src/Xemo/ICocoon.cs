@@ -9,5 +9,5 @@ public interface ICocoon<TContent>
     ValueTask<ICocoon<TContent>> Put(TContent content);
     ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch);
     ValueTask<TShape> Grow<TShape>(IMorph<TContent, TShape> morph);
-    ValueTask Erase();
+    ValueTask Delete();
 }

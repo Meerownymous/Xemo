@@ -118,7 +118,7 @@ public sealed class BlobClusterTests
                 Age = 20
             }.InBlobCluster(id, subject, serviceClient.Value());
 
-        await cluster.Add("cocoon-456", new { Name = "Jane Doe", Age = 18 });
+        await cluster.Add(new { Name = "Jane Doe", Age = 18 }, "cocoon-456");
 
         //Wait for azure updates
         var found = false;
@@ -153,7 +153,7 @@ public sealed class BlobClusterTests
                 Pattern = ".*"
             }.InBlobCluster(id, subject, serviceClient.Value());
 
-        await cluster.Add("cocoon-456", new { Pattern = ".$" });
+        await cluster.Add(new { Pattern = ".$" }, "cocoon-456");
 
         //Wait for azure updates
         var retries = 30;
