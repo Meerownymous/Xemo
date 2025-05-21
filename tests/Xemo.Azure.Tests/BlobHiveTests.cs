@@ -85,7 +85,7 @@ public sealed class BlobHiveTests
         var prefix = new EncodedContainerName(Guid.NewGuid().ToString()).AsString().Substring(0, 8);
         var blobServiceClient = new TestBlobServiceClient(prefix);
         var hive = new BlobHive(blobServiceClient.Value(), prefix);
-        await hive.Attachment("cocoon-123-mood").Patch(_ => new AsInput(":)").Stream());
+        await hive.Attachment("cocoon-123-mood").Patch(_ => new AsStream(":)"));
 
         Assert.Equal(
             ":)",

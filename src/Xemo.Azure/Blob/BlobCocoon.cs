@@ -16,10 +16,10 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
         return id.Value;
     }
     
-    public async ValueTask<ICocoon<TContent>> Put(TContent content)
+    public async ValueTask<ICocoon<TContent>> Put(TContent newContent)
     {
-        await Upload(content);
-        await UpdateTags(content);
+        await Upload(newContent);
+        await UpdateTags(newContent);
         return this;
     }
 
@@ -31,7 +31,7 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
             current =
                 JsonConvert.DeserializeObject<TContent>(
                     AsText._(
-                        new AsInput((await blobClient.DownloadAsync()).Value.Content),
+                        new AsConduit((await blobClient.DownloadAsync()).Value.Content),
                         Encoding.UTF8
                     ).AsString()
                 );
@@ -56,7 +56,7 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
             await morph.Shaped(
                 JsonConvert.DeserializeObject<TContent>(
                     AsText._(
-                        new AsInput((await blobClient.DownloadAsync()).Value.Content),
+                        new AsConduit((await blobClient.DownloadAsync()).Value.Content),
                         Encoding.UTF8
                     ).AsString()
                 )

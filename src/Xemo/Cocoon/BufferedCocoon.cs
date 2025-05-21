@@ -25,21 +25,21 @@ public sealed class BufferedCocoon<TContent>(
         return id.Value;
     }
     
-    public async ValueTask<ICocoon<TContent>> Put(TContent content)
+    public async ValueTask<ICocoon<TContent>> Put(TContent newContent)
     {
         await buffer.AddOrUpdate(
             id.Value,
             async _ =>
             {
-                await origin.Patch(_ => content);
-                return content;
+                await origin.Patch(_ => newContent);
+                return newContent;
             },
             async (_, existing) =>
             {
                 var before = (TContent)await existing;
-                if(!content.Equals(before))
-                    await origin.Patch(_ => content);
-                return content;
+                if(!newContent.Equals(before))
+                    await origin.Patch(_ => newContent);
+                return newContent;
             }
         );
         return origin;

@@ -7,8 +7,8 @@ public abstract class CocoonEnvelope<TContent>(ICocoon<TContent> guts) : ICocoon
 {
     public string ID() => guts.ID();
     
-    public ValueTask<ICocoon<TContent>> Put(TContent content) =>
-        guts.Put(content);
+    public ValueTask<ICocoon<TContent>> Put(TContent newContent) =>
+        guts.Put(newContent);
 
     public ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch) =>
         guts.Patch(patch);

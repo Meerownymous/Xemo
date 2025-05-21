@@ -12,11 +12,11 @@ public sealed class RamClusterCocoon<TContent>(
         return id;
     }
     
-    public async ValueTask<ICocoon<TContent>> Put(TContent content)
+    public async ValueTask<ICocoon<TContent>> Put(TContent newContent)
     {
         await memory.AddOrUpdate(id,
             _ => throw new InvalidOperationException("No content to patch."),
-            (_, _) => ValueTask.FromResult(content)
+            (_, _) => ValueTask.FromResult(newContent)
         );
         return this;
     }

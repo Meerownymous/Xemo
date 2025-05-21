@@ -27,7 +27,7 @@ public sealed class BlobHive(
             if (!container.Exists())
                 container.CreateIfNotExists();
         }
-        catch (Exception e)
+        catch (Exception)
         {
             // ignored
         }
@@ -74,7 +74,7 @@ public sealed class BlobHive(
                 this.vaults.GetOrAdd(name, _ =>
                 {
                     var blobClient = vaultContainer.Value.GetBlobClient(new EncodedBlobName(name).AsString());
-                    Upload(blobClient, name, defaultValue);
+                    Upload(blobClient, defaultValue);
                     UpdateTags(blobClient, name, defaultValue);
                     return blobClient;
                 })
@@ -133,7 +133,7 @@ public sealed class BlobHive(
         );
     }
 
-    private void Upload<TContent>(BlobClient blobClient, string id, TContent content)
+    private void Upload<TContent>(BlobClient blobClient, TContent content)
     {
         blobClient.Upload(
             new MemoryStream(
