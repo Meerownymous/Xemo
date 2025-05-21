@@ -12,7 +12,7 @@ public sealed class BufferedAttachmentTests
     public async Task GrowsFromOrigin()
     {
         var origin = new RamAttachment("1", new ConcurrentDictionary<string, Task<Stream>>());
-        await origin.Patch(_ => new AsInput("Je suis un attachement").Stream());
+        await origin.Patch(_ => new AsConduit("Je suis un attachement").Stream());
 
         Assert.Equal(
             "Je suis un attachement",
@@ -25,7 +25,7 @@ public sealed class BufferedAttachmentTests
     {
         var ram = new ConcurrentDictionary<string, Task<Stream>>();
         var origin = new RamAttachment("1", ram);
-        await origin.Patch(_ => new AsInput("Je suis un attachement").Stream());
+        await origin.Patch(_ => new AsConduit("Je suis un attachement").Stream());
 
         var buffered = new BufferedAttachment(origin);
         await buffered.Grow(c => new AsText(c).AsString());
@@ -42,10 +42,10 @@ public sealed class BufferedAttachmentTests
     {
         var ram = new ConcurrentDictionary<string, Task<Stream>>();
         var origin = new RamAttachment("1", ram);
-        await origin.Patch(_ => new AsInput("Je suis un attachement").Stream());
+        await origin.Patch(_ => new AsConduit("Je suis un attachement").Stream());
 
         var buffered = new BufferedAttachment(origin);
-        await buffered.Patch(_ => new AsInput("Je suis patched").Stream());
+        await buffered.Patch(_ => new AsConduit("Je suis patched").Stream());
 
         Assert.Equal(
             "Je suis patched",
@@ -58,11 +58,11 @@ public sealed class BufferedAttachmentTests
     {
         var ram = new ConcurrentDictionary<string, Task<Stream>>();
         var origin = new RamAttachment("1", ram);
-        await origin.Patch(_ => new AsInput("Je suis un attachement").Stream());
+        await origin.Patch(_ => new AsConduit("Je suis un attachement").Stream());
 
         var buffered = new BufferedAttachment(origin);
         await buffered.Grow(c => new AsText(c).AsString());
-        await buffered.Patch(_ => new AsInput("Je suis patched").Stream());
+        await buffered.Patch(_ => new AsConduit("Je suis patched").Stream());
 
         Assert.Equal(
             "Je suis patched",
@@ -75,11 +75,11 @@ public sealed class BufferedAttachmentTests
     {
         var ram = new ConcurrentDictionary<string, Task<Stream>>();
         var origin = new RamAttachment("1", ram);
-        await origin.Patch(_ => new AsInput(":)").Stream());
+        await origin.Patch(_ => new AsConduit(":)").Stream());
 
         var buffered = new BufferedAttachment(origin);
         await buffered.Grow(c => new AsText(c).AsString());
-        await origin.Patch(_ => new AsInput(":(").Stream());
+        await origin.Patch(_ => new AsConduit(":(").Stream());
 
         Assert.Equal(
             ":)",

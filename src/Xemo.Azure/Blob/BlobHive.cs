@@ -27,7 +27,7 @@ public sealed class BlobHive(
             if (!container.Exists())
                 container.CreateIfNotExists();
         }
-        catch (Exception e)
+        catch (Exception)
         {
             // ignored
         }

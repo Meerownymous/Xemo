@@ -61,7 +61,7 @@ public sealed class RamHiveTests
     {
         var hive = new RamHive();
         var attachment =
-            await hive.Attachment("settings").Patch(_ => new AsInput("Yes").Stream());
+            await hive.Attachment("settings").Patch(_ => new AsConduit("Yes").Stream());
 
         Assert.Equal(
             "Yes",
@@ -75,7 +75,7 @@ public sealed class RamHiveTests
         var hive =
             new RamHive();
         var attachment =
-            await hive.Attachment("settings").Patch(_ => new AsInput("Yes").Stream());
+            await hive.Attachment("settings").Patch(_ => new AsConduit("Yes").Stream());
 
         Assert.Equal(
             "Yes",

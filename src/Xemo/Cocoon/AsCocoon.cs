@@ -8,8 +8,8 @@ public sealed class AsCocoon<TContent>(Func<ICocoon<TContent>> cocoon) : ICocoon
     private readonly Lazy<ICocoon<TContent>> cocoon = new(cocoon);
     public string ID() => this.cocoon.Value.ID();
 
-    public ValueTask<ICocoon<TContent>> Put(TContent content) =>
-        this.cocoon.Value.Put(content);
+    public ValueTask<ICocoon<TContent>> Put(TContent newContent) =>
+        this.cocoon.Value.Put(newContent);
 
     public ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch) =>
         this.cocoon.Value.Patch(patch);

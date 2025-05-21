@@ -21,10 +21,10 @@ public sealed class RamCocoon<TContent>(Func<string> id, TContent content)
         return id.Value;
     }
     
-    public async ValueTask<ICocoon<TContent>> Put(TContent content)
+    public ValueTask<ICocoon<TContent>> Put(TContent newContent)
     {
-        this.content = content;
-        return this;
+        this.content = newContent;
+        return ValueTask.FromResult<ICocoon<TContent>>(this);
     }
 
     public async ValueTask<ICocoon<TContent>> Patch(IPatch<TContent> patch)
@@ -33,15 +33,11 @@ public sealed class RamCocoon<TContent>(Func<string> id, TContent content)
         return this;
     }
 
-    public ValueTask<TShape> Grow<TShape>(IMorph<TContent, TShape> morph)
-    {
-        return morph.Shaped(content);
-    }
+    public ValueTask<TShape> Grow<TShape>(IMorph<TContent, TShape> morph) =>
+        morph.Shaped(content);
 
-    public ValueTask Delete()
-    {
+    public ValueTask Delete() =>
         throw new InvalidOperationException("A standalone RAM cocoon cannot be erased.");
-    }
 }
 
 public static class RamCocoonExtensions
