@@ -1,6 +1,3 @@
-using System;
-using System.Threading.Tasks;
-
 namespace Xemo.Cocoon;
 
 /// <summary>
@@ -16,10 +13,7 @@ public sealed class RamCocoon<TContent>(Func<string> id, TContent content)
     {
     }
 
-    public string ID()
-    {
-        return id.Value;
-    }
+    public string ID() => id.Value;
     
     public ValueTask<ICocoon<TContent>> Put(TContent newContent)
     {

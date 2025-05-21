@@ -22,7 +22,7 @@ public sealed class BlobAttachmentTests
             );
         await
             attachment.Patch(
-                _ => new AsConduit("I am attached!").Stream()
+                _ => new AsStream("I am attached!")
             );
 
         Assert.Equal(
@@ -45,7 +45,7 @@ public sealed class BlobAttachmentTests
                     new EncodedBlobName("attachment-" + Guid.NewGuid()).AsString()
                 );
         await blobClient.UploadAsync(
-            new AsConduit("I am attached!").Stream()
+            new AsStream("I am attached!")
         );
 
         Assert.Equal(
