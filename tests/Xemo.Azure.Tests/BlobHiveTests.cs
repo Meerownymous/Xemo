@@ -10,7 +10,7 @@ public sealed class BlobHiveTests
     [Fact]
     public async Task AddsVault()
     {
-        var prefix = new EncodedContainerName(Guid.NewGuid().ToString()).AsString().Substring(0, 8);
+        var prefix = new EncodedContainerName(Guid.NewGuid().ToString()).AsSubText(0, 8).Str();
         var blobServiceClient = new TestBlobServiceClient(prefix);
         Assert.Equal(
             123,
@@ -30,7 +30,7 @@ public sealed class BlobHiveTests
     [Fact]
     public async Task UsesExistingVault()
     {
-        var prefix = new EncodedContainerName(Guid.NewGuid().ToString()).AsString().Substring(0, 8);
+        var prefix = new EncodedContainerName(Guid.NewGuid().ToString()).AsSubText(0, 8).Str();
         var blobServiceClient = new TestBlobServiceClient(prefix);
 
         await new BlobHive(blobServiceClient.Value(), prefix).Vault("last-periodic-report", "initial").Grow(s => s);
@@ -40,7 +40,7 @@ public sealed class BlobHiveTests
     [Fact]
     public async Task AddsStringVaultWithDefaultValue()
     {
-        var prefix = new EncodedContainerName(Guid.NewGuid().ToString()).AsString().Substring(0, 8);
+        var prefix = new EncodedContainerName(Guid.NewGuid().ToString()).AsSubText(0, 8).Str();
         var blobServiceClient = new TestBlobServiceClient(prefix);
         
         await new BlobHive(blobServiceClient.Value(), prefix)
@@ -59,7 +59,7 @@ public sealed class BlobHiveTests
     [Fact]
     public async Task AddsCluster()
     {
-        var prefix = new EncodedContainerName(Guid.NewGuid().ToString()).AsString().Substring(0, 8);
+        var prefix = new EncodedContainerName(Guid.NewGuid().ToString()).AsSubText(0, 8).Str();
         using var blobServiceClient = new TestBlobServiceClient(prefix);
 
         Assert.Equal(
@@ -82,14 +82,14 @@ public sealed class BlobHiveTests
     [Fact]
     public async Task DeliversAttachment()
     {
-        var prefix = new EncodedContainerName(Guid.NewGuid().ToString()).AsString().Substring(0, 8);
+        var prefix = new EncodedContainerName(Guid.NewGuid().ToString()).AsSubText(0, 8).Str();
         var blobServiceClient = new TestBlobServiceClient(prefix);
         var hive = new BlobHive(blobServiceClient.Value(), prefix);
         await hive.Attachment("cocoon-123-mood").Patch(_ => new AsStream(":)"));
 
         Assert.Equal(
             ":)",
-            await hive.Attachment("cocoon-123-mood").Grow(s => AsText._(s).AsString())
+            await hive.Attachment("cocoon-123-mood").Grow(s => s.AsText().Str())
         );
     }
 }

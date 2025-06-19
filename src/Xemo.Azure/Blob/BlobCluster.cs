@@ -46,7 +46,7 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
     public async ValueTask<IOptional<ICocoon<TContent>>> Grab(string id)
     {
         IOptional<ICocoon<TContent>> result = new OptEmpty<ICocoon<TContent>>();
-        var client = Client(new EncodedBlobName(id).AsString());
+        var client = Client(new EncodedBlobName(id).Str());
         if (await client.ExistsAsync())
             result = new OptFull<ICocoon<TContent>>(
                 new BlobCocoon<TContent>(client)
@@ -62,7 +62,7 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
             containerClient
                 .Value
                 .FindBlobsByTagsAsync( 
-                    new FactAsTagQuery<TContent>(new AssertSimple<TContent>(fact)).AsString()
+                    new FactAsTagQuery<TContent>(new AssertSimple<TContent>(fact)).Str()
                 )
         )
             result = 
@@ -75,15 +75,13 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
     public ValueTask<IEnumerable<ICocoon<TContent>>> Matches(IFact<TContent> fact)
     {
         return ValueTask.FromResult(
-            Mapped._(
-                blob =>
-                    new BlobCocoon<TContent>(Client(blob.BlobName)) as ICocoon<TContent>,
                 containerClient
                     .Value
                     .FindBlobsByTags(
-                        new FactAsTagQuery<TContent>(new AssertSimple<TContent>(fact)).AsString()
-                    )
-            )
+                        new FactAsTagQuery<TContent>(new AssertSimple<TContent>(fact)).Str()
+                    ).AsMapped(blob =>
+                        new BlobCocoon<TContent>(Client(blob.BlobName))
+                    ).Cast<ICocoon<TContent>>()
         );
     }
 
@@ -91,7 +89,7 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
     {
         return 
             await new BlobCocoon<TContent>(
-                Client(new EncodedBlobName(identifier).AsString())
+                Client(new EncodedBlobName(identifier).Str())
             ).Patch(_ => content);
     }
 
@@ -122,4 +120,10 @@ public sealed class BlobCluster<TContent>(Func<BlobContainerClient> containerCli
             Thread.Sleep(delayMilliseconds); // Wait before retrying
         }
     }
+}
+
+public static partial class EnumerableSmarts
+{
+    public static IEnumerable<TContent> Typed<TContent>(this IEnumerable enumerable) =>
+        enumerable.Cast<TContent>();
 }

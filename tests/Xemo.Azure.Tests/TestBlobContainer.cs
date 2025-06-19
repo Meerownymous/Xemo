@@ -36,7 +36,7 @@ public sealed class TestBlobContainer : IScalar<BlobContainerClient>, IDisposabl
     {
         container = new Lazy<BlobContainerClient>(() =>
         {
-            var name = new EncodedContainerName(containerName()).AsString();
+            var name = new EncodedContainerName(containerName()).Str();
             var cont = blobService.Value().GetBlobContainerClient(name);
             try
             {

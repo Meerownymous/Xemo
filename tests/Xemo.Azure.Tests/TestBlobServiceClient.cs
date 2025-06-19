@@ -21,10 +21,10 @@ public sealed class TestBlobServiceClient : IScalar<BlobServiceClient>, IDisposa
         service =
             new Lazy<BlobServiceClient>(() =>
                 new BlobServiceClient(
-                    new Uri(new Secret("blobStorageUri").AsString()),
+                    new Uri(new Secret("blobStorageUri").Str()),
                     new StorageSharedKeyCredential(
-                        new Secret("storageAccountName").AsString(),
-                        new Secret("storageAccountSecret").AsString()
+                        new Secret("storageAccountName").Str(),
+                        new Secret("storageAccountSecret").Str()
                     )
                 )
             );

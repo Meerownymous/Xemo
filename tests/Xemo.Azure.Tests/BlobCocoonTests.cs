@@ -24,7 +24,7 @@ public sealed class BlobCocoonTests
                     .InBlobClusterCocoon(
                         container.Value()
                             .GetBlobClient(
-                                new EncodedBlobName(blobName).AsString()
+                                new EncodedBlobName(blobName).Str()
                             )
                     ).Value
                 ).Grow(content => content.FirstName)
@@ -42,7 +42,7 @@ public sealed class BlobCocoonTests
             container
                 .Value()
                 .GetBlobClient(
-                    new EncodedBlobName("123").AsString()
+                    new EncodedBlobName("123").Str()
                 );
 
         await new
@@ -74,7 +74,7 @@ public sealed class BlobCocoonTests
             await (await schema.InBlobClusterCocoon(
                         container.Value()
                             .GetBlobClient(
-                                new EncodedBlobName("123").AsString()
+                                new EncodedBlobName("123").Str()
                             )
                     ).Value
                 )

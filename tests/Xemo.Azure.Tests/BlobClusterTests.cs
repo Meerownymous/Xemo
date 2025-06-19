@@ -92,7 +92,7 @@ public sealed class BlobClusterTests
         {
             if (containerService
                 .Value()
-                .FindBlobsByTags($"Name = '{new EncodedTag("John Doe").AsString()}'")
+                .FindBlobsByTags($"Name = '{new EncodedTag("John Doe").Str()}'")
                 .Any()
                )
                 break;
@@ -125,8 +125,8 @@ public sealed class BlobClusterTests
         var retries = 30;
         for (var i = 0; i < retries; i++)
         {
-            if (containerService.Value().FindBlobsByTags($"Name = '{new EncodedTag("John Doe").AsString()}'").Any()
-                && containerService.Value().FindBlobsByTags($"Name = '{new EncodedTag("John Doe").AsString()}'").Any())
+            if (containerService.Value().FindBlobsByTags($"Name = '{new EncodedTag("John Doe").Str()}'").Any()
+                && containerService.Value().FindBlobsByTags($"Name = '{new EncodedTag("John Doe").Str()}'").Any())
             {
                 found = true;
                 break;
@@ -160,8 +160,8 @@ public sealed class BlobClusterTests
         var found = false;
         for (var i = 0; i < retries; i++)
         {
-            if (containerService.Value().FindBlobsByTags($"Pattern = '{new EncodedTag(".*").AsString()}'").Any()
-                && containerService.Value().FindBlobsByTags($"Pattern = '{new EncodedTag(".$").AsString()}'").Any())
+            if (containerService.Value().FindBlobsByTags($"Pattern = '{new EncodedTag(".*").Str()}'").Any()
+                && containerService.Value().FindBlobsByTags($"Pattern = '{new EncodedTag(".$").Str()}'").Any())
             {
                 found = true;
                 break;

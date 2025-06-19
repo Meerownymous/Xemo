@@ -56,7 +56,7 @@ public sealed class BufferedCluster<TContent>(
             : await FirstBufferMatch(fact);
         return opt.Has()
             ? new OptFull<ICocoon<TContent>>(
-                AsBuffered(opt.Value())
+                Buffered(opt.Value())
             )
             : new OptEmpty<ICocoon<TContent>>();
     }
@@ -66,13 +66,7 @@ public sealed class BufferedCluster<TContent>(
         var matches = matchFromOrigin
             ? await origin.Matches(fact)
             : await BufferMatches(fact);
-        return
-            Mapped._(
-                cocoon =>
-                    (ICocoon<TContent>)
-                    AsBuffered(cocoon),
-                matches
-            );
+        return matches.AsMapped(Buffered);
     }
 
     public async ValueTask<ICocoon<TContent>> Add(TContent content, string identifier)
@@ -82,7 +76,7 @@ public sealed class BufferedCluster<TContent>(
         {
             Preload();
             var added =
-                AsBuffered(await origin.Add(content, identifier));
+                Buffered(await origin.Add(content, identifier));
             await contentBuffer.AddOrUpdate(identifier,
                 _ => new ValueTask<object>(content),
                 (_,_) => new ValueTask<object>(content)
@@ -138,7 +132,7 @@ public sealed class BufferedCluster<TContent>(
                 {
                     cocoonBuffer.AddOrUpdate(
                         cocoon.ID(),
-                        _ => AsBuffered(cocoon),
+                        _ => Buffered(cocoon),
                         (_, existing) => existing
                     );
                 }
@@ -147,12 +141,10 @@ public sealed class BufferedCluster<TContent>(
         );
     }
 
-    private BufferedCocoon<TContent> AsBuffered(ICocoon<TContent> cocoon)
-    {
-        return new BufferedCocoon<TContent>(
+    private BufferedCocoon<TContent> Buffered(ICocoon<TContent> cocoon) =>
+        new(
             cocoon, 
             contentBuffer, 
             () => cocoonBuffer.TryRemove(cocoon.ID(), out _)
         );
-    }
 }

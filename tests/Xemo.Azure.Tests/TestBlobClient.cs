@@ -37,7 +37,7 @@ public sealed class TestBlobClient : IScalar<BlobClient>, IDisposable
         blobClient = new Lazy<BlobClient>(() =>
             containerClient
                 .Value()
-                .GetBlobClient(new EncodedBlobName(id()).AsString())
+                .GetBlobClient(new EncodedBlobName(id()).Str())
         );
     }
 

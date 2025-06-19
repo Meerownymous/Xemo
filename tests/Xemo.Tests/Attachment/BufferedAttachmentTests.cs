@@ -16,7 +16,7 @@ public sealed class BufferedAttachmentTests
 
         Assert.Equal(
             "Je suis un attachement",
-            await new BufferedAttachment(origin).Grow(c => new AsText(c).AsString())
+            await new BufferedAttachment(origin).Grow(c => new AsText(c).Str())
         );
     }
 
@@ -28,12 +28,12 @@ public sealed class BufferedAttachmentTests
         await origin.Patch(_ => new AsStream("Je suis un attachement"));
 
         var buffered = new BufferedAttachment(origin);
-        await buffered.Grow(c => new AsText(c).AsString());
+        await buffered.Grow(c => new AsText(c).Str());
         await origin.Patch(_ => new MemoryStream());
 
         Assert.Equal(
             "Je suis un attachement",
-            await buffered.Grow(c => new AsText(c).AsString())
+            await buffered.Grow(c => new AsText(c).Str())
         );
     }
 
@@ -49,7 +49,7 @@ public sealed class BufferedAttachmentTests
 
         Assert.Equal(
             "Je suis patched",
-            await origin.Grow(c => new AsText(c).AsString())
+            await origin.Grow(c => new AsText(c).Str())
         );
     }
 
@@ -61,12 +61,12 @@ public sealed class BufferedAttachmentTests
         await origin.Patch(_ => new AsStream("Je suis un attachement"));
 
         var buffered = new BufferedAttachment(origin);
-        await buffered.Grow(c => new AsText(c).AsString());
+        await buffered.Grow(c => new AsText(c).Str());
         await buffered.Patch(_ => new AsStream("Je suis patched"));
 
         Assert.Equal(
             "Je suis patched",
-            await origin.Grow(c => new AsText(c).AsString())
+            await origin.Grow(c => new AsText(c).Str())
         );
     }
 
@@ -78,12 +78,12 @@ public sealed class BufferedAttachmentTests
         await origin.Patch(_ => new AsStream(":)"));
 
         var buffered = new BufferedAttachment(origin);
-        await buffered.Grow(c => new AsText(c).AsString());
+        await buffered.Grow(c => new AsText(c).Str());
         await origin.Patch(_ => new AsStream(":("));
 
         Assert.Equal(
             ":)",
-            await buffered.Grow(c => new AsText(c).AsString())
+            await buffered.Grow(c => new AsText(c).Str())
         );
     }
 }

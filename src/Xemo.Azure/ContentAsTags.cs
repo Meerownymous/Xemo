@@ -21,12 +21,15 @@ public sealed class ContentAsTags<TSource>(TSource source) : MapEnvelope<string,
                 foreach (var property in source.GetType().GetProperties())
                     if (IsSuitableForBlobTag(property))
                         result = result.With(
-                            AsPair._(
+                            (
                                 property.Name,
                                 new EncodedTag(
-                                    Convert.ToString(property.GetValue(source), CultureInfo.InvariantCulture)
-                                ).AsString()
-                            )
+                                    Convert.ToString(
+                                        property.GetValue(source), 
+                                        CultureInfo.InvariantCulture
+                                    )
+                                ).Str()
+                            ).AsPair()
                         );
             }
 

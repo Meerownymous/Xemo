@@ -7,7 +7,7 @@ namespace Xemo.Azure;
 ///     A name encoded so that it can be used as azure blob name.
 /// </summary>
 public sealed class DecodedBlobName(string encoded) : TextEnvelope(
-    AsText._(() =>
+    (() =>
     {
         try
         {

@@ -12,7 +12,7 @@ public static class BlobClusterSmarts
     {
         return Task.Run(async () =>
         {
-            var containerClient = blobClient.GetBlobContainerClient(new EncodedContainerName(name).AsString());
+            var containerClient = blobClient.GetBlobContainerClient(new EncodedContainerName(name).Str());
             var result = new BlobCluster<TContent>(() => containerClient);
             await result.Add(content, id);
             return result;

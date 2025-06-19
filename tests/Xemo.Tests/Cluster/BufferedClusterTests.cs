@@ -31,10 +31,9 @@ public sealed class BufferedClusterTests
 
         Assert.Equal(
             new[] { "1", "2", "3" },
-            Mapped._(
-                cocoon => cocoon.ID(),
-                buffered
-            ).ToArray()
+            buffered
+                .AsMapped(cocoon => cocoon.ID())
+                .ToArray()
         );
     }
 
@@ -62,10 +61,8 @@ public sealed class BufferedClusterTests
 
         Assert.Equal(
             new[] { "Item A", "Item B", "Item C" },
-            Mapped._(
-                cocoon => cocoon.Grow(c => c).Result,
-                buffered
-            ).ToArray()
+            buffered.AsMapped(cocoon => cocoon.Grow(c => c).Result)
+                .ToArray()
         );
     }
 
@@ -90,12 +87,8 @@ public sealed class BufferedClusterTests
 
         Assert.Equal(
             ["Item A", "Item B", "Item C"],
-            Sorted._(
-                Mapped._(
-                    cocoon => cocoon.Grow(c => c).Result,
-                    buffered
-                )
-            )
+                buffered.AsMapped(cocoon => cocoon.Grow(c => c).Result)
+                    .AsSorted()
         );
     }
     
