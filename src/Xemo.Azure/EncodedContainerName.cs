@@ -12,7 +12,7 @@ namespace Xemo.Azure;
 ///     A name escaped so that it can be used as identifier for azure containers.
 /// </summary>
 public sealed class EncodedContainerName(string origin) : TextEnvelope(
-    AsText._(() => $"{Escaped(origin)}")
+    () => $"{Escaped(origin)}"
 )
 {
     private static readonly char[] base36Chars =

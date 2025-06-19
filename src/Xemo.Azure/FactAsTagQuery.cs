@@ -9,9 +9,7 @@ namespace Xemo.Azure
     ///     Translates a fact to an Azure tag query.
     /// </summary>
     public sealed class FactAsTagQuery<TInput>(IFact<TInput> fact) : TextEnvelope(
-        AsText._(() =>
-            TranslateExpressionToAzureQuery(fact.AsExpression())
-        )
+        () => TranslateExpressionToAzureQuery(fact.AsExpression())
     )
     {
         private static string TranslateExpressionToAzureQuery(Expression<Func<TInput, bool>> expression)
@@ -39,7 +37,7 @@ namespace Xemo.Azure
             if (expression is ConstantExpression constantExpression)
             {
                 // Handle constant values (e.g., "John", 30)
-                return $"'{new EncodedTag(constantExpression.Value.ToString()).AsString()}'"; // Wrap the value in quotes for Azure
+                return $"'{new EncodedTag(constantExpression.Value.ToString()).Str()}'"; // Wrap the value in quotes for Azure
             }
 
             if (expression is UnaryExpression unaryExpression)

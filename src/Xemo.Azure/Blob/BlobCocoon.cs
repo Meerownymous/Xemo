@@ -9,7 +9,7 @@ namespace Xemo.Azure.Blob;
 
 public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TContent>
 {
-    private readonly Lazy<string> id = new(() => new DecodedBlobName(blobClient.Name).AsString());
+    private readonly Lazy<string> id = new(() => new DecodedBlobName(blobClient.Name).Str());
 
     public string ID()
     {
@@ -30,13 +30,12 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
         if (await blobClient.ExistsAsync())
             current =
                 JsonConvert.DeserializeObject<TContent>(
-                    AsText._(
-                        new AsConduit((await blobClient.DownloadAsync()).Value.Content),
-                        Encoding.UTF8
-                    ).AsString()
+                    (await blobClient.DownloadAsync()).Value.Content
+                        .AsConduit()
+                        .AsText(Encoding.UTF8)
+                        .Str()
                 );
         var patched = await patch.Patch(current);
-
         if ((before != null && !before.Equals(patched)) || before == null)
         {
             await Upload(patched);
@@ -55,26 +54,21 @@ public sealed class BlobCocoon<TContent>(BlobClient blobClient) : ICocoon<TConte
         return
             await morph.Shaped(
                 JsonConvert.DeserializeObject<TContent>(
-                    AsText._(
-                        new AsConduit((await blobClient.DownloadAsync()).Value.Content),
-                        Encoding.UTF8
-                    ).AsString()
+                    new AsConduit((await blobClient.DownloadAsync()).Value.Content)
+                        .AsText(Encoding.UTF8)
+                        .Str()
                 )
             );
     }
 
-    public async ValueTask Delete()
-    {
-        await blobClient.DeleteAsync();
-    }
+    public async ValueTask Delete() => await blobClient.DeleteAsync();
 
     private async Task UpdateTags(TContent content)
     {
         await blobClient.SetTagsAsync(
-            new AsDictionary<string, string>(
                 new ContentAsTags<TContent>(content)
-                    .With(AsPair._("_id", id.Value))
-            )
+                    .With(("_id", id.Value).AsPair())
+                    .AsDictionary()
         );
     }
 

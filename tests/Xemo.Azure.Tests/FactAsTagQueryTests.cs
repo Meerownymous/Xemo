@@ -17,7 +17,7 @@ public sealed class FactAsTagQueryTests
             "Name = 'Yada'",
             new FactAsTagQuery<Rec>(
                 new AssertSimple<Rec>(If.True<Rec>(s => s.Name == "Yada"))
-            ).AsString()
+            ).Str()
         );
     }
     
@@ -25,10 +25,10 @@ public sealed class FactAsTagQueryTests
     public void BuildsQueryWithSpecialChars()
     {
         Assert.Equal(
-            $"Name = '{new EncodedTag(".*").AsString()}'",
+            $"Name = '{new EncodedTag(".*").Str()}'",
             new FactAsTagQuery<Rec>(
                 new AssertSimple<Rec>(If.True<Rec>(s => s.Name == ".*"))
-            ).AsString()
+            ).Str()
         );
     }
     
@@ -40,7 +40,7 @@ public sealed class FactAsTagQueryTests
             "Name = 'Yada'",
             new FactAsTagQuery<Rec>(
                 new AssertSimple<Rec>(If.True<Rec>(s => s.Name == name))
-            ).AsString()
+            ).Str()
         );
     }
 }

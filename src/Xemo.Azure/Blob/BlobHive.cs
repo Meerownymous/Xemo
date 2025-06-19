@@ -16,12 +16,11 @@ public sealed class BlobHive(
 ) : IHive
 {
     private readonly Lazy<BlobServiceClient> blobService = new(azureBlobService);
-
     private readonly Lazy<BlobContainerClient> vaultContainer = new(() =>
     {
         var container =
             azureBlobService()
-                .GetBlobContainerClient(new EncodedContainerName(containerPrefix + "vaults").AsString());
+                .GetBlobContainerClient(new EncodedContainerName(containerPrefix + "vaults").Str());
         try
         {
             if (!container.Exists())
@@ -62,7 +61,9 @@ public sealed class BlobHive(
     public ICocoon<TContent> Vault<TContent>(string name)
     {
         return new BlobCocoon<TContent>(
-            this.vaults.GetOrAdd(name, _ => vaultContainer.Value.GetBlobClient(new EncodedBlobName(name).AsString()))
+            this.vaults.GetOrAdd(name, _ => 
+                this.vaultContainer.Value.GetBlobClient(new EncodedBlobName(name).Str())
+            )
         );
 
     }
@@ -73,7 +74,7 @@ public sealed class BlobHive(
             new BlobCocoon<TContent>(
                 this.vaults.GetOrAdd(name, _ =>
                 {
-                    var blobClient = vaultContainer.Value.GetBlobClient(new EncodedBlobName(name).AsString());
+                    var blobClient = this.vaultContainer.Value.GetBlobClient(new EncodedBlobName(name).Str());
                     Upload(blobClient, defaultValue);
                     UpdateTags(blobClient, name, defaultValue);
                     return blobClient;
@@ -84,16 +85,12 @@ public sealed class BlobHive(
     public ICluster<TContent> Cluster<TContent>(string name)
     {
         return
-            this.clusters.GetOrAdd(name,
-                _ =>
-                {
-                    var containerClient =
-                        blobService
-                            .Value
-                            .GetBlobContainerClient(containerPrefix + new EncodedContainerName(name).AsString());
-
-                    return new BlobCluster<TContent>(containerClient);
-                }) as ICluster<TContent>;
+            this.clusters.GetOrAdd(
+                name,
+                _ => new BlobCluster<TContent>(
+                        ContainerClient(containerPrefix, name, blobService.Value)
+                    )
+            ) as ICluster<TContent>;
     }
 
     public IAttachment Attachment(string link)
@@ -103,10 +100,8 @@ public sealed class BlobHive(
                 _ =>
                 {
                     var container =
-                        blobService
-                            .Value
-                            .GetBlobContainerClient(
-                                containerPrefix + new EncodedContainerName("attachments").AsString());
+                        ContainerClient(containerPrefix, "attachments", blobService.Value);
+                    
                     try
                     {
                         if (!container.Exists())
@@ -117,7 +112,7 @@ public sealed class BlobHive(
                         // ignored
                     }
                     WaitUntilReady(container);
-                    var blobClient = container.GetBlobClient(new EncodedBlobName(link).AsString());
+                    var blobClient = container.GetBlobClient(new EncodedBlobName(link).Str());
                     return new BlobAttachment(blobClient);
                 }
             );
@@ -128,7 +123,7 @@ public sealed class BlobHive(
         blobClient.SetTags(
             new AsDictionary<string, string>(
                 new ContentAsTags<TContent>(content)
-                    .With(AsPair._("_id", id))
+                    .With(("_id", id).AsPair())
             )
         );
     }
@@ -166,5 +161,14 @@ public sealed class BlobHive(
 
             Thread.Sleep(delayMilliseconds); // Wait before retrying
         }
+    }
+
+    private static BlobContainerClient ContainerClient(string containerPrefix, string name, BlobServiceClient blobService)
+    {
+        return
+            blobService
+                .GetBlobContainerClient(
+                    containerPrefix + new EncodedContainerName(name).Str()
+                );
     }
 }

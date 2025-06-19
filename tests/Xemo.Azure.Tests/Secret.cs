@@ -17,7 +17,7 @@ public sealed class Secret : TextEnvelope
     ///     Environment variables are prioritized over files.
     ///     Handy to prevent secrets from leaking online.
     /// </summary>
-    public Secret(string name) : base(AsText._(() =>
+    public Secret(string name) : base((() =>
         {
             var result = string.Empty;
             if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable(name, EnvironmentVariableTarget.Process)))
@@ -52,7 +52,7 @@ public sealed class SecretTests
     {
         Assert.Equal(
             "This is a secret in the secrets file",
-            new Secret("test").AsString()
+            new Secret("test").Str()
         );
     }
 
@@ -65,7 +65,7 @@ public sealed class SecretTests
                 "test", "this is a secret in an environment variable", EnvironmentVariableTarget.Process
             );
 
-            Assert.Equal("this is a secret in an environment variable", new Secret("test").AsString());
+            Assert.Equal("this is a secret in an environment variable", new Secret("test").Str());
         }
         finally
         {

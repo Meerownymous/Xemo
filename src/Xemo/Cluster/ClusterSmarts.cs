@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using Tonga;
+using Tonga.Enumerable;
 using Xemo;
 using Xemo.Fact;
 
@@ -14,11 +15,8 @@ public static class ClusterSmarts
     }
 
     public static async Task<IEnumerable<TResult>> Mapped<TContent, TResult>(
-        this ICluster<TContent> source, Func<ICocoon<TContent>, Task<TResult>> mapping)
-    {
-        var tasks = Tonga.Enumerable.Mapped._(mapping, source);
-        return await Task.WhenAll(tasks); // Wait for all tasks to complete
-    }
+        this ICluster<TContent> source, Func<ICocoon<TContent>, Task<TResult>> mapping) =>
+        await Task.WhenAll(source.AsMapped(mapping)); // Wait for all tasks to complete
 
     public static ValueTask<IOptional<ICocoon<TContent>>> FirstMatch<TContent>(
         this ICluster<TContent> cluster,

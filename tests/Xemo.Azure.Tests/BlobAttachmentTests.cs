@@ -17,7 +17,7 @@ public sealed class BlobAttachmentTests
                 container
                     .Value()
                     .GetBlobClient(
-                        new EncodedBlobName("attachment-" + Guid.NewGuid()).AsString()
+                        new EncodedBlobName("attachment-" + Guid.NewGuid()).Str()
                     )
             );
         await
@@ -28,7 +28,7 @@ public sealed class BlobAttachmentTests
         Assert.Equal(
             "I am attached!",
             await attachment.Grow(
-                stream => AsText._(stream).AsString()
+                stream => stream.AsText().Str()
             )
         );
     }
@@ -42,7 +42,7 @@ public sealed class BlobAttachmentTests
             container
                 .Value()
                 .GetBlobClient(
-                    new EncodedBlobName("attachment-" + Guid.NewGuid()).AsString()
+                    new EncodedBlobName("attachment-" + Guid.NewGuid()).Str()
                 );
         await blobClient.UploadAsync(
             new AsStream("I am attached!")
@@ -51,7 +51,7 @@ public sealed class BlobAttachmentTests
         Assert.Equal(
             "I am attached!",
             await new BlobAttachment(blobClient).Grow(
-                stream => AsText._(stream).AsString()
+                stream => stream.AsText().Str()
             )
         );
     }

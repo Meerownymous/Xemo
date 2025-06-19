@@ -65,7 +65,7 @@ public sealed class RamHiveTests
 
         Assert.Equal(
             "Yes",
-            await attachment.Grow(stream => AsText._(stream).AsString())
+            await attachment.Grow(stream => stream.AsText().Str())
         );
     }
 
@@ -79,7 +79,7 @@ public sealed class RamHiveTests
 
         Assert.Equal(
             "Yes",
-            await attachment.Grow(stream => AsText._(stream).AsString())
+            await attachment.Grow(stream => stream.AsText().Str())
         );
     }
 }
