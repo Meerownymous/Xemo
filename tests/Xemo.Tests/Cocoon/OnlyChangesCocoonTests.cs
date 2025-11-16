@@ -117,7 +117,7 @@ public sealed class OnlyChangesCocoonTests
                 }
             }.InRamCocoon()
             .OnBeforePatch(() => delegated = true)
-            .AsOnlyChanges((l,r) => l.IsContentEqual(r).IsTrue())
+            .AsOnlyChanges((l,r) => l.IsContentEqual(r))
             .Patch(_ => new
             {
                 Name = "Peter Checkson",
@@ -143,7 +143,7 @@ public sealed class OnlyChangesCocoonTests
                 }
             }.InRamCocoon()
             .OnBeforePatch(() => delegated = true)
-            .AsOnlyChanges((l,r) => l.IsContentEqual(r).IsTrue())
+            .AsOnlyChanges((l,r) => l.IsContentEqual(r))
             .Patch(_ => new
             {
                 Name = "Bernd Checkson",

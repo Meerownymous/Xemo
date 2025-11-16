@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using Tonga;
 
 namespace Xemo.Cocoon;
 
@@ -49,4 +50,9 @@ public static class OnlyChangesCocoonSmarts
         this ICocoon<TContent> origin,
         Func<TContent,TContent,bool> isContentEqual
     ) => new(origin, isContentEqual);
+    
+    public static OnlyChangesCocoon<TContent> AsOnlyChanges<TContent>(
+        this ICocoon<TContent> origin,
+        Func<TContent,TContent,IFact> isContentEqual
+    ) => new(origin, (left,right) => isContentEqual(left, right).IsTrue());
 }
