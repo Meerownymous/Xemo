@@ -13,6 +13,8 @@ using Cake.Core.Diagnostics;
 using Cake.Core.IO;
 using Cake.Frosting;
 
+namespace Build;
+
 public static class Program
 {
     public static int Main(string[] args)
@@ -25,16 +27,16 @@ public static class Program
 
 public static class Settings
 {
-    public static string ModuleName = "Xemo";
+    public static readonly string ModuleName = "Xemo";
     public static string Version = "0.1.0";
-    public static string Configuration = "Release";
+    public static readonly string Configuration = "Release";
     public static string NugetReleaseToken = string.Empty;
-    public static string NugetSource = "https://api.nuget.org/v3/index.json";
+    public static readonly string NugetSource = "https://api.nuget.org/v3/index.json";
 
-    public static FilePath SolutionPath = new($"../{ModuleName}.sln");
-    public static DirectoryPath ModulePath = new("../src");
-    public static DirectoryPath TestModulePath = new("../tests");
-    public static DirectoryPath ArtifactPath = new("../artifacts");
+    public static readonly FilePath SolutionPath = new($"../{ModuleName}.sln");
+    public static readonly DirectoryPath ModulePath = new("../src");
+    public static readonly DirectoryPath TestModulePath = new("../tests");
+    public static readonly DirectoryPath ArtifactPath = new("../artifacts");
 }
 
 public class BuildContext : FrostingContext
