@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Xemo.Cocoon;
 using Xunit;
 
@@ -98,6 +99,58 @@ public sealed class OnlyChangesCocoonTests
             .Patch(_ => new
             {
                 Name = "Bernd Checkson"
+            });
+        
+        Assert.True(delegated);
+    }
+    
+    [Fact]
+    public async Task DoesNotPatchIfUnchangedWithDTOAndCustomComparison()
+    {
+        var delegated = false;
+        await new
+            {
+                Name = "Peter Checkson",
+                Atts = new Dictionary<string,string>()
+                {
+                    { "Age", "16" }
+                }
+            }.InRamCocoon()
+            .OnBeforePatch(() => delegated = true)
+            .AsOnlyChanges((l,r) => l.IsContentEqual(r).IsTrue())
+            .Patch(_ => new
+            {
+                Name = "Peter Checkson",
+                Atts = new Dictionary<string,string>()
+                {
+                    { "Age", "16" }
+                }
+            });
+        
+        Assert.False(delegated);
+    }
+    
+    [Fact]
+    public async Task PatchesIfChangedWithDTOAndCustomComparison()
+    {
+        var delegated = false;
+        await new
+            {
+                Name = "Peter Checkson",
+                Atts = new Dictionary<string,string>()
+                {
+                    { "Age", "16" }
+                }
+            }.InRamCocoon()
+            .OnBeforePatch(() => delegated = true)
+            .AsOnlyChanges((l,r) => l.IsContentEqual(r).IsTrue())
+            .Patch(_ => new
+            {
+                Name = "Bernd Checkson",
+                Atts = new Dictionary<string,string>()
+                {
+                    { "Age", "16" }
+                }
             });
         
         Assert.True(delegated);
