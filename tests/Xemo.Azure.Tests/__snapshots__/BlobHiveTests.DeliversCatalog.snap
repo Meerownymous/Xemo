@@ -1,0 +1,44 @@
+﻿{
+  "Clusters": [
+    {
+      "Name": "c586dc4amy-cluster-5nunfvbe",
+      "Blobs": [
+        {
+          "AzureBlobID": "313233",
+          "Tags": [
+            {
+              "Key": "ID",
+              "Value": "123"
+            },
+            {
+              "Key": "Name",
+              "Value": "my-name"
+            },
+            {
+              "Key": "_id",
+              "Value": "123"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "c586dc4avaults-1yhs6rwu",
+      "Blobs": [
+        {
+          "AzureBlobID": "6974732d616c6c2d6d792d7661756c742d",
+          "Tags": [
+            {
+              "Key": "MagicNumber",
+              "Value": "123"
+            },
+            {
+              "Key": "_id",
+              "Value": "its-all-my-vault-"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

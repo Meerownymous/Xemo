@@ -60,26 +60,43 @@ public sealed class BlobHive(
 
     public ICocoon<TContent> Vault<TContent>(string name)
     {
-        return new BlobCocoon<TContent>(
-            this.vaults.GetOrAdd(name, _ => 
-                this.vaultContainer.Value.GetBlobClient(new EncodedBlobName(name).Str())
-            )
-        );
-
+        ICocoon<TContent> result;
+        if (name == "__catalog")
+        {
+            result = new BlobCatalog<TContent>(blobService.Value);
+        }
+        else
+        {
+            result = new BlobCocoon<TContent>(
+                this.vaults.GetOrAdd(name, _ =>
+                    this.vaultContainer.Value.GetBlobClient(new EncodedBlobName(name).Str())
+                )
+            );
+        }
+        return result as ICocoon<TContent>;
     }
     
     public ICocoon<TContent> Vault<TContent>(string name, TContent defaultValue)
     {
-        return
-            new BlobCocoon<TContent>(
-                this.vaults.GetOrAdd(name, _ =>
-                {
-                    var blobClient = this.vaultContainer.Value.GetBlobClient(new EncodedBlobName(name).Str());
-                    Upload(blobClient, defaultValue);
-                    UpdateTags(blobClient, name, defaultValue);
-                    return blobClient;
-                })
-            );
+        ICocoon<TContent> result;
+        if (name == "__catalog")
+        {
+            result = new BlobCatalog<TContent>(blobService.Value);
+        }
+        else
+        {
+            result =
+                new BlobCocoon<TContent>(
+                    this.vaults.GetOrAdd(name, _ =>
+                    {
+                        var blobClient = this.vaultContainer.Value.GetBlobClient(new EncodedBlobName(name).Str());
+                        Upload(blobClient, defaultValue);
+                        UpdateTags(blobClient, name, defaultValue);
+                        return blobClient;
+                    })
+                );
+        }
+        return result;
     }
 
     public ICluster<TContent> Cluster<TContent>(string name)

@@ -25,3 +25,9 @@ public sealed class ReadOnlyCocoon<TContent>(ICocoon<TContent> origin, Func<TCon
 
     public async ValueTask Delete() => throw rejection(await origin.Grow(cnt => cnt));
 }
+
+public static class ReadOnlyCocoonSmarts
+{
+    public static ReadOnlyCocoon<TContent> AsReadOnly<TContent>(this ICocoon<TContent> cocoon) => 
+        new(cocoon);
+}
